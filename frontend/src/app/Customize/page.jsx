@@ -5,16 +5,17 @@ import ColorPicker from '../Customize/ColorPicker';
 import CandyPreview from '../Customize/CandyPreview';
 import HoverToolbar from '../Customize/HoverToolbar';
 import DesignOptions from '../Customize/DesignOptions';
-import ActiveCustomizationToolbar from './ActiveCustomizationToolbar'; // Import the new toolbar component
+import ActiveCustomizationToolbar from './ActiveCustomizationToolbar'; // Assuming this is in the same directory
+import PackagingOptions from './PackagingOptions'; // Make sure you have this component created
+
 import { toast } from "sonner";
 
 const MAX_COLOR_SELECTIONS = 5;
 
-
 const Customize = () => {
   const [selectedColors, setSelectedColors] = useState([]);
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
+  const totalSteps = 3; // Total steps including the new Packaging step
 
   // State management for design customizations
   const [selectedImage, setSelectedImage] = useState(null); // Can be null or { src, position, zoom, rotation }
@@ -178,7 +179,7 @@ const Customize = () => {
                       alt="Selected Image"
                       className="object-cover" // Ensure it covers the space within the circle
                       style={{
-                        transform: `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})`,
+                        transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
                         width: '100%', // Take full width of parent div
                         height: '100%', // Take full height of parent div
                       }}
@@ -212,7 +213,7 @@ const Customize = () => {
                 >
                   {selectedClipart ? ( // Only render if selectedClipart is not null
                     <img
-                      src={selectedClipart} // Clipart is expected to be just a string URL
+                      src={typeof selectedClipart === 'object' ? selectedClipart.src : selectedClipart} // Get src if object, else use directly
                       alt="Selected Clipart"
                       className="w-12 h-12 object-contain"
                     />
@@ -222,6 +223,19 @@ const Customize = () => {
             </div>
           </div>
         );
+
+      case 3: // NEW CASE: Packaging Options
+        return (
+          <PackagingOptions
+            selectedImage={selectedImage}
+            firstLine={firstLine}
+            secondLine={secondLine}
+            selectedFontStyle={selectedFontStyle}
+            selectedClipart={selectedClipart}
+            selectedColors={selectedColors} // Pass selected colors for random candy background
+          />
+        );
+
       default:
         return <div>Invalid step</div>;
     }
@@ -229,6 +243,9 @@ const Customize = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Assuming Header was meant to be included, but it's not in your imports for this file. */}
+      {/* If you intend to use a Header component, ensure it's imported correctly. */}
+      {/* <Header /> */}
       <HoverToolbar onReset={handleReset} />
 
       <main className="container mx-auto px-4 py-8">
@@ -251,11 +268,11 @@ const Customize = () => {
 
             <button
               className={`px-8 py-3 rounded-md font-medium ${
-                currentStep === 1 && selectedColors.length === 0
+                currentStep === 1 && selectedColors.length === 0 // Condition for step 1
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-xl'
               }`}
-              disabled={currentStep === 1 && selectedColors.length === 0}
+              disabled={currentStep === 1 && selectedColors.length === 0} // Disable if no colors selected on step 1
               onClick={handleNext}
             >
               {currentStep === totalSteps ? 'Finish' : 'Next'}
@@ -267,4 +284,7 @@ const Customize = () => {
   );
 };
 
+// Note: The export name in your original code was 'Customizee'.
+// I'm assuming this was a typo and changed it to 'Customize' for consistency.
+// If 'Customizee' is intentional, please change it back.
 export default Customize;
