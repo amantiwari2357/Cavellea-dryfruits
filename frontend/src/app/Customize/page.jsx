@@ -5,9 +5,11 @@ import ColorPicker from '../Customize/ColorPicker';
 import CandyPreview from '../Customize/CandyPreview';
 import HoverToolbar from '../Customize/HoverToolbar';
 import DesignOptions from '../Customize/DesignOptions';
+import ActiveCustomizationToolbar from './ActiveCustomizationToolbar'; // Import the new toolbar component
 import { toast } from "sonner";
 
 const MAX_COLOR_SELECTIONS = 5;
+
 
 const Customize = () => {
   const [selectedColors, setSelectedColors] = useState([]);
@@ -15,11 +17,14 @@ const Customize = () => {
   const totalSteps = 3;
 
   // State management for design customizations
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null); // Can be null or { src, position, zoom, rotation }
   const [firstLine, setFirstLine] = useState('');
   const [secondLine, setSecondLine] = useState('');
   const [selectedFontStyle, setSelectedFontStyle] = useState('Bold');
   const [selectedClipart, setSelectedClipart] = useState(null); // This is correctly separate
+
+  // NEW STATE: To track which customization is active for toolbar display
+  const [activeCustomization, setActiveCustomization] = useState(null); // Can be 'image', 'text', 'clipart', or null
 
   const handleColorSelection = (colors) => {
     setSelectedColors(colors);
@@ -49,7 +54,31 @@ const Customize = () => {
     setFirstLine(''); // Reset text
     setSecondLine(''); // Reset text
     setSelectedFontStyle('Bold'); // Reset font style
+    setActiveCustomization(null); // Reset active customization too
     toast.info("Customization reset");
+  };
+
+  // NEW HANDLERS for toolbar actions
+  const handleEditActiveCustomization = (type) => {
+    setActiveCustomization(type); // Set which type is active for editing in DesignOptions
+    // DesignOptions will use this 'activeCustomization' prop to determine which panel to open.
+  };
+
+  const handleRemoveActiveCustomization = (type) => {
+    if (type === 'image') {
+      setSelectedImage(null);
+    } else if (type === 'text') {
+      setFirstLine('');
+      setSecondLine('');
+    } else if (type === 'clipart') {
+      setSelectedClipart(null);
+    }
+    setActiveCustomization(null); // Clear active selection after removal
+    toast.info(`${type.charAt(0).toUpperCase() + type.slice(1)} removed.`);
+  };
+
+  const handleCancelActiveCustomization = () => {
+    setActiveCustomization(null); // Just close the toolbar, no change to customization data
   };
 
   // Render content based on current step
@@ -102,10 +131,17 @@ const Customize = () => {
             </div>
 
             {/* Design Options and Preview Circles */}
-            <div className="lg:col-span-2">
-              <div className="flex">
-                {/* Design options on the left */}
-                <div className="flex-grow">
+            <div className="lg:col-span-2 flex"> {/* Changed to flex to align sidebar and circles */}
+              {/* Design options or Active Customization Toolbar */}
+              <div className="flex-grow"> {/* Allows this div to take available space */}
+                {activeCustomization ? (
+                  <ActiveCustomizationToolbar
+                    activeType={activeCustomization}
+                    onEdit={handleEditActiveCustomization}
+                    onRemove={handleRemoveActiveCustomization}
+                    onCancel={handleCancelActiveCustomization}
+                  />
+                ) : (
                   <DesignOptions
                     onImageSelect={setSelectedImage}
                     onTextChange={(first, second) => {
@@ -116,48 +152,71 @@ const Customize = () => {
                     firstLine={firstLine}
                     secondLine={secondLine}
                     selectedFontStyle={selectedFontStyle}
-                    selectedImage={selectedImage}
+                    selectedImage={selectedImage} // Pass the processed image object
                     onClipartSelect={setSelectedClipart} // Pass the setter for clipart
+                    selectedClipart={selectedClipart} // Pass current selected clipart for highlighting
+                    onSelectOption={setActiveCustomization} // Pass callback for radio button selection
+                    currentSelectedOption={activeCustomization} // Pass current active option for radio button state
                   />
+                )}
+              </div>
+
+              {/* Preview circles on the right */}
+              <div className="flex flex-col space-y-10 items-center justify-center pl-14">
+                {/* Image preview circle */}
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+                    ${selectedImage ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}
+                    ${activeCustomization === 'image' ? 'ring-4 ring-blue-500' : ''}
+                  `}
+                  onClick={() => selectedImage && setActiveCustomization('image')} // Make clickable if image exists
+                >
+                  {selectedImage ? (
+                    <img
+                      // Use a style to apply transformations within the preview circle
+                      src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
+                      alt="Selected Image"
+                      className="object-cover" // Ensure it covers the space within the circle
+                      style={{
+                        transform: `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})`,
+                        width: '100%', // Take full width of parent div
+                        height: '100%', // Take full height of parent div
+                      }}
+                    />
+                  ) : null}
                 </div>
 
-                {/* Preview circles on the right */}
-                <div className="flex flex-col space-y-10 items-center justify-center pl-14">
-                  {/* Image preview circle */}
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${selectedImage ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}`}>
-                    {selectedImage ? (
-                      <img
-                        src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
-                        alt="Selected Image"
-                        className="w-12 h-12 object-contain"
-                      />
-                    ) : null}
-                  </div>
+                {/* Text preview circle */}
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer
+                    ${(firstLine || secondLine) ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}
+                    ${activeCustomization === 'text' ? 'ring-4 ring-orange-500' : ''}
+                  `}
+                  onClick={() => (firstLine || secondLine) && setActiveCustomization('text')} // Make clickable if text exists
+                >
+                  {(firstLine || secondLine) ? (
+                    <div className={`text-xs text-center leading-tight truncate w-10`} style={{ fontFamily: selectedFontStyle }}>
+                      {firstLine && <div>{firstLine}</div>}
+                      {secondLine && <div>{secondLine}</div>}
+                    </div>
+                  ) : null}
+                </div>
 
-                  {/* Text preview circle */}
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${(firstLine || secondLine) ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}`}>
-                    {(firstLine || secondLine) ? (
-                      <div className={`text-xs text-center leading-tight truncate w-10`}>
-                        {firstLine && <div>{firstLine}</div>}
-                        {secondLine && <div>{secondLine}</div>}
-                      </div>
-                    ) : null}
-                  </div>
-
-                  {/* Clipart preview circle - CORRECTED LOGIC */}
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                    selectedClipart
-                      ? 'border-2 border-black'
-                      : 'border border-gray-300 border-dashed'
-                  }`}>
-                    {selectedClipart ? ( // Only render if selectedClipart is not null
-                      <img
-                        src={typeof selectedClipart === 'object' ? selectedClipart.src : selectedClipart} // Get src if object, else use directly
-                        alt="Selected Clipart"
-                        className="w-12 h-12 object-contain"
-                      />
-                    ) : null}
-                  </div>
+                {/* Clipart preview circle */}
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+                    ${selectedClipart ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}
+                    ${activeCustomization === 'clipart' ? 'ring-4 ring-green-500' : ''}
+                  `}
+                  onClick={() => selectedClipart && setActiveCustomization('clipart')} // Make clickable if clipart exists
+                >
+                  {selectedClipart ? ( // Only render if selectedClipart is not null
+                    <img
+                      src={selectedClipart} // Clipart is expected to be just a string URL
+                      alt="Selected Clipart"
+                      className="w-12 h-12 object-contain"
+                    />
+                  ) : null}
                 </div>
               </div>
             </div>
