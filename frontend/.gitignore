@@ -1,0 +1,63 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Logs
+logs
+*.log
+logs/*.log
+logs/**/*.log
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Editor/IDE Specific
+.vscode/
+.idea/
+*.iml
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Compiled files
+dist/
+build/
+*.out
+*.o
+*.pyc
+*.class
+
+# Python virtual environment
+venv/
+__pycache__/
+
+# Java dependencies
+target/
+*.jar
+*.war
+*.ear
+
+# React & Next.js build files
+.next/
+out/
+.cache/
+
+# Database & system files
+*.sqlite
+*.db
+
+# Misc
+*.swp
+*.swo
+*.bak
+*.tmp
+coverage/
+.vercel

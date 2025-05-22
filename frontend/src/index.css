@@ -1,0 +1,162 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Titan+One&display=swap');
+
+@layer base {
+  :root {
+    --background: 30 33% 98%;
+    --foreground: 25 10% 15%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 45 100% 50%;
+    --primary-foreground: 0 0% 0%;
+
+    --secondary: 330 100% 70%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 15 80% 50%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 1.5rem;
+    
+    /* Custom variables for sidebar and layout */
+    --sidebar-bg-color: #ffffff;
+    --option-bg-color: #f0f2f5;
+    --option-card-bg-color: white;
+    --option-card-border: 1px solid #f0f0f0;
+    --sidebar-border-color: #ececec;
+    --sidebar-icon-color: #545758;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: inherit;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    font-family: -apple-system, "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 1rem;
+    font-weight: 300;
+    word-break: break-word;
+    margin: 0;
+    color: rgba(0, 0, 0, 0.87);
+    background-color: #fff;
+  }
+  
+  h1, h2, h3, h4 {
+    font-family: 'Titan One', cursive;
+  }
+}
+
+.candy-button {
+  @apply px-6 py-2 rounded-full font-bold transition-all duration-200 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.primary-button {
+  @apply candy-button bg-candy-yellow text-black border-2 border-black hover:shadow-lg;
+}
+
+.secondary-button {
+  @apply candy-button bg-white text-black border-2 border-black hover:shadow-lg;
+}
+
+.progress-step {
+  @apply w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300;
+}
+
+.step-active {
+  @apply bg-candy-green text-white;
+}
+
+.step-completed {
+  @apply bg-candy-green text-white;
+}
+
+.step-inactive {
+  @apply bg-gray-200 text-gray-500;
+}
+
+.candy-preview {
+  @apply w-16 h-16 rounded-full shadow-md transition-all duration-300 hover:shadow-lg cursor-pointer;
+}
+
+/* New styles based on provided CSS */
+.content-container {
+  overflow: hidden;
+  flex: 1 1 auto;
+  margin-top: 13.625rem;
+  padding-top: -7.625rem;
+  pointer-events: none;
+}
+
+.sidebar-container {
+  display: flex;
+  flex: 1 1 auto;
+  position: relative;
+  width: 93%;
+}
+
+.bg-light {
+  background-color: #f3f6fa;
+  border-radius: inherit;
+  color: #040607;
+  height: 100%;
+}
+
+.bg-white-custom {
+  background-color: #ffffff;
+  border-radius: inherit;
+  color: #040607;
+  height: 100%;
+}
+
+.color-option {
+  @apply w-12 h-12 rounded-full transition-all duration-200 flex items-center justify-center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.color-option:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.color-option-selected {
+  @apply ring-2 ring-black scale-105;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  padding: 1rem;
+}
