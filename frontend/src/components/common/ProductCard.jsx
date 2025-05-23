@@ -3,7 +3,7 @@ import React from "react";
 import Rating from "../ui/Rating";
 import Image from "next/image";
 import Link from "next/link";
-import { Product } from "@/types/product.types";
+// import { Product } from "@/types/product.types";
 
 import PropTypes from "prop-types";
 
@@ -66,7 +66,7 @@ const ProductCard = ({ data }) => {
         )}
         {data.discount.percentage > 0 ? (
           <span className="font-medium text-[10px] xl:text-xs py-1.5 px-3.5 rounded-full bg-[#FF3333]/10 text-[#FF3333]">
-            {`-${data.discount.percentage}%`}
+            {`-$${data.discount.percentage}%`}
           </span>
         ) : (
           data.discount.amount > 0 && (

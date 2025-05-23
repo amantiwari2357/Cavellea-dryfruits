@@ -98,7 +98,7 @@ const ProductCard = ({ data }) => {
             )}
             {data.discount.percentage > 0 ? (
               <span className="font-medium text-[10px] xl:text-xs py-1.5 px-3.5 rounded-full bg-[#FF3333]/10 text-[#FF3333]">
-                {`-${data.discount.percentage}%`}
+                {`-$${data.discount.percentage}%`}
               </span>
             ) : (
               data.discount.amount > 0 && (

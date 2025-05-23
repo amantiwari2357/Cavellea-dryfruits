@@ -3,7 +3,7 @@ import Rating from "../ui/Rating";
 import { IoEllipsisHorizontal } from "react-icons/io5";
 import Button from "@/components/ui/button";
 import { IoIosCheckmarkCircle } from "react-icons/io";
-import { Review } from "@/types/review.types";
+// import { Review } from "@/types/review.types";
 import { cn } from "@/lib/utils";
 
 // PropTypes will be used for prop validation below
