@@ -16,7 +16,7 @@ const OrderPage = () => {
       brand: "NutriDelight",
       size: "500g",
       quantity: 2,
-      price: "$20",
+      price: "₹20",
       status: "Ready for Delivery",
       expectedDelivery: "15th March 2025",
       timeline: [
@@ -31,7 +31,7 @@ const OrderPage = () => {
       brand: "California Dates",
       size: "100g",
       quantity: 1,
-      price: "$20",
+      price: "₹20",
       status: "Ready for Delivery",
       expectedDelivery: "18th March 2025",
       timeline: [
