@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+
 import { toast } from "sonner";
 
 const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLine, secondLine, selectedFontStyle }) => {
