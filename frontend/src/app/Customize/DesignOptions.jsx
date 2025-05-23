@@ -294,7 +294,7 @@ const DesignOptions = ({
         </div>
       </RadioGroup>
 
-      {/* Text Fields Panel */}
+      {/* /* Text Fields Panel */ }
       {showTextFields && (
         <div className="mt-6 p-4 border rounded-md shadow-md">
           <h4 className="text-lg font-bold mb-4">Add Your Text</h4>
@@ -356,8 +356,67 @@ const DesignOptions = ({
 
       {/* Image Upload Panel */}
       {showImageUpload && (
-        <div className="mt-6 p-4 border rounded-md shadow-md">
-          <h4 className="text-lg font-bold mb-4">Upload Image</h4>
+        <div className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4">
+          <h4 className="text-lg font-bold">Choose an Image</h4>
+          <p className="text-sm text-gray-700">• First image upload is <strong>FREE</strong>.</p>
+          <p className="text-sm text-gray-700">• Add a second image for <strong>$4.99</strong>.</p>
+
+      <div className="flex flex-col items-center mt-4">
+            <img
+              src="/images/convert.jpeg"
+              alt="Selected"
+              className="max-h-20 object-contain"
+            />
+            <p className="text-xs text-gray-500 mt-2 text-center">
+              Your image will be printed in black.
+            </p>
+          </div>
+
+          {/* Best Friend: Three Images in a Row */}
+          <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
+          <div className="flex flex-row items-center justify-center gap-4">
+            <div className="flex flex-col items-center">
+              <img
+                src="/images/print.png"
+                alt="Best Friend 1"
+                className="max-h-20 object-contain rounded-md"
+              />
+              <p className="text-xs text-gray-500 mt-1 text-center">1-2 faces</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <img
+                src="/images/print1.png"
+                alt="Best Friend 2"
+                className="max-h-20 object-contain rounded-md"
+              />
+              <p className="text-xs text-gray-500 mt-1 text-center">face forward</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <img
+                src="/images/print2.png"
+                alt="Best Friend 3"
+                className="max-h-20 object-contain rounded-md"
+              />
+              <p className="text-xs text-gray-500 mt-1 text-center">crop to show face only</p>
+            </div>
+          </div>
+
+      
+          <div className="mt-6">
+            <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
+            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+              <li>Upload a high-quality <code>.jpg</code>, <code>.jpeg</code>, or <code>.png</code> file (15MB max).</li>
+              <li>Backgrounds will be removed, and the photo will be printed in black.</li>
+              <li>Only 1–2 faces cheek-to-cheek are allowed. Close cropping to faces gives the best results. Arms, legs, or full body can't be included.</li>
+              <li>
+                We can’t reproduce copyrighted or trademarked images/logos unless legal permission is provided.
+                For logo printing inquiries, please contact our Business Consultants directly.
+              </li>
+              <li>First image upload is <strong>FREE</strong>. Add a second image for <strong>$4.99</strong>.</li>
+            </ul>
+          </div>
+
+          <hr className="mt-4 border-gray-300" />
 
           {/* This preview should show the currently selected image, not the one being edited */}
           {selectedImage && !showImageEditor && ( // Only show if an image is already selected AND editor is not active
@@ -383,39 +442,40 @@ const DesignOptions = ({
             </label>
           </div>
 
-          <div className="flex justify-between">
-            <button
-              onClick={() => {
-                onImageSelect(null); // Clear selected image
-                setEditingImage(null); // Clear image in editor
-                setShowImageUpload(false);
-                setSelectedOption("none"); // Set to none if image is cancelled
-              }}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
-            >
-              Clear Image
-            </button>
+          <div className="flex justify-between gap-x-4">
+  <button
+    onClick={() => {
+      onImageSelect(null); // Clear selected image
+      setEditingImage(null); // Clear image in editor
+      setShowImageUpload(false);
+      setSelectedOption("none"); // Set to none if image is cancelled
+    }}
+    className="w-40 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+  >
+    Clear Image
+  </button>
 
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
+  <input
+    type="file"
+    ref={fileInputRef}
+    onChange={handleFileChange}
+    accept="image/*"
+    className="hidden"
+  />
 
-            <button
-              onClick={handleUploadClick}
-              disabled={!agreeTerms}
-              className={`px-4 py-2 rounded-md ${
-                agreeTerms
-                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              } transition-colors`}
-            >
-              Upload New Image
-            </button>
-          </div>
+  <button
+    onClick={handleUploadClick}
+    disabled={!agreeTerms}
+    className={`w-40 px-4 py-2 rounded-md ${
+      agreeTerms
+        ? "bg-yellow-400 text-black hover:bg-yellow-500"
+        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+    } transition-colors`}
+  >
+    Upload New Image
+  </button>
+</div>
+
         </div>
       )}
 

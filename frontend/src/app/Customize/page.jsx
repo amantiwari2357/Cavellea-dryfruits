@@ -89,8 +89,8 @@ const Customize = () => {
         return (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 ">
             <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-4xl font-bold mb-4">choose up to three colors</h2>
-              <p className="text-gray-600 mb-6">Light colors print best.<br />Click color again to remove it.</p>
+              {/* <h2 className="text-4xl font-bold mb-4">choose up to three colors</h2> */}
+              <p className="text-gray-600 mb-6 text-center">Light colors print best Click color again to remove it.</p>
 
               {/* CandyPreview component here */}
               <CandyPreview
@@ -117,8 +117,8 @@ const Customize = () => {
         return (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-4xl font-bold mb-6">preview your design</h2>
-              <p className="text-gray-600 mb-6">See how your customizations will look on the candies.</p>
+              {/* <h2 className="text-4xl font-bold mb-6">preview your design</h2> */}
+              <p className="text-gray-600 mb-6 text-center">See how your customizations will look on the candies.</p>
 
               {/* CandyPreview component here */}
               <CandyPreview

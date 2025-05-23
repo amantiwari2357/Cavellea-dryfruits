@@ -10,17 +10,17 @@ import { integralCF } from "@/styles/fonts";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
 } from "@/components/ui/dialog";
 
 const Header = () => {
   const [showContinueDialog, setShowContinueDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const handlePersonalize = () => {
@@ -30,13 +30,15 @@ const Header = () => {
   const handleStartOver = () => {
     setShowContinueDialog(false);
     router.push("/Customize");
-    // Reset form data logic can go here
   };
 
   const handleContinue = () => {
-    setShowContinueDialog(false);
-    router.push("/Customize");
-    // Load previous data logic can go here
+    setLoading(true);
+    setTimeout(() => {
+      setShowContinueDialog(false);
+      setLoading(false);
+      router.push("/Customize");
+    }, 2000);
   };
 
   return (
@@ -190,11 +192,32 @@ const Header = () => {
             </button>
             <button
               onClick={handleContinue}
-              className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-2 rounded-full font-medium transition-colors"
+              disabled={loading}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-2 rounded-full font-medium transition-colors flex items-center justify-center gap-2"
             >
-              <div className="relative">
-                yes
-                <span className="absolute -right-4 -top-2">
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-black"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                  />
+                </svg>
+              ) : (
+                <>
+                  yes
                   <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
                     <path
                       d="M8 12.5L11 15.5L16 9.5"
@@ -204,8 +227,8 @@ const Header = () => {
                       strokeLinejoin="round"
                     />
                   </svg>
-                </span>
-              </div>
+                </>
+              )}
             </button>
           </DialogFooter>
         </DialogContent>
