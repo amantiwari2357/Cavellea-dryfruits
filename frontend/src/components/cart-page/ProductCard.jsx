@@ -79,7 +79,7 @@ const ProductCard = ({ data }) => {
               </span>
             ) : data.discount.amount > 0 ? (
               <span className="font-bold text-black text-xl xl:text-2xl">
-                {`$${data.price - data.discount.amount}`}
+                {`₹${data.price - data.discount.amount}`}
               </span>
             ) : (
               <span className="font-bold text-black text-xl xl:text-2xl">
