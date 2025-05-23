@@ -19,27 +19,31 @@ import {
 } from "@/components/ui/dialog";
 
 const Header = () => {
-  const [showContinueDialog, setShowContinueDialog] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [showContinueDialog, setShowContinueDialog] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handlePersonalize = () => {
-    setShowContinueDialog(true);
-  };
+  // const handlePersonalize = () => {
+  //   setShowContinueDialog(true);
+  // };
+  
+const handlePersonalize = () => {
+  router.push('/Customize'); // Make sure Customize.jsx is in `pages/`
+};
 
-  const handleStartOver = () => {
-    setShowContinueDialog(false);
-    router.push("/Customize");
-  };
+  // const handleStartOver = () => {
+  //   setShowContinueDialog(false);
+  //   router.push("/Customize");
+  // };
 
-  const handleContinue = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setShowContinueDialog(false);
-      setLoading(false);
-      router.push("/Customize");
-    }, 2000);
-  };
+  // const handleContinue = () => {
+  //   setLoading(true);
+  //   setTimeout(() => {
+  //     setShowContinueDialog(false);
+  //     setLoading(false);
+  //     router.push("/Customize");
+  //   }, 2000);
+  // };
 
   return (
     <header className="bg-[#F2F0F1] pt-10 md:pt-24 overflow-hidden">
@@ -176,7 +180,7 @@ const Header = () => {
       </div>
 
       {/* Dialog */}
-      <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
+      {/* <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">
@@ -232,7 +236,7 @@ const Header = () => {
             </button>
           </DialogFooter>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </header>
   );
 };

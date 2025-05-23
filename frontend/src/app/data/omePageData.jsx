@@ -1,6 +1,6 @@
 // src/data/homePageData.ts
-import { Product } from "@/types/product.types";
-import { Review } from "@/types/review.types";
+// import { Product } from "@/types/product.types";
+// import { Review } from "@/types/review.types";
 
 export const newArrivalsData = [
   {

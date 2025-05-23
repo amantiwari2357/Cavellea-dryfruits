@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useRef, useEffect } from 'react';
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+// import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ImageIcon, TypeIcon, Palette, MoveHorizontal, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
+import clipartdata from "@/app/data/clipartData"
 const DesignOptions = ({
   onImageSelect,
   onTextChange,
@@ -13,8 +13,8 @@ const DesignOptions = ({
   firstLine,
   secondLine,
   selectedFontStyle,
-  selectedImage, // This is the processed image from CandyPreview
-  onClipartSelect // <-- NEW PROP: Function to update selectedClipart in parent
+  selectedImage: parentSelectedImage,
+  onClipartSelect
 }) => {
   const [showTextFields, setShowTextFields] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
@@ -30,17 +30,15 @@ const DesignOptions = ({
   const [tempSecondLine, setTempSecondLine] = useState(secondLine);
   const [tempFontStyle, setTempFontStyle] = useState(selectedFontStyle);
 
-  // Image editing state
   const [showImageEditor, setShowImageEditor] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
-  const [editingImage, setEditingImage] = useState(null); // This holds the raw uploaded image dataURL for editing
+  const [editingImage, setEditingImage] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [imageZoom, setImageZoom] = useState(100); // Range 50-150
-  const [imageRotation, setImageRotation] = useState(0); // Range 0-360
+  const [imageZoom, setImageZoom] = useState(100); 
+  const [imageRotation, setImageRotation] = useState(0);
 
-  // Selected design option (radio button)
-  const [selectedOption, setSelectedOption] = useState("none"); // none, image, text, clipart
+  const [selectedOption, setSelectedOption] = useState("none");
 
   const fontStyles = [
     "Bold",
@@ -51,40 +49,23 @@ const DesignOptions = ({
     "Monospace",
   ];
 
-  // Sample cliparts
-  const allCliparts = [
-    { src: '/images/cliparts1.avif', alt: 'Graduation Cap', category: 'Graduation' },
-    { src: '/images/cliparts2.avif', alt: 'Class of 2024', category: 'Graduation' },
-    { src: '/images/cliparts3.avif', alt: 'Star', category: 'Birthday' },
-    { src: '/images/cliparts4.avif', alt: 'Heart', category: 'Wedding' },
-    { src: '/images/cliparts5.avif', alt: 'Tree', category: 'Holiday' },
-    { src: '/images/cliparts6.avif', alt: 'Cake', category: 'Birthday' },
-    { src: '/images/cliparts7.avif', alt: 'Wedding Ring', category: 'Wedding' },
-    { src: '/images/cliparts8.avif', alt: 'Gift Box', category: 'Holiday' },
-    { src: '/images/cliparts9.avif', alt: 'Graduation Cap', category: 'Graduation' },
-    { src: '/images/cliparts10.avif', alt: 'Graduation Cap', category: 'Graduation' },
-    { src: '/images/cliparts11.avif', alt: 'Graduation Cap', category: 'Graduation' },
-    { src: '/images/cliparts12.avif', alt: 'Graduation Cap', category: 'Graduation' },
-    { src: '/images/cliparts13.avif', alt: 'Graduation Cap', category: 'Graduation' },
-    { src: '/images/cliparts14.avif', alt: 'Graduation Cap', category: 'Graduation' },
-  ];
+  const allCliparts = clipartdata;
 
   const filteredCliparts = allCliparts.filter(
     clipart =>
       (selectedCategory === 'All' || clipart.category === selectedCategory) &&
-      clipart.alt.toLowerCase().includes(searchTerm.toLowerCase())
+      (clipart.alt && clipart.alt.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files && e.target.files.length > 0 ? e.target.files[0] : null;
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const imageUrl = event.target.result;
-        setEditingImage(imageUrl); // Set the image for the editor
-        setShowImageEditor(true); // Show the editor
-        setShowImageUpload(false); // Hide the upload panel
-        // Reset image transformation values for new image
+        setEditingImage(imageUrl);
+        setShowImageEditor(true);
+        setShowImageUpload(false);
         setImagePosition({ x: 0, y: 0 });
         setImageZoom(100);
         setImageRotation(0);
@@ -96,6 +77,8 @@ const DesignOptions = ({
   const handleUploadClick = () => {
     if (agreeTerms) {
       fileInputRef.current.click();
+    } else {
+      toast.error("Please agree to the terms and conditions to upload an image.");
     }
   };
 
@@ -103,42 +86,31 @@ const DesignOptions = ({
     onTextChange(tempFirstLine, tempSecondLine);
     onFontStyleChange(tempFontStyle);
     setShowTextFields(false);
-    // No need to change selectedOption here, as text can coexist with image/clipart
   };
 
   const handleClipartSelect = (src) => {
-    // Pass the selected clipart URL up to the parent
-    onClipartSelect(src); // <-- CORRECTED: Use onClipartSelect
+    onClipartSelect(src);
     setShowClipartPanel(false);
-    // Don't set selectedOption to "clipart" here if you want multiple active selections.
-    // The radio button merely *opens* the clipart panel, not dictates its exclusivity.
   };
 
-  // Handle option selection for panel display
   const handleOptionSelect = (value) => {
-    // Only update selectedOption if it's not "none"
     setSelectedOption(value);
-
-    // Reset all panels (hide all before showing the selected one)
     setShowTextFields(false);
     setShowImageUpload(false);
     setShowClipartPanel(false);
-    setShowImageEditor(false); // Ensure editor also closes
+    setShowImageEditor(false);
 
     // Open the corresponding panel
     if (value === "image") {
-      setShowImageUpload(true);
       // If an image is already selected and processed, potentially show editor
-      // This is a design choice: re-edit or re-upload?
-      // For now, it re-opens upload panel. If you want to re-edit, you'd need to
-      // check if 'selectedImage' has data and jump to editor.
-      if (selectedImage) { // If there's an already selected image from parent state
-        setEditingImage(selectedImage.src); // Load it into editor
-        setImagePosition(selectedImage.position || { x: 0, y: 0 });
-        setImageZoom(selectedImage.zoom || 100);
-        setImageRotation(selectedImage.rotation || 0);
+      if (parentSelectedImage && parentSelectedImage.src) { // Check if there's an already selected image from parent state
+        setEditingImage(parentSelectedImage.src); // Load it into editor
+        setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
+        setImageZoom(parentSelectedImage.zoom || 100);
+        setImageRotation(parentSelectedImage.rotation || 0);
         setShowImageEditor(true);
-        setShowImageUpload(false); // Hide upload panel if editor is shown
+      } else {
+        setShowImageUpload(true); // Otherwise, show upload panel
       }
     } else if (value === "text") {
       setShowTextFields(true);
@@ -165,30 +137,18 @@ const DesignOptions = ({
     if (!container || !imageRef.current) return;
 
     const containerRect = container.getBoundingClientRect();
+    const imageRect = imageRef.current.getBoundingClientRect();
 
-    // Get the image's transformed size (considering zoom)
-    const originalImage = new Image();
-    originalImage.src = editingImage; // Use the raw image for actual dimensions
-    const currentImageWidth = originalImage.width * (imageZoom / 100);
-    const currentImageHeight = originalImage.height * (imageZoom / 100);
-
-
-    // Calculate new position relative to the container
     let newX = e.clientX - dragStart.x;
     let newY = e.clientY - dragStart.y;
 
-    // Limit the drag area to the container boundaries, considering current image size
-    // Note: This calculation needs to be more robust if the image can be larger than the container after zoom
-    // For simplicity, let's assume the image is scaled to fit initially, or we adjust boundaries.
-    // The current clamp might not be perfect for highly zoomed images.
-    const imageDisplayWidth = imageRef.current.clientWidth;
-    const imageDisplayHeight = imageRef.current.clientHeight;
+    // Clamp the image position within the container bounds
+    // This is a simplified clamping and might need refinement for complex rotations/zooms
+    const maxX = (containerRect.width - imageRect.width) / 2;
+    const maxY = (containerRect.height - imageRect.height) / 2;
 
-    const limitX = (containerRect.width - imageDisplayWidth) / 2;
-    const limitY = (containerRect.height - imageDisplayHeight) / 2;
-
-    newX = Math.max(-limitX, Math.min(newX, limitX));
-    newY = Math.max(-limitY, Math.min(newY, limitY));
+    newX = Math.max(-maxX, Math.min(newX, maxX));
+    newY = Math.max(-maxY, Math.min(newY, maxY));
 
     setImagePosition({ x: newX, y: newY });
   };
@@ -212,17 +172,18 @@ const DesignOptions = ({
   }, [isDragging, dragStart, imagePosition, imageZoom, imageRotation, editingImage]); // Added dependencies
 
   const handleImageConfirm = () => {
-    // Pass the edited image with transformation data
+    // When confirming, pass all transformation data to the parent
+    // The parent (CandyPreview) will be responsible for applying these styles
+    // and ensuring the image is displayed as a circle using CSS.
     onImageSelect({
-      src: editingImage, // The base image URL
+      src: editingImage,
       position: imagePosition,
       zoom: imageZoom,
-      rotation: imageRotation
+      rotation: imageRotation,
+      isCircular: true // Indicate that it should be displayed as a circle
     });
     setShowImageEditor(false);
     toast.success("Image has been added to your candy design!");
-    // Do NOT change selectedOption to "image" here if you want multiple active selections.
-    // The radio button merely *opened* the image editor, it doesn't dictate its exclusivity.
   };
 
   const handleResetImageEdits = () => {
@@ -236,10 +197,6 @@ const DesignOptions = ({
       <h2 className="text-3xl font-bold mb-6 text-center">Design Your Candy</h2>
       <p className="text-gray-600 mb-8 text-center">Choose your design option below</p>
 
-      {/* Design options as radio group */}
-      {/* The radio group here is primarily for *showing/hiding the panels*,
-          not for making the selected customization type exclusive.
-          The parent component (`Customize`) manages which types are active. */}
       <RadioGroup value={selectedOption} onValueChange={handleOptionSelect} className="flex flex-col space-y-5">
         {/* Image Option */}
         <div className={`flex items-center space-x-3 p-3 rounded-lg ${selectedOption === "image" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"}`}>
@@ -251,7 +208,7 @@ const DesignOptions = ({
             <div>
               <label htmlFor="option-image" className="text-lg font-semibold cursor-pointer">Image</label>
               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
-              {selectedImage && <p className="text-xs text-gray-500 mt-1">Image selected</p>}
+              {parentSelectedImage && <p className="text-xs text-gray-500 mt-1">Image selected</p>}
             </div>
           </div>
         </div>
@@ -281,8 +238,7 @@ const DesignOptions = ({
             <div>
               <label htmlFor="option-clipart" className="text-lg font-semibold cursor-pointer">Clipart</label>
               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
-              {/* Add a check for selectedClipart if you want a similar indicator */}
-              {/* Assuming selectedClipart is passed down as a prop */}
+              {/* Assuming onClipartSelect is passed and used by parent to manage selectedClipart */}
               {onClipartSelect && <p className="text-xs text-gray-500 mt-1">Clipart selected</p>}
             </div>
           </div>
@@ -294,7 +250,7 @@ const DesignOptions = ({
         </div>
       </RadioGroup>
 
-      {/* /* Text Fields Panel */ }
+      {/* Text Fields Panel */}
       {showTextFields && (
         <div className="mt-6 p-4 border rounded-md shadow-md">
           <h4 className="text-lg font-bold mb-4">Add Your Text</h4>
@@ -358,27 +314,26 @@ const DesignOptions = ({
       {showImageUpload && (
         <div className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4">
           <h4 className="text-lg font-bold">Choose an Image</h4>
-          <p className="text-sm text-gray-700">• First image upload is <strong>FREE</strong>.</p>
-          <p className="text-sm text-gray-700">• Add a second image for <strong>$4.99</strong>.</p>
+          <p className="text-sm text-gray-700">• First image upload is FREE.</p>
+          {/* <p className="text-sm text-gray-700">• Add a second image for $4.99.</p> */}
 
-      <div className="flex flex-col items-center mt-4">
+          <div className="flex flex-col items-center mt-4">
             <img
               src="/images/convert.jpeg"
-              alt="Selected"
-              className="max-h-20 object-contain"
+              alt="Conversion Example"
+              className="max-h-20 object-contain w-full"
             />
             <p className="text-xs text-gray-500 mt-2 text-center">
               Your image will be printed in black.
             </p>
           </div>
-
           {/* Best Friend: Three Images in a Row */}
           <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
           <div className="flex flex-row items-center justify-center gap-4">
             <div className="flex flex-col items-center">
               <img
                 src="/images/print.png"
-                alt="Best Friend 1"
+                alt="Best Result Example 1"
                 className="max-h-20 object-contain rounded-md"
               />
               <p className="text-xs text-gray-500 mt-1 text-center">1-2 faces</p>
@@ -386,7 +341,7 @@ const DesignOptions = ({
             <div className="flex flex-col items-center">
               <img
                 src="/images/print1.png"
-                alt="Best Friend 2"
+                alt="Best Result Example 2"
                 className="max-h-20 object-contain rounded-md"
               />
               <p className="text-xs text-gray-500 mt-1 text-center">face forward</p>
@@ -394,37 +349,38 @@ const DesignOptions = ({
             <div className="flex flex-col items-center">
               <img
                 src="/images/print2.png"
-                alt="Best Friend 3"
+                alt="Best Result Example 3"
                 className="max-h-20 object-contain rounded-md"
               />
               <p className="text-xs text-gray-500 mt-1 text-center">crop to show face only</p>
             </div>
           </div>
 
-      
           <div className="mt-6">
             <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
             <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-              <li>Upload a high-quality <code>.jpg</code>, <code>.jpeg</code>, or <code>.png</code> file (15MB max).</li>
+              <li>Upload a high-quality .jpg, .jpeg, or .png file (15MB max).</li>
               <li>Backgrounds will be removed, and the photo will be printed in black.</li>
-              <li>Only 1–2 faces cheek-to-cheek are allowed. Close cropping to faces gives the best results. Arms, legs, or full body can't be included.</li>
+              <li>Only 1–2 faces cheek-to-cheek are allowed. Close cropping to faces gives the 
+                best results. Arms, legs, or full body can't be included.</li>
               <li>
                 We can’t reproduce copyrighted or trademarked images/logos unless legal permission is provided.
                 For logo printing inquiries, please contact our Business Consultants directly.
               </li>
-              <li>First image upload is <strong>FREE</strong>. Add a second image for <strong>$4.99</strong>.</li>
+               {/* <li>First image upload is FREE. Add a second image for $4.99.</li> */}
             </ul>
           </div>
 
           <hr className="mt-4 border-gray-300" />
 
           {/* This preview should show the currently selected image, not the one being edited */}
-          {selectedImage && !showImageEditor && ( // Only show if an image is already selected AND editor is not active
+          {parentSelectedImage && !showImageEditor && ( // Only show if an image is already selected AND editor is not active
             <div className="mb-4">
               <img
-                src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
+                src={typeof parentSelectedImage === 'object' ? parentSelectedImage.src : parentSelectedImage}
                 alt="Previously Selected"
-                className="max-h-40 mx-auto object-contain"
+                className="max-h-40 mx-auto object-contain rounded-full"
+                style={{ borderRadius: '50%' }} // Apply circular style for preview
               />
               <p className="text-xs text-gray-500 text-center mt-2">Currently selected image</p>
             </div>
@@ -443,38 +399,38 @@ const DesignOptions = ({
           </div>
 
           <div className="flex justify-between gap-x-4">
-  <button
-    onClick={() => {
-      onImageSelect(null); // Clear selected image
-      setEditingImage(null); // Clear image in editor
-      setShowImageUpload(false);
-      setSelectedOption("none"); // Set to none if image is cancelled
-    }}
-    className="w-40 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
-  >
-    Clear Image
-  </button>
+            <button
+              onClick={() => {
+                onImageSelect(null); // Clear selected image
+                setEditingImage(null); // Clear image in editor
+                setShowImageUpload(false);
+                setSelectedOption("none"); // Set to none if image is cancelled
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+            >
+              Clear Image
+            </button>
 
-  <input
-    type="file"
-    ref={fileInputRef}
-    onChange={handleFileChange}
-    accept="image/*"
-    className="hidden"
-  />
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/*"
+              className="hidden"
+            />
 
-  <button
-    onClick={handleUploadClick}
-    disabled={!agreeTerms}
-    className={`w-40 px-4 py-2 rounded-md ${
-      agreeTerms
-        ? "bg-yellow-400 text-black hover:bg-yellow-500"
-        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-    } transition-colors`}
-  >
-    Upload New Image
-  </button>
-</div>
+            <button
+              onClick={handleUploadClick}
+              disabled={!agreeTerms}
+              className={`w-full px-4 py-2 rounded-md ${
+                agreeTerms
+                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+              } transition-colors`}
+            >
+              Upload New Image
+            </button>
+          </div>
 
         </div>
       )}
@@ -487,8 +443,6 @@ const DesignOptions = ({
             <button
               onClick={() => {
                 setShowClipartPanel(false);
-                // Optionally set selectedOption to "none" if no clipart is selected yet
-                // if (!onClipartSelect) setSelectedOption("none"); // This logic depends on desired UX
               }}
               className="text-gray-500 hover:text-black"
             >
@@ -526,8 +480,8 @@ const DesignOptions = ({
                 key={index}
                 onClick={() => handleClipartSelect(clipart.src)}
                 className={`cursor-pointer p-1 rounded-md ${
-                  // Corrected: Check against selectedClipart (passed from parent)
-                  selectedImage && typeof selectedImage === 'string' && selectedImage === clipart.src // Assuming selectedImage (which could be clipart.src now) is a string
+                  // Check if this clipart is the currently selected one (assuming parentSelectedImage could be a clipart src)
+                  parentSelectedImage && typeof parentSelectedImage === 'string' && parentSelectedImage === clipart.src
                     ? "ring-2 ring-yellow-500"
                     : ""
                 }`}
@@ -558,11 +512,15 @@ const DesignOptions = ({
                   ref={imageRef}
                   src={editingImage}
                   alt="Editing"
-                  className="object-cover cursor-move"
+                  className="object-cover cursor-move w-full h-full" // Ensure image fills its container
                   style={{
                     transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
                     transition: isDragging ? 'none' : 'transform 0.2s ease',
                     cursor: isDragging ? 'grabbing' : 'grab',
+                    minWidth: `${imageZoom}%`, // Helps with initial sizing for zoom effect
+                    minHeight: `${imageZoom}%`,
+                    maxWidth: `${imageZoom}%`,
+                    maxHeight: `${imageZoom}%`,
                   }}
                   onMouseDown={handleMouseDown}
                 />
@@ -586,7 +544,7 @@ const DesignOptions = ({
                   <Slider
                     value={[imageZoom]}
                     min={50}
-                    max={150}
+                    max={200} // Increased max zoom for more flexibility
                     step={1}
                     onValueChange={(value) => setImageZoom(value[0])}
                     className="flex-1"
