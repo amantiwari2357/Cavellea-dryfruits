@@ -243,9 +243,6 @@ const Customize = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Assuming Header was meant to be included, but it's not in your imports for this file. */}
-      {/* If you intend to use a Header component, ensure it's imported correctly. */}
-      {/* <Header /> */}
       <HoverToolbar onReset={handleReset} />
 
       <main className="container mx-auto px-4 py-8">
@@ -283,8 +280,4 @@ const Customize = () => {
     </div>
   );
 };
-
-// Note: The export name in your original code was 'Customizee'.
-// I'm assuming this was a typo and changed it to 'Customize' for consistency.
-// If 'Customizee' is intentional, please change it back.
 export default Customize;

@@ -117,7 +117,7 @@ const DesignOptions = ({
     } else if (value === "clipart") {
       setShowClipartPanel(true);
     }
-  };
+  };  
 
   // Mouse event handlers for image dragging
   const handleMouseDown = (e) => {

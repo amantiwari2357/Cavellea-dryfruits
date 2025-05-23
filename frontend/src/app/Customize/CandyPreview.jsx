@@ -197,16 +197,13 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
     return typeof selectedclipart === 'object' ? selectedclipart.src : selectedclipart;
   };
 
-  // Get image/clipart style transformations
-  // This function is now generalized for both image and clipart
+
   const getMediaStyle = (mediaObject) => {
     if (!mediaObject) return {};
 
     const baseStyle = {
       maxWidth: '70%',
       maxHeight: '70%',
-      // You might want to consider applying filter for dark colors here if needed for clipart too
-      // filter: isDark ? 'brightness(0) invert(1)' : 'brightness(0)',
     };
 
     // Add transform style if the media has transformation data
@@ -267,14 +264,14 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
 
                   {/* Render Image */}
                   {candy.contentType === 'image' && hasImage && (
-                    <div className="w-full h-full flex items-center justify-center">
+                    // <div className="w-36 h-24 rounded-full overflow-hidden flex items-center justify-center cursor-pointer border-2 border-red-500">
                       <img
                         src={getImageSource()}
                         alt="Customized Image"
-                        className="object-contain"
-                        style={getMediaStyle(selectedImage)} // Use getMediaStyle
+                        className="w-full h-full rounded-full object-cover"
+                        // style={getMediaStyle(selectedImage)} // Use getMediaStyle
                       />
-                    </div>
+                    // </div>
                   )}
 
                   {/* Render Clipart */}

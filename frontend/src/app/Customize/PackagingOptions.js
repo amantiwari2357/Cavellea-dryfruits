@@ -64,8 +64,8 @@ const PackagingOptions = ({ selectedImage, firstLine, secondLine, selectedFontSt
         <img
           src={getMediaSource(selectedImage)}
           alt="Image"
-          className="w-full h-full object-contain rounded-full"
-          style={getMediaStyle(selectedImage)}
+          className="w-full h-full rounded-full object-cover"
+          // style={getMediaStyle(selectedImage)}
         />
       );
     } else if (type === 'text' && (firstLine || secondLine)) {
