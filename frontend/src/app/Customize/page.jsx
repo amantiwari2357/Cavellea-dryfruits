@@ -153,21 +153,44 @@ const Customize = () => {
                     firstLine={firstLine}
                     secondLine={secondLine}
                     selectedFontStyle={selectedFontStyle}
-                    selectedImage={selectedImage} // Pass the processed image object
-                    onClipartSelect={setSelectedClipart} // Pass the setter for clipart
-                    selectedClipart={selectedClipart} // Pass current selected clipart for highlighting
-                    onSelectOption={setActiveCustomization} // Pass callback for radio button selection
-                    currentSelectedOption={activeCustomization} // Pass current active option for radio button state
+                    selectedImage={selectedImage}
+                    onClipartSelect={setSelectedClipart}
+                    selectedClipart={selectedClipart}
+                    onSelectOption={setActiveCustomization}
+                    currentSelectedOption={activeCustomization}
                   />
                 )}
               </div>
 
               {/* Preview circles on the right */}
-              <div className="flex flex-col space-y-10 items-center justify-center pl-14">
-                {/* Image preview circle */}
+               <div className="flex flex-col space-y-10 items-start justify-center pl-4">
+     
+                        {/* Image preview circle */}
                 <div
                   className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-                    ${selectedImage ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}
+                    ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+                    ${activeCustomization === 'image' ? 'ring-4 ring-blue-500' : ''}
+                  `}
+                  onClick={() => selectedImage && setActiveCustomization('image')} // Make clickable if image exists
+                >
+                  {selectedImage ? (
+                    <img
+                      // Use a style to apply transformations within the preview circle
+                      src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
+                      alt="Selected Image"
+                      className="object-cover" // Ensure it covers the space within the circle
+                      style={{
+                        transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
+                  ) : null}
+                </div>
+                {/* for second image when user want to uplaod one more image */}
+                <div
+                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+                    ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
                     ${activeCustomization === 'image' ? 'ring-4 ring-blue-500' : ''}
                   `}
                   onClick={() => selectedImage && setActiveCustomization('image')} // Make clickable if image exists
@@ -190,7 +213,7 @@ const Customize = () => {
                 {/* Text preview circle */}
                 <div
                   className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer
-                    ${(firstLine || secondLine) ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}
+                    ${(firstLine || secondLine) ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
                     ${activeCustomization === 'text' ? 'ring-4 ring-orange-500' : ''}
                   `}
                   onClick={() => (firstLine || secondLine) && setActiveCustomization('text')} // Make clickable if text exists
@@ -205,8 +228,8 @@ const Customize = () => {
 
                 {/* Clipart preview circle */}
                 <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-                    ${selectedClipart ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}
+                    className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+                      ${selectedClipart ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
                     ${activeCustomization === 'clipart' ? 'ring-4 ring-green-500' : ''}
                   `}
                   onClick={() => selectedClipart && setActiveCustomization('clipart')} // Make clickable if clipart exists
@@ -222,9 +245,10 @@ const Customize = () => {
               </div>
             </div>
           </div>
+           
         );
 
-      case 3: // NEW CASE: Packaging Options
+      case 3:
         return (
           <PackagingOptions
             selectedImage={selectedImage}

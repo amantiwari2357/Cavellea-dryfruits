@@ -272,7 +272,7 @@ const imageUploadRef = useRef(null);
               <label htmlFor="option-clipart" className="text-lg font-semibold cursor-pointer">Clipart</label>
               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
               {/* Assuming onClipartSelect is passed and used by parent to manage selectedClipart */}
-              {onClipartSelect && <p className="text-xs text-gray-500 mt-1">Clipart selected</p>}
+              {onClipartSelect && <p className="text-xs text-gray-500 mt-1"></p>}  
             </div>
           </div>
            </Link>
