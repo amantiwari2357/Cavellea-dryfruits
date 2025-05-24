@@ -1,11 +1,17 @@
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 // import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { ImageIcon, TypeIcon, Palette, MoveHorizontal, ZoomIn, ZoomOut, RotateCw } from 'lucide-react';
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import clipartdata from "@/app/data/clipartData"
+import Link from 'next/link';
+
+// import { useRef } from 'react';
+
+// const imageUploadRef = useRef<HTMLDivElement | null>(null);
+
 const DesignOptions = ({
   onImageSelect,
   onTextChange,
@@ -39,6 +45,8 @@ const DesignOptions = ({
   const [imageRotation, setImageRotation] = useState(0);
 
   const [selectedOption, setSelectedOption] = useState("none");
+
+const imageUploadRef = useRef(null);
 
   const fontStyles = [
     "Bold",
@@ -172,9 +180,6 @@ const DesignOptions = ({
   }, [isDragging, dragStart, imagePosition, imageZoom, imageRotation, editingImage]); // Added dependencies
 
   const handleImageConfirm = () => {
-    // When confirming, pass all transformation data to the parent
-    // The parent (CandyPreview) will be responsible for applying these styles
-    // and ensuring the image is displayed as a circle using CSS.
     onImageSelect({
       src: editingImage,
       position: imagePosition,
@@ -196,26 +201,44 @@ const DesignOptions = ({
     <div className="p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-3xl font-bold mb-6 text-center">Design Your Candy</h2>
       <p className="text-gray-600 mb-8 text-center">Choose your design option below</p>
-
-      <RadioGroup value={selectedOption} onValueChange={handleOptionSelect} className="flex flex-col space-y-5">
+{/* aaaaaaaaaaaa */}
+      <RadioGroup  value={selectedOption} onValueChange={handleOptionSelect} className="flex flex-col space-y-5">
         {/* Image Option */}
-        <div className={`flex items-center space-x-3 p-3 rounded-lg ${selectedOption === "image" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"}`}>
+        <Link href={"#upload-image"}>
+        <div
+          ref={imageUploadRef}
+          className={`flex items-center space-x-3 p-3 rounded-lg ${
+            selectedOption === "image"
+              ? "bg-blue-50 border border-blue-200"
+              : "hover:bg-gray-50"
+          }`}
+        >
           <RadioGroupItem value="image" id="option-image" />
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleOptionSelect("image")}>
+          <div
+            className="flex items-center space-x-3 cursor-pointer"
+            onClick={() => handleOptionSelect("image")}
+          >
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
               <ImageIcon className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <label htmlFor="option-image" className="text-lg font-semibold cursor-pointer">Image</label>
+              <label
+                htmlFor="option-image"
+                className="text-lg font-semibold cursor-pointer"
+              >
+                Image
+              </label>
               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
-              {parentSelectedImage && <p className="text-xs text-gray-500 mt-1">Image selected</p>}
+              {parentSelectedImage && (
+                <p className="text-xs text-gray-500 mt-1">Image selected</p>
+              )}
             </div>
           </div>
         </div>
-
-        {/* Text Option */}
+        </Link>
         <div className={`flex items-center space-x-3 p-3 rounded-lg ${selectedOption === "text" ? "bg-orange-50 border border-orange-200" : "hover:bg-gray-50"}`}>
-          <RadioGroupItem value="text" id="option-text" />
+          <RadioGroupItem value="text"/>
+           <Link href={"#select-text"}>
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleOptionSelect("text")}>
             <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
               <span className="text-2xl font-bold text-orange-500">Aa</span>
@@ -226,33 +249,42 @@ const DesignOptions = ({
               {(firstLine || secondLine) && <p className="text-xs text-gray-500 mt-1">Text added</p>}
             </div>
           </div>
+           </Link>
         </div>
+        
 
         {/* Clipart Option */}
         <div className={`flex items-center space-x-3 p-3 rounded-lg ${selectedOption === "clipart" ? "bg-green-50 border border-green-200" : "hover:bg-gray-50"}`}>
-          <RadioGroupItem value="clipart" id="option-clipart" />
+          <RadioGroupItem value="clipart"/>
+                       <Link href={"#select-clipart"}>
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleOptionSelect("clipart")}>
+             
             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
               <Palette className="h-5 w-5 text-green-600" />
             </div>
+            
             <div>
+             
               <label htmlFor="option-clipart" className="text-lg font-semibold cursor-pointer">Clipart</label>
               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
               {/* Assuming onClipartSelect is passed and used by parent to manage selectedClipart */}
               {onClipartSelect && <p className="text-xs text-gray-500 mt-1">Clipart selected</p>}
             </div>
           </div>
+           </Link>
         </div>
+        
 
         {/* Option for additional image - shown as an example from the reference */}
         <div className="mt-2 text-center">
           <span className="text-gray-500 text-sm">+$4.99 for another image</span>
         </div>
       </RadioGroup>
+      
 
       {/* Text Fields Panel */}
       {showTextFields && (
-        <div className="mt-6 p-4 border rounded-md shadow-md">
+        <div id="select-text" className="mt-6 p-4 border rounded-md shadow-md">
           <h4 className="text-lg font-bold mb-4">Add Your Text</h4>
           <div className="space-y-4">
             <div>
@@ -312,8 +344,8 @@ const DesignOptions = ({
 
       {/* Image Upload Panel */}
       {showImageUpload && (
-        <div className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4">
-          <h4 className="text-lg font-bold">Choose an Image</h4>
+        <div ref={imageUploadRef} className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4">
+          <h4 id="upload-image" className="text-lg font-bold">Choose an Image</h4>
           <p className="text-sm text-gray-700">• First image upload is FREE.</p>
           {/* <p className="text-sm text-gray-700">• Add a second image for $4.99.</p> */}
 
@@ -386,7 +418,7 @@ const DesignOptions = ({
             </div>
           )}
 
-          <div className="mb-4">
+          <div  className="mb-4">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
@@ -401,10 +433,10 @@ const DesignOptions = ({
           <div className="flex justify-between gap-x-4">
             <button
               onClick={() => {
-                onImageSelect(null); // Clear selected image
-                setEditingImage(null); // Clear image in editor
+                onImageSelect(null); 
+                setEditingImage(null); 
                 setShowImageUpload(false);
-                setSelectedOption("none"); // Set to none if image is cancelled
+                setSelectedOption("none");
               }}
               className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
             >
@@ -437,7 +469,7 @@ const DesignOptions = ({
 
       {/* Clipart Panel */}
       {showClipartPanel && (
-        <div className="mt-6 p-4 border rounded-md shadow-md">
+        <div id="select-clipart" className="mt-6 p-4 border rounded-md shadow-md">
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-lg font-bold">Choose Clipart</h4>
             <button

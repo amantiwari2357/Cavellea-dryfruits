@@ -269,6 +269,11 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
                         src={getImageSource()}
                         alt="Customized Image"
                         className="w-full h-full rounded-full object-cover"
+                         style={{
+                        transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
+                        width: '100%', 
+                        height: '100%', 
+                      }}
                         // style={getMediaStyle(selectedImage)} // Use getMediaStyle
                       />
                     // </div>

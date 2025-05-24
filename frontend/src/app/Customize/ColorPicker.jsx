@@ -71,7 +71,7 @@ const ColorPicker = ({ selectedColors, onSelectColor, maxSelections = 3 }) => {
                           : "text-white"
                       }`}
                     >
-                      m
+                      C
                     </span> */}
                   </button>
                   <span className="mt-1 text-xs font-medium text-gray-700">
