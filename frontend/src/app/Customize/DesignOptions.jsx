@@ -203,7 +203,7 @@ const imageUploadRef = useRef(null);
   
 
   return (
-    <div className="p-0 bg-white rounded-lg shadow-md">
+    <div className="p-0 bg-white w-64 rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-1 text-center">Design Your Candy</h2>
       <p className="text-gray-600 text-center mb-0">Choose your design option below</p>
       <RadioGroup  value={selectedOption} onValueChange={handleOptionSelect} className="flex flex-col space-y-1">
@@ -360,11 +360,11 @@ const imageUploadRef = useRef(null);
       <img
         src="/images/convert.jpeg"
         alt="Conversion Example"
-        className="max-h-40  min-w-100 rounded-lg bg-cover bg-no-repeat bg-center"
+        className="max-h-50 w-74 rounded-lg bg-cover bg-no-repeat bg-center"
       />
-      <p className="text-xs text-gray-500 mt-2 text-center">
+      {/* <p className="text-xs text-gray-500 mt-2 text-center">
         Your image will be printed in black.
-      </p>
+      </p> */}
     </div>
 
     <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
@@ -397,7 +397,7 @@ const imageUploadRef = useRef(null);
         <p className="text-xs text-gray-500 mt-1 text-center">crop to show face only</p>
       </div>
     </div>
- 
+      
     <div className="mt-6">
       <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
       <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
