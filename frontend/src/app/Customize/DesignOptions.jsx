@@ -8,9 +8,6 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import clipartdata from "@/app/data/clipartData"
 import Link from 'next/link';
 
-// import { useRef } from 'react';
-
-// const imageUploadRef = useRef<HTMLDivElement | null>(null);
 
 const DesignOptions = ({
   onImageSelect,
@@ -47,6 +44,11 @@ const DesignOptions = ({
   const [selectedOption, setSelectedOption] = useState("none");
 
 const imageUploadRef = useRef(null);
+
+ const [showMore, setShowMore] = useState(false);
+
+ const editorRef = useRef(null);
+ 
 
   const fontStyles = [
     "Bold",
@@ -181,6 +183,7 @@ const imageUploadRef = useRef(null);
 
   const handleImageConfirm = () => {
     onImageSelect({
+      
       src: editingImage,
       position: imagePosition,
       zoom: imageZoom,
@@ -197,17 +200,18 @@ const imageUploadRef = useRef(null);
     setImageRotation(0);
   };
 
+  
+
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
-      <h2 className="text-3xl font-bold mb-6 text-center">Design Your Candy</h2>
-      <p className="text-gray-600 mb-8 text-center">Choose your design option below</p>
-{/* aaaaaaaaaaaa */}
-      <RadioGroup  value={selectedOption} onValueChange={handleOptionSelect} className="flex flex-col space-y-5">
+    <div className="p-0 bg-white rounded-lg shadow-md">
+      <h2 className="text-2xl font-bold mb-1 text-center">Design Your Candy</h2>
+      <p className="text-gray-600 text-center mb-0">Choose your design option below</p>
+      <RadioGroup  value={selectedOption} onValueChange={handleOptionSelect} className="flex flex-col space-y-1">
         {/* Image Option */}
         <Link href={"#upload-image"}>
         <div
           ref={imageUploadRef}
-          className={`flex items-center space-x-3 p-3 rounded-lg ${
+          className={`flex items-center space-x-3 p-3 rounded-lg mb-0 ${
             selectedOption === "image"
               ? "bg-blue-50 border border-blue-200"
               : "hover:bg-gray-50"
@@ -215,7 +219,7 @@ const imageUploadRef = useRef(null);
         >
           <RadioGroupItem value="image" id="option-image" />
           <div
-            className="flex items-center space-x-3 cursor-pointer"
+            className="flex items-center space-x-3 cursor-pointer mb-0"
             onClick={() => handleOptionSelect("image")}
           >
             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
@@ -254,7 +258,7 @@ const imageUploadRef = useRef(null);
         
 
         {/* Clipart Option */}
-        <div className={`flex items-center space-x-3 p-3 rounded-lg ${selectedOption === "clipart" ? "bg-green-50 border border-green-200" : "hover:bg-gray-50"}`}>
+        <div className={`flex items-center space-x-3 p-3 rounded-lg mb-0 ${selectedOption === "clipart" ? "bg-green-50 border border-green-200" : "hover:bg-gray-50"}`}>
           <RadioGroupItem value="clipart"/>
                        <Link href={"#select-clipart"}>
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => handleOptionSelect("clipart")}>
@@ -277,7 +281,7 @@ const imageUploadRef = useRef(null);
 
         {/* Option for additional image - shown as an example from the reference */}
         <div className="mt-2 text-center">
-          <span className="text-gray-500 text-sm">+$4.99 for another image</span>
+          {/* <span className="text-gray-500 text-sm">+$4.99 for another image</span> */}
         </div>
       </RadioGroup>
       
@@ -342,130 +346,167 @@ const imageUploadRef = useRef(null);
         </div>
       )}
 
-      {/* Image Upload Panel */}
-      {showImageUpload && (
-        <div ref={imageUploadRef} className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4">
-          <h4 id="upload-image" className="text-lg font-bold">Choose an Image</h4>
-          <p className="text-sm text-gray-700">• First image upload is FREE.</p>
-          {/* <p className="text-sm text-gray-700">• Add a second image for $4.99.</p> */}
+     {showImageUpload && (
+  <div
+    ref={imageUploadRef}
+    className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
+  >
+    <h4 id="upload-image" className="text-lg font-bold">Choose an Image</h4>
+    <p className="text-sm text-gray-700">• First image upload is FREE.</p>
 
-          <div className="flex flex-col items-center mt-4">
-            <img
-              src="/images/convert.jpeg"
-              alt="Conversion Example"
-              className="max-h-20 object-contain w-full"
-            />
-            <p className="text-xs text-gray-500 mt-2 text-center">
-              Your image will be printed in black.
-            </p>
-          </div>
-          {/* Best Friend: Three Images in a Row */}
-          <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
-          <div className="flex flex-row items-center justify-center gap-4">
-            <div className="flex flex-col items-center">
-              <img
-                src="/images/print.png"
-                alt="Best Result Example 1"
-                className="max-h-20 object-contain rounded-md"
-              />
-              <p className="text-xs text-gray-500 mt-1 text-center">1-2 faces</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <img
-                src="/images/print1.png"
-                alt="Best Result Example 2"
-                className="max-h-20 object-contain rounded-md"
-              />
-              <p className="text-xs text-gray-500 mt-1 text-center">face forward</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <img
-                src="/images/print2.png"
-                alt="Best Result Example 3"
-                className="max-h-20 object-contain rounded-md"
-              />
-              <p className="text-xs text-gray-500 mt-1 text-center">crop to show face only</p>
-            </div>
-          </div>
+   
 
-          <div className="mt-6">
-            <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
-            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-              <li>Upload a high-quality .jpg, .jpeg, or .png file (15MB max).</li>
-              <li>Backgrounds will be removed, and the photo will be printed in black.</li>
-              <li>Only 1–2 faces cheek-to-cheek are allowed. Close cropping to faces gives the 
-                best results. Arms, legs, or full body can't be included.</li>
-              <li>
-                We can’t reproduce copyrighted or trademarked images/logos unless legal permission is provided.
-                For logo printing inquiries, please contact our Business Consultants directly.
-              </li>
-               {/* <li>First image upload is FREE. Add a second image for $4.99.</li> */}
-            </ul>
-          </div>
+    <div className="flex flex-col items-center mt-4">
+      <img
+        src="/images/convert.jpeg"
+        alt="Conversion Example"
+        className="max-h-20 object-contain w-full"
+      />
+      <p className="text-xs text-gray-500 mt-2 text-center">
+        Your image will be printed in black.
+      </p>
+    </div>
 
-          <hr className="mt-4 border-gray-300" />
+    <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
+    <div className="flex flex-row items-center justify-center gap-4">
+      {/* Best Result Example 1 */}
+      <div className="flex flex-col items-center">
+        <img
+          src="/images/print.png"
+          alt="Best Result Example 1"
+          className="max-h-20 object-contain rounded-md"
+        />
+        <p className="text-xs text-gray-500 mt-1 text-center">1-2 faces</p>
+      </div>
+      {/* Example 2 */}
+      <div className="flex flex-col items-center">
+        <img
+          src="/images/print1.png"
+          alt="Best Result Example 2"
+          className="max-h-20 object-contain rounded-md"
+        />
+        <p className="text-xs text-gray-500 mt-1 text-center">face forward</p>
+      </div>
+      {/* Example 3 */}
+      <div className="flex flex-col items-center">
+        <img
+          src="/images/print2.png"
+          alt="Best Result Example 3"
+          className="max-h-20 object-contain rounded-md"
+        />
+        <p className="text-xs text-gray-500 mt-1 text-center">crop to show face only</p>
+      </div>
+    </div>
+ 
+    <div className="mt-6">
+      <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
+      <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+        <li>Upload a clear .jpg, .jpeg, or .png (max 15MB).</li>
+        <li>Backgrounds will be removed; image prints in black. </li>
+         {showMore && (
+           <>
+        <li>
+          Only 1–2 close faces allowed. No arms or full body.
+        </li>
+        <li>
+          No copyrighted/logos unless with written permission.
+        </li>
+         </>
+            )}
+      </ul>
+    </div>
+      <div className="mt-2">
+           <button
+  onClick={() => setShowMore(!showMore)}
+  className="relative inline-flex items-center gap-1 text-sm font-medium text-blue-600 transition duration-300 ease-in-out hover:text-blue-800 group"
+>
+  <span>{showMore ? "View Less" : "View More"}</span>
+  <svg
+    className={`w-4 h-4 transition-transform duration-300 transform ${
+      showMore ? "rotate-180" : ""
+    } group-hover:translate-x-1`}
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    viewBox="0 0 24 24"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+  </svg>
+</button>
 
-          {/* This preview should show the currently selected image, not the one being edited */}
-          {parentSelectedImage && !showImageEditor && ( // Only show if an image is already selected AND editor is not active
-            <div className="mb-4">
-              <img
-                src={typeof parentSelectedImage === 'object' ? parentSelectedImage.src : parentSelectedImage}
-                alt="Previously Selected"
-                className="max-h-40 mx-auto object-contain rounded-full"
-                style={{ borderRadius: '50%' }} // Apply circular style for preview
-              />
-              <p className="text-xs text-gray-500 text-center mt-2">Currently selected image</p>
-            </div>
-          )}
-
-          <div  className="mb-4">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-sm text-gray-700">I agree to the terms and conditions</span>
-            </label>
-          </div>
-
-          <div className="flex justify-between gap-x-4">
-            <button
-              onClick={() => {
-                onImageSelect(null); 
-                setEditingImage(null); 
-                setShowImageUpload(false);
-                setSelectedOption("none");
-              }}
-              className="w-full px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
-            >
-              Clear Image
-            </button>
-
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
-
-            <button
-              onClick={handleUploadClick}
-              disabled={!agreeTerms}
-              className={`w-full px-4 py-2 rounded-md ${
-                agreeTerms
-                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              } transition-colors`}
-            >
-              Upload New Image
-            </button>
           </div>
 
-        </div>
-      )}
+    <hr className="mt-4 border-gray-300" />
+
+    {parentSelectedImage && !showImageEditor && (
+      <div className="mb-4">
+        <img
+          src={
+            typeof parentSelectedImage === "object"
+              ? parentSelectedImage.src
+              : parentSelectedImage
+          }
+          alt="Previously Selected"
+          className="max-h-40 mx-auto object-contain rounded-full"
+          style={{ borderRadius: "50%" }}
+        />
+        <p className="text-xs text-gray-500 text-center mt-2">Currently selected image</p>
+      </div>
+    )}
+
+    {/* Checkbox moved here after all requirements */}
+    <div className="mb-4">
+      <label className="flex items-center space-x-2">
+        <input
+          type="checkbox"
+          checked={agreeTerms}
+          onChange={(e) => setAgreeTerms(e.target.checked)}
+          className="rounded"
+        />
+        <span className="text-sm text-gray-700">
+          I agree to the terms and conditions
+        </span>
+      </label>
+    </div>
+    {/* Upload Button moved here just below the heading */}
+    <div className="flex justify-center mt-2">
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
+      <button
+        onClick={handleUploadClick}
+        disabled={!agreeTerms}
+        className={`px-4 py-2 rounded-md ${
+          agreeTerms
+            ? "bg-yellow-400 text-black hover:bg-yellow-500"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        } transition-colors`}
+      >
+        Upload New Image
+      </button>
+    </div>
+
+    {/* Clear button and logic */}
+    <div className="flex justify-center mt-2">
+      <button
+        onClick={() => {
+          onImageSelect(null);
+          setEditingImage(null);
+          setShowImageUpload(false);
+          setSelectedOption("none");
+        }}
+        className="py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-yellow-500 transition-colors bg-yellow-400"
+      >
+     Click To Clear.........
+      </button>
+    </div>
+  </div>
+)}
+
 
       {/* Clipart Panel */}
       {showClipartPanel && (
@@ -531,7 +572,7 @@ const imageUploadRef = useRef(null);
 
       {/* Inline Image Editor */}
       {showImageEditor && (
-        <div className="mt-6 p-4 border rounded-md shadow-md">
+        <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
           <h4 className="text-lg font-bold mb-4">Edit Your Image</h4>
 
           <div className="flex flex-col items-center space-y-6 py-4">
@@ -544,12 +585,12 @@ const imageUploadRef = useRef(null);
                   ref={imageRef}
                   src={editingImage}
                   alt="Editing"
-                  className="object-cover cursor-move w-full h-full" // Ensure image fills its container
+                  className="object-cover cursor-move w-full h-full"
                   style={{
                     transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
                     transition: isDragging ? 'none' : 'transform 0.2s ease',
                     cursor: isDragging ? 'grabbing' : 'grab',
-                    minWidth: `${imageZoom}%`, // Helps with initial sizing for zoom effect
+                    minWidth: `${imageZoom}%`,
                     minHeight: `${imageZoom}%`,
                     maxWidth: `${imageZoom}%`,
                     maxHeight: `${imageZoom}%`,

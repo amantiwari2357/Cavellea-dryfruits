@@ -50,19 +50,19 @@ const Customize = () => {
 
   const handleReset = () => {
     setSelectedColors([]);
-    setSelectedImage(null); // Reset image
-    setSelectedClipart(null); // Reset clipart
-    setFirstLine(''); // Reset text
-    setSecondLine(''); // Reset text
-    setSelectedFontStyle('Bold'); // Reset font style
-    setActiveCustomization(null); // Reset active customization too
+    setSelectedImage(null); 
+    setSelectedClipart(null); 
+    setFirstLine(''); 
+    setSecondLine(''); 
+    setSelectedFontStyle('Bold'); 
+    setActiveCustomization(null);
     toast.info("Customization reset");
   };
 
   // NEW HANDLERS for toolbar actions
   const handleEditActiveCustomization = (type) => {
-    setActiveCustomization(type); // Set which type is active for editing in DesignOptions
-    // DesignOptions will use this 'activeCustomization' prop to determine which panel to open.
+    setActiveCustomization(type);
+   
   };
 
   const handleRemoveActiveCustomization = (type) => {
@@ -74,12 +74,12 @@ const Customize = () => {
     } else if (type === 'clipart') {
       setSelectedClipart(null);
     }
-    setActiveCustomization(null); // Clear active selection after removal
+    setActiveCustomization(null);
     toast.info(`${type.charAt(0).toUpperCase() + type.slice(1)} removed.`);
   };
 
   const handleCancelActiveCustomization = () => {
-    setActiveCustomization(null); // Just close the toolbar, no change to customization data
+    setActiveCustomization(null); 
   };
 
   // Render content based on current step
@@ -180,8 +180,8 @@ const Customize = () => {
                       className="object-cover" // Ensure it covers the space within the circle
                       style={{
                         transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
-                        width: '100%', // Take full width of parent div
-                        height: '100%', // Take full height of parent div
+                        width: '100%',
+                        height: '100%',
                       }}
                     />
                   ) : null}
