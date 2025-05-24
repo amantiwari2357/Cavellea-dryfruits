@@ -360,7 +360,7 @@ const imageUploadRef = useRef(null);
       <img
         src="/images/convert.jpeg"
         alt="Conversion Example"
-        className="max-h-20 object-contain w-full"
+        className="max-h-40  min-w-100 rounded-lg bg-cover bg-no-repeat bg-center"
       />
       <p className="text-xs text-gray-500 mt-2 text-center">
         Your image will be printed in black.
