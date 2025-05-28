@@ -100,7 +100,7 @@ const DesignOptions = ({
 
 
   const handleUploadClick = () => {
-    if (agreeTerms) {
+    if (agreeTerms && fileInputRef.current) {
       fileInputRef.current.click();
      
     } else {
@@ -536,8 +536,8 @@ const DesignOptions = ({
                     : parentSelectedImage
                 }
                 alt="Previously Selected"
-                className="max-h-40 mx-auto object-contain rounded-full"
-                style={{ borderRadius: "50%" }}
+                className="mx-auto rounded-full"
+                style={{ borderRadius: "50%" , height:'150px' , width:'150px' }}
               />
               <p className="text-xs text-gray-500 text-center mt-2">
                 Currently selected image
@@ -561,33 +561,41 @@ const DesignOptions = ({
           </div>
           {/* Upload Button moved here just below the heading */}
           
-         {/* Upload First Image Button */}
-<div className="flex justify-center mt-2">
-  <input
-    type="file"
-    ref={fileInputRef}
-    onChange={handleFileChange}
-    accept="image/*"
-    className="hidden"
-    multiple
-  />
-  <button
-    onClick={handleUploadClick}
-    disabled={!agreeTerms}
-    className={`px-4 py-2 rounded-md ${
-      agreeTerms
-        ? "bg-yellow-400 text-black hover:bg-yellow-500"
-        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-    } transition-colors`}
-  >
-    Upload First Image
-  </button>
-</div>
+     {/* Upload First Image Button */}
+{!firstImageUploaded && (
+  <div className="flex justify-center mt-2">
+    <input
+      type="file"
+      ref={fileInputRef}
+      onChange={handleFileChange}
+      accept="image/*"
+      className="hidden"
+      multiple
+    />
+    <button
+      onClick={handleUploadClick}
+      disabled={!agreeTerms}
+      className={`px-4 py-2 rounded-md ${
+        agreeTerms
+          ? "bg-yellow-400 text-black hover:bg-yellow-500"
+          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+      } transition-colors`}
+    >
+      Upload First Image
+    </button>
+  </div>
+)}
 
 {/* Conditionally show Second Upload Button */}
+
 {firstImageUploaded && (
   <div className="flex justify-center mt-2">
-    <button onClick={handleUploadClick}>Upload Another Image</button>
+    <button
+      onClick={handleUploadClick}
+      className="px-4 py-2 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 transition-colors]"
+    >
+      Upload Next Image
+    </button>
   </div>
 )}
 
