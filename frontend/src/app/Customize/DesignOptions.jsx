@@ -24,6 +24,7 @@ const DesignOptions = ({
   secondLine,
   selectedFontStyle,
   selectedImage: parentSelectedImage,
+ 
   onClipartSelect,
 }) => {
   const [showTextFields, setShowTextFields] = useState(false);
@@ -55,6 +56,10 @@ const DesignOptions = ({
   const [showMore, setShowMore] = useState(false);
 
   const editorRef = useRef(null);
+  const [firstImageUploaded, setFirstImageUploaded] = useState(false);
+
+  
+  
 
   const fontStyles = [
     "Bold",
@@ -74,27 +79,30 @@ const DesignOptions = ({
       clipart.alt.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleFileChange = (e) => {
-    const file =
-      e.target.files && e.target.files.length > 0 ? e.target.files[0] : null;
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target.result;
-        setEditingImage(imageUrl);
-        setShowImageEditor(true);
-        setShowImageUpload(false);
-        setImagePosition({ x: 0, y: 0 });
-        setImageZoom(100);
-        setImageRotation(0);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+ const handleFileChange = (e) => {
+  const file =
+    e.target.files && e.target.files.length > 0 ? e.target.files[0] : null;
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageUrl = event.target.result;
+      setEditingImage(imageUrl);
+      setShowImageEditor(true);
+      setShowImageUpload(false);
+      setImagePosition({ x: 0, y: 0 });
+      setImageZoom(100);
+      setImageRotation(0);
+      setFirstImageUploaded(true);
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 
   const handleUploadClick = () => {
     if (agreeTerms) {
       fileInputRef.current.click();
+     
     } else {
       toast.error(
         "Please agree to the terms and conditions to upload an image."
@@ -231,6 +239,8 @@ const DesignOptions = ({
     setImageZoom(100);
     setImageRotation(0);
   };
+// new state for manage a multiple image
+
 
   return (
     <div className="p-0 bg-white w-64 rounded-lg shadow-md">
@@ -516,9 +526,7 @@ const DesignOptions = ({
               </svg>
             </button>
           </div>
-
           <hr className="mt-4 border-gray-300" />
-
           {parentSelectedImage && !showImageEditor && (
             <div className="mb-4">
               <img
@@ -553,28 +561,38 @@ const DesignOptions = ({
           </div>
           {/* Upload Button moved here just below the heading */}
           
-          <div className="flex justify-center mt-2">
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/*"
-              className="hidden"
-            />
+         {/* Upload First Image Button */}
+<div className="flex justify-center mt-2">
+  <input
+    type="file"
+    ref={fileInputRef}
+    onChange={handleFileChange}
+    accept="image/*"
+    className="hidden"
+    multiple
+  />
+  <button
+    onClick={handleUploadClick}
+    disabled={!agreeTerms}
+    className={`px-4 py-2 rounded-md ${
+      agreeTerms
+        ? "bg-yellow-400 text-black hover:bg-yellow-500"
+        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+    } transition-colors`}
+  >
+    Upload First Image
+  </button>
+</div>
 
-            <button
-              onClick={handleUploadClick}
-              disabled={!agreeTerms}
-              className={`px-4 py-2 rounded-md ${
-                agreeTerms
-                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-              } transition-colors`}
-            >
-              Upload First Image
-            </button>
-          </div>
+{/* Conditionally show Second Upload Button */}
+{firstImageUploaded && (
+  <div className="flex justify-center mt-2">
+    <button onClick={handleUploadClick}>Upload Another Image</button>
+  </div>
+)}
 
+
+      
           {/* Clear button and logic */}
           <div className="flex justify-center mt-2">
             <button
@@ -619,7 +637,7 @@ const DesignOptions = ({
               className="w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-
+        {/* ye categories dynamic aaayange*/}
           <div className="mb-4">
             <select
               value={selectedCategory}
