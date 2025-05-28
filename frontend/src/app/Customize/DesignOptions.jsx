@@ -56,7 +56,7 @@ const DesignOptions = ({
   const [showMore, setShowMore] = useState(false);
 
   const editorRef = useRef(null);
-  
+
   const [firstImageUploaded, setFirstImageUploaded] = useState(false);
   const [secondImageUploaded,  setSecondImageUploaded] = useState(false);
 
@@ -132,32 +132,57 @@ const DesignOptions = ({
     setShowClipartPanel(false);
   };
 
-  const handleOptionSelect = (value) => {
-    setSelectedOption(value);
-    setShowTextFields(false);
-    setShowImageUpload(false);
-    setShowClipartPanel(false);
-    setShowImageEditor(false);
-
-    // Open the corresponding panel
+ const handleOptionSelect = (value) => {
+  // Agar wahi option dobara select ho raha hai
+  if (selectedOption === value) {
     if (value === "image") {
-      // If an image is already selected and processed, potentially show editor
+      // Agar secondImageUploaded pehle se false hai toh usko true kar do
+      if (secondImageUploaded) {
+        setSecondImageUploaded(true);
+      }
+      // Aur baaki jo image editor ya upload dikhana hai wo handle karo
       if (parentSelectedImage && parentSelectedImage.src) {
-        // Check if there's an already selected image from parent state
-        setEditingImage(parentSelectedImage.src); // Load it into editor
+        setEditingImage(parentSelectedImage.src);
         setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
         setImageZoom(parentSelectedImage.zoom || 100);
         setImageRotation(parentSelectedImage.rotation || 0);
         setShowImageEditor(true);
+        setShowImageUpload(false);
       } else {
-        setShowImageUpload(true); // Otherwise, show upload panel
+        setShowImageUpload(true);
+        setShowImageEditor(false);
       }
-    } else if (value === "text") {
-      setShowTextFields(true);
-    } else if (value === "clipart") {
-      setShowClipartPanel(true);
     }
-  };
+    // Agar doosra option hai aur wahi dobara select ho toh kuch karna ho toh yahan handle kar sakte ho
+    return; // Bas yahi karo, baaki function skip karo kyunki selected option change nahi ho raha
+  }
+
+  // Naya option select karne par normal state reset karo
+  setSelectedOption(value);
+  setShowTextFields(false); 
+  setShowImageUpload(false);
+  setShowClipartPanel(false);
+  setShowImageEditor(false);
+  setSecondImageUploaded(false); // Reset second image upload flag
+
+  // Phir naya option ke hisaab se panels dikhana
+  if (value === "image") {
+    if (parentSelectedImage && parentSelectedImage.src) {
+      setEditingImage(parentSelectedImage.src);
+      setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
+      setImageZoom(parentSelectedImage.zoom || 100);
+      setImageRotation(parentSelectedImage.rotation || 0);
+      setShowImageEditor(true);
+    } else {
+      setShowImageUpload(true);
+    }
+  } else if (value === "text") {
+    setShowTextFields(true);
+  } else if (value === "clipart") {
+    setShowClipartPanel(true);
+  }
+};
+
 
   // Mouse event handlers for image dragging
   const handleMouseDown = (e) => {
@@ -256,7 +281,9 @@ const DesignOptions = ({
         onValueChange={handleOptionSelect}
         className="flex flex-col space-y-6"
       >
-        {/* Image Option */}
+
+        {/* yaha se Image Option suru hoga*/}
+
         <Link href={"#upload-image"}>
           <div
             ref={imageUploadRef}
@@ -289,6 +316,8 @@ const DesignOptions = ({
             </div>
           </div>
         </Link>
+
+        {/* yaha se text ka code end hoga */}
         <div
           className={`flex items-center space-x-3 p-3 rounded-lg ${
             selectedOption === "text"
