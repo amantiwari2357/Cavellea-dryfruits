@@ -50,12 +50,14 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
       // Determine what customization options we have
       const hasText = firstLine || secondLine;
       const hasImage = selectedImage !== null;
-      const hasClipart = selectedclipart !== null; // New: Check for clipart
+      const hasClipart = selectedclipart !== null;
 
       const customizationOptions = [];
       if (hasText) customizationOptions.push('text');
       if (hasImage) customizationOptions.push('image');
-      if (hasClipart) customizationOptions.push('clipart'); // Add clipart as an option
+      if (hasClipart) customizationOptions.push('clipart');
+      // If you want to allow two images, push 'image' twice
+      if (hasImage) customizationOptions.push('image');
 
       const hasCustomization = customizationOptions.length > 0;
 

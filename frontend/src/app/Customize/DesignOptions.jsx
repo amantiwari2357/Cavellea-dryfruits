@@ -2,7 +2,6 @@
 import { useRef, useEffect, useState } from "react";
 import {
   ImageIcon,
-  TypeIcon,
   Palette,
   MoveHorizontal,
   ZoomIn,

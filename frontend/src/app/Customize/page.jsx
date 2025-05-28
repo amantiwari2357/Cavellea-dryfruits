@@ -7,7 +7,6 @@ import HoverToolbar from '../Customize/HoverToolbar';
 import DesignOptions from '../Customize/DesignOptions';
 import ActiveCustomizationToolbar from './ActiveCustomizationToolbar'; // Assuming this is in the same directory
 import PackagingOptions from './PackagingOptions'; // Make sure you have this component created
-
 import { toast } from "sonner";
 
 const MAX_COLOR_SELECTIONS = 5;
@@ -19,6 +18,8 @@ const Customize = () => {
 
   // State management for design customizations
   const [selectedImage, setSelectedImage] = useState(null); // Can be null or { src, position, zoom, rotation }
+  // NEW STATE: For the second image
+  const [secondSelectedImage, setSecondSelectedImage] = useState(null);
   const [firstLine, setFirstLine] = useState('');
   const [secondLine, setSecondLine] = useState('');
   const [selectedFontStyle, setSelectedFontStyle] = useState('Bold');
@@ -50,11 +51,12 @@ const Customize = () => {
 
   const handleReset = () => {
     setSelectedColors([]);
-    setSelectedImage(null); 
-    setSelectedClipart(null); 
-    setFirstLine(''); 
-    setSecondLine(''); 
-    setSelectedFontStyle('Bold'); 
+    setSelectedImage(null);
+    setSecondSelectedImage(null); // Reset the second image as well
+    setSelectedClipart(null);
+    setFirstLine('');
+    setSecondLine('');
+    setSelectedFontStyle('Bold');
     setActiveCustomization(null);
     toast.info("Customization reset");
   };
@@ -62,12 +64,14 @@ const Customize = () => {
   // NEW HANDLERS for toolbar actions
   const handleEditActiveCustomization = (type) => {
     setActiveCustomization(type);
-   
   };
 
   const handleRemoveActiveCustomization = (type) => {
     if (type === 'image') {
+      // If removing the main image, also clear the second image, or shift it up
+      // For simplicity, let's clear both if 'image' (main) is removed
       setSelectedImage(null);
+      setSecondSelectedImage(null);
     } else if (type === 'text') {
       setFirstLine('');
       setSecondLine('');
@@ -79,7 +83,7 @@ const Customize = () => {
   };
 
   const handleCancelActiveCustomization = () => {
-    setActiveCustomization(null); 
+    setActiveCustomization(null);
   };
 
   // Render content based on current step
@@ -89,13 +93,13 @@ const Customize = () => {
         return (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 ">
             <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
-              {/* <h2 className="text-4xl font-bold mb-4">choose up to three colors</h2> */}
               <p className="text-gray-600 mb-6 text-center">Light colors print best Click color again to remove it.</p>
 
               {/* CandyPreview component here */}
               <CandyPreview
                 selectedColors={selectedColors}
                 selectedImage={selectedImage}
+                secondSelectedImage={secondSelectedImage}
                 firstLine={firstLine}
                 secondLine={secondLine}
                 selectedFontStyle={selectedFontStyle}
@@ -117,13 +121,13 @@ const Customize = () => {
         return (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
-              {/* <h2 className="text-4xl font-bold mb-6">preview your design</h2> */}
               <p className="text-gray-600 mb-6 text-center">See how your customizations will look on the candies.</p>
 
               {/* CandyPreview component here */}
               <CandyPreview
                 selectedColors={selectedColors}
                 selectedImage={selectedImage}
+                secondSelectedImage={secondSelectedImage} 
                 firstLine={firstLine}
                 secondLine={secondLine}
                 selectedFontStyle={selectedFontStyle}
@@ -144,7 +148,13 @@ const Customize = () => {
                   />
                 ) : (
                   <DesignOptions
-                    onImageSelect={setSelectedImage}
+                    onImageSelect={setSelectedImage} // This handles the main image
+                    // You'll need a way for DesignOptions to set the second image.
+                    // For now, I'm assuming DesignOptions might internally manage multiple images
+                    // or you'll extend it to have an `onSecondImageSelect` prop.
+                    // For a simpler approach, you might have separate upload buttons in DesignOptions
+                    // for 'Image 1' and 'Image 2', each calling a different state setter.
+                    // If DesignOptions handles the 'next image' logic, it should update secondSelectedImage.
                     onTextChange={(first, second) => {
                       setFirstLine(first);
                       setSecondLine(second);
@@ -158,57 +168,69 @@ const Customize = () => {
                     selectedClipart={selectedClipart}
                     onSelectOption={setActiveCustomization}
                     currentSelectedOption={activeCustomization}
+                    // Pass the second image state setter if DesignOptions will handle it
+                    // Example: onSecondImageSelect={setSecondSelectedImage}
+                    // Or pass the current second image for internal display logic in DesignOptions
+                    secondSelectedImage={secondSelectedImage}
+                    setSecondSelectedImage={setSecondSelectedImage}
                   />
                 )}
               </div>
 
               {/* Preview circles on the right */}
-               <div className="flex flex-col space-y-10 items-start justify-center pl-4">
-     
-                        {/* Image preview circle */}
+              <div className="flex flex-col space-y-10 items-start justify-center pl-4">
+
+                {/* First Image preview circle */}
                 <div
                   className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
                     ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-                    ${activeCustomization === 'image' ? 'ring-4 ring-blue-500' : ''}
+                    ${activeCustomization === 'image' && selectedImage ? 'ring-4 ring-blue-500' : ''}
                   `}
-                  onClick={() => selectedImage && setActiveCustomization('image')} // Make clickable if image exists
+                  onClick={() => selectedImage && setActiveCustomization('image')}
                 >
                   {selectedImage ? (
                     <img
-                      // Use a style to apply transformations within the preview circle
                       src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
-                      alt="Selected Image"
-                      className="object-cover" // Ensure it covers the space within the circle
+                      alt="Selected Image 1"
+                      className="object-cover"
                       style={{
                         transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
                         width: '100%',
                         height: '100%',
                       }}
                     />
-                  ) : null}
+                  ) : (
+                    <span className="text-gray-400 text-xs">Image 1</span> // Placeholder if no image
+                  )}
                 </div>
-                {/* for second image when user want to uplaod one more image */}
+
+                {/* Second Image preview circle */}
                 <div
                   className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-                    ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-                    ${activeCustomization === 'image' ? 'ring-4 ring-blue-500' : ''}
+                    ${secondSelectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+                    ${activeCustomization === 'secondImage' && secondSelectedImage ? 'ring-4 ring-blue-500' : ''}
                   `}
-                  onClick={() => selectedImage && setActiveCustomization('image')} // Make clickable if image exists
+                  // You'll need to define what 'secondImage' means for activeCustomization
+                  // For now, let's assume a new type 'secondImage' for this.
+                  onClick={() => secondSelectedImage && setActiveCustomization('secondImage')}
                 >
-                  {selectedImage ? (
+                  {secondSelectedImage ? (
                     <img
-                      // Use a style to apply transformations within the preview circle
-                      src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
-                      alt="Selected Image"
-                      className="object-cover" // Ensure it covers the space within the circle
+                      src={typeof secondSelectedImage === 'object' ? secondSelectedImage.src : secondSelectedImage}
+                      alt="Selected Image 2"
+                      className="object-cover"
                       style={{
-                        transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
+                        // Apply transformations if secondSelectedImage also stores position, zoom, rotation
+                        transform: secondSelectedImage.position ? `translate(${secondSelectedImage.position.x}px, ${secondSelectedImage.position.y}px) rotate(${secondSelectedImage.rotation}deg) scale(${secondSelectedImage.zoom / 100})` : 'none',
                         width: '100%',
                         height: '100%',
                       }}
                     />
-                  ) : null}
+                  ) : (
+                    <span className="text-gray-400 text-xs">Image 2</span> // Placeholder if no second image
+                  )}
                 </div>
+
 
                 {/* Text preview circle */}
                 <div
@@ -216,36 +238,41 @@ const Customize = () => {
                     ${(firstLine || secondLine) ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
                     ${activeCustomization === 'text' ? 'ring-4 ring-orange-500' : ''}
                   `}
-                  onClick={() => (firstLine || secondLine) && setActiveCustomization('text')} // Make clickable if text exists
+                  onClick={() => (firstLine || secondLine) && setActiveCustomization('text')}
                 >
                   {(firstLine || secondLine) ? (
                     <div className={`text-xs text-center leading-tight truncate w-10`} style={{ fontFamily: selectedFontStyle }}>
                       {firstLine && <div>{firstLine}</div>}
                       {secondLine && <div>{secondLine}</div>}
                     </div>
-                  ) : null}
+                  ) : (
+                    <span className="text-gray-400 text-xs">Text</span> // Placeholder for text
+                  )}
                 </div>
 
                 {/* Clipart preview circle */}
                 <div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-                      ${selectedClipart ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+                    ${selectedClipart ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
                     ${activeCustomization === 'clipart' ? 'ring-4 ring-green-500' : ''}
                   `}
-                  onClick={() => selectedClipart && setActiveCustomization('clipart')} // Make clickable if clipart exists
+                  onClick={() => selectedClipart && setActiveCustomization('clipart')}
                 >
-                  {selectedClipart ? ( // Only render if selectedClipart is not null
+                  {selectedClipart ? (
                     <img
-                      src={typeof selectedClipart === 'object' ? selectedClipart.src : selectedClipart} // Get src if object, else use directly
+                      src={typeof selectedClipart === 'object' ? selectedClipart.src : selectedClipart}
                       alt="Selected Clipart"
                       className="w-12 h-12 object-contain"
                     />
-                  ) : null}
+                  ) : (
+                    <span className="text-gray-400 text-xs">Clipart</span> // Placeholder for clipart
+                  )}
                 </div>
               </div>
             </div>
+
           </div>
-           
+
         );
 
       case 3:
