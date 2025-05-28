@@ -102,7 +102,7 @@ const DesignOptions = ({
   const handleUploadClick = () => {
     if (agreeTerms && fileInputRef.current) {
       fileInputRef.current.click();
-     
+     fileInputRef.current.value = null;
     } else {
       toast.error(
         "Please agree to the terms and conditions to upload an image."
@@ -244,20 +244,20 @@ const DesignOptions = ({
 
   return (
     <div className="p-0 bg-white w-64 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-1 text-center">Design Your Candy</h2>
-      <p className="text-gray-600 text-center mb-0">
+      <h2 className="text-2xl font-bold mb-6 text-center">Design Your Candy</h2>
+      <p className="text-gray-600 text-center mb-6">
         Choose your design option below
       </p>
       <RadioGroup
         value={selectedOption}
         onValueChange={handleOptionSelect}
-        className="flex flex-col space-y-1"
+        className="flex flex-col space-y-8"
       >
         {/* Image Option */}
         <Link href={"#upload-image"}>
           <div
             ref={imageUploadRef}
-            className={`flex items-center space-x-3 p-3 rounded-lg mb-0 ${
+            className={`flex items-center space-x-4 p-3 rounded-lg mb-0 ${
               selectedOption === "image"
                 ? "bg-blue-50 border border-blue-200"
                 : "hover:bg-gray-50"
@@ -562,7 +562,7 @@ const DesignOptions = ({
           {/* Upload Button moved here just below the heading */}
           
      {/* Upload First Image Button */}
-{!firstImageUploaded && (
+{firstImageUploaded && (
   <div className="flex justify-center mt-2">
     <input
       type="file"
