@@ -1,6 +1,5 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
-// import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   ImageIcon,
   TypeIcon,
@@ -58,6 +57,17 @@ const DesignOptions = ({
 
   // New state to manage if an image has been uploaded, regardless of which one
   const [hasImageBeenUploaded, setHasImageBeenUploaded] = useState(false);
+
+  // New state for the second image preview (the one currently on the candy)
+  const [currentlySelectedImageForCandy, setCurrentlySelectedImageForCandy] =
+    useState(parentSelectedImage);
+
+  useEffect(() => {
+    // Update currentlySelectedImageForCandy when parentSelectedImage changes
+    if (parentSelectedImage) {
+      setCurrentlySelectedImageForCandy(parentSelectedImage);
+    }
+  }, [parentSelectedImage]);
 
   const fontStyles = [
     "Bold",
@@ -159,7 +169,11 @@ const DesignOptions = ({
 
     // Show panels based on the newly selected option
     if (value === "image") {
-      if (parentSelectedImage && parentSelectedImage.src && !hasImageBeenUploaded) {
+      if (
+        parentSelectedImage &&
+        parentSelectedImage.src &&
+        !hasImageBeenUploaded
+      ) {
         // If there's a pre-selected image and no image has been uploaded yet in this session
         setEditingImage(parentSelectedImage.src);
         setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
@@ -246,6 +260,13 @@ const DesignOptions = ({
       rotation: imageRotation,
       isCircular: true, // Indicate that it should be displayed as a circle
     });
+    setCurrentlySelectedImageForCandy({
+      src: editingImage,
+      position: imagePosition,
+      zoom: imageZoom,
+      rotation: imageRotation,
+      isCircular: true,
+    }); // Update the currently selected image for the second preview
     setShowImageEditor(false);
     toast.success("Image has been added to your candy design!");
     window.scrollTo({
@@ -271,7 +292,7 @@ const DesignOptions = ({
         onValueChange={handleOptionSelect}
         className="flex flex-col space-y-6"
       >
-        {/* yaha se Image Option suru hoga*/}
+        {/* Image Option */}
 
         <Link href={"#upload-image"}>
           <div
@@ -298,7 +319,7 @@ const DesignOptions = ({
                   Image
                 </label>
                 <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
-                {parentSelectedImage && (
+                {currentlySelectedImageForCandy && (
                   <p className="text-xs text-gray-500 mt-1">Image selected</p>
                 )}
               </div>
@@ -306,7 +327,7 @@ const DesignOptions = ({
           </div>
         </Link>
 
-        {/* yaha se text ka code end hoga */}
+        {/* Text Option */}
         <div
           className={`flex items-center space-x-3 p-3 rounded-lg ${
             selectedOption === "text"
@@ -544,23 +565,31 @@ const DesignOptions = ({
             </button>
           </div>
           <hr className="mt-4 border-gray-300" />
-          {parentSelectedImage && !showImageEditor && (
-            <div className="mb-4">
-              <img
-                src={
-                  typeof parentSelectedImage === "object"
-                    ? parentSelectedImage.src
-                    : parentSelectedImage
-                }
-                alt="Previously Selected"
-                className="mx-auto rounded-full"
-                style={{ borderRadius: "50%", height: "150px", width: "150px" }}
-              />
-              <p className="text-xs text-gray-500 text-center mt-2">
-                Currently selected image
-              </p>
-            </div>
-          )}
+
+          {/* Second Preview Circle for Currently Selected Image */}
+          {currentlySelectedImageForCandy &&
+            currentlySelectedImageForCandy.src && (
+              <div className="mb-4 text-center">
+                <img
+                  src={
+                    typeof currentlySelectedImageForCandy === "object"
+                      ? currentlySelectedImageForCandy.src
+                      : currentlySelectedImageForCandy
+                  }
+                  alt="Currently Selected"
+                  className="mx-auto rounded-full border-2 border-dashed border-gray-300"
+                  style={{
+                    borderRadius: "50%",
+                    height: "100px",
+                    width: "100px",
+                    objectFit: "cover",
+                  }}
+                />
+                <p className="text-xs text-gray-500 mt-2">
+                  Image currently on candy
+                </p>
+              </div>
+            )}
 
           {/* Checkbox moved here after all requirements */}
           <div className="mb-4">
@@ -626,6 +655,7 @@ const DesignOptions = ({
                 setShowImageUpload(false);
                 setSelectedOption("none");
                 setHasImageBeenUploaded(false); // Reset the flag when cleared
+                setCurrentlySelectedImageForCandy(null); // Clear the currently selected image for candy
               }}
               className="py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-yellow-500 transition-colors bg-yellow-400"
             >
