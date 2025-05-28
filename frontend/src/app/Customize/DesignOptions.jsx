@@ -56,7 +56,9 @@ const DesignOptions = ({
   const [showMore, setShowMore] = useState(false);
 
   const editorRef = useRef(null);
+  
   const [firstImageUploaded, setFirstImageUploaded] = useState(false);
+  const [secondImageUploaded,  setSecondImageUploaded] = useState(false);
 
   
   
@@ -93,6 +95,7 @@ const DesignOptions = ({
       setImageZoom(100);
       setImageRotation(0);
       setFirstImageUploaded(true);
+      setSecondImageUploaded(true);
     };
     reader.readAsDataURL(file);
   }
@@ -251,7 +254,7 @@ const DesignOptions = ({
       <RadioGroup
         value={selectedOption}
         onValueChange={handleOptionSelect}
-        className="flex flex-col space-y-8"
+        className="flex flex-col space-y-6"
       >
         {/* Image Option */}
         <Link href={"#upload-image"}>
@@ -562,7 +565,7 @@ const DesignOptions = ({
           {/* Upload Button moved here just below the heading */}
           
      {/* Upload First Image Button */}
-{firstImageUploaded && (
+{!firstImageUploaded && (
   <div className="flex justify-center mt-2">
     <input
       type="file"
@@ -588,7 +591,7 @@ const DesignOptions = ({
 
 {/* Conditionally show Second Upload Button */}
 
-{firstImageUploaded && (
+{secondImageUploaded && (
   <div className="flex justify-center mt-2">
     <button
       onClick={handleUploadClick}
@@ -598,7 +601,6 @@ const DesignOptions = ({
     </button>
   </div>
 )}
-
 
       
           {/* Clear button and logic */}
@@ -817,6 +819,7 @@ const DesignOptions = ({
         </div>
       )}
     </div>
+    
   );
 };
 
