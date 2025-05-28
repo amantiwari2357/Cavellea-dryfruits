@@ -22,7 +22,7 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
       { name: 'Light Blue', value: '#A3E0F5', key: 'lightBlue' },
       { name: 'Dark Green', value: '#007C36', key: 'darkGreen' },
       { name: 'Platinum', value: '#E5E4E2', key: 'platinum' },
-      { name: 'Orange', funvalue: '#FF5C00', key: 'orange' },
+      // { name: 'Orange', funvalue: '#FF5C00', key: 'orange' },
       { name: 'Light Purple', value: '#C1A7E2', key: 'lightPurple' },
       { name: 'Dark Pink', value: '#D6218F', key: 'darkPink' },
       { name: 'Dark Yellow', value: '#EFAA22', key: 'darkYellow' },

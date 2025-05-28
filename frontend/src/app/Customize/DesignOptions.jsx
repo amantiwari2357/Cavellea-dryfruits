@@ -93,15 +93,23 @@ const imageUploadRef = useRef(null);
   };
 
   const handleTextConfirm = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
     onTextChange(tempFirstLine, tempSecondLine);
     onFontStyleChange(tempFontStyle);
     setShowTextFields(false);
   };
 
-  const handleClipartSelect = (src) => {
-    onClipartSelect(src);
-    setShowClipartPanel(false);
-  };
+const handleClipartSelect = (src) => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+  onClipartSelect(src);
+  setShowClipartPanel(false);
+};
 
   const handleOptionSelect = (value) => {
     setSelectedOption(value);
@@ -182,6 +190,10 @@ const imageUploadRef = useRef(null);
   }, [isDragging, dragStart, imagePosition, imageZoom, imageRotation, editingImage]); // Added dependencies
 
   const handleImageConfirm = () => {
+    window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // for a smooth scroll
+  });
     onImageSelect({
       
       src: editingImage,
@@ -192,6 +204,11 @@ const imageUploadRef = useRef(null);
     });
     setShowImageEditor(false);
     toast.success("Image has been added to your candy design!");
+    window.scrollTo({
+    top: 0,
+    behavior: 'smooth' // for a smooth scroll
+  });
+
   };
 
   const handleResetImageEdits = () => {
@@ -667,13 +684,13 @@ const imageUploadRef = useRef(null);
               <button
                 onClick={() => {
                   setShowImageEditor(false);
-                  setShowImageUpload(true); // Go back to upload panel
+                  setShowImageUpload(true); 
                 }}
                 className="w-full border-2 border-brown-800 text-brown-800 font-bold py-3 px-6 rounded-full"
               >
                 Back
               </button>
-              <button
+              <button id='up'
                 onClick={handleImageConfirm}
                 className="w-full bg-yellow-400 text-black font-bold py-3 px-6 rounded-full hover:bg-yellow-500"
               >
