@@ -109,7 +109,7 @@ const DesignOptions = ({
   const handleUploadClick = () => {
     if (agreeTerms && fileInputRef.current) {
       fileInputRef.current.click();
-      fileInputRef.current.value = null; // Clear the input so same file can be uploaded again
+      // fileInputRef.current.value = null; 
     } else {
       toast.error(
         "Please agree to the terms and conditions to upload an image."
@@ -632,6 +632,13 @@ const DesignOptions = ({
           {/* Conditionally show Upload Next Image Button */}
           {hasImageBeenUploaded && (
             <div className="flex justify-center mt-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
               <button
                 onClick={handleUploadClick}
                 disabled={!agreeTerms}
