@@ -24,7 +24,6 @@ const DesignOptions = ({
   secondLine,
   selectedFontStyle,
   selectedImage: parentSelectedImage,
- 
   onClipartSelect,
 }) => {
   const [showTextFields, setShowTextFields] = useState(false);
@@ -57,11 +56,8 @@ const DesignOptions = ({
 
   const editorRef = useRef(null);
 
-  const [firstImageUploaded, setFirstImageUploaded] = useState(false);
-  const [secondImageUploaded,  setSecondImageUploaded] = useState(false);
-
-  
-  
+  // New state to manage if an image has been uploaded, regardless of which one
+  const [hasImageBeenUploaded, setHasImageBeenUploaded] = useState(false);
 
   const fontStyles = [
     "Bold",
@@ -81,31 +77,29 @@ const DesignOptions = ({
       clipart.alt.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
- const handleFileChange = (e) => {
-  const file =
-    e.target.files && e.target.files.length > 0 ? e.target.files[0] : null;
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const imageUrl = event.target.result;
-      setEditingImage(imageUrl);
-      setShowImageEditor(true);
-      setShowImageUpload(false);
-      setImagePosition({ x: 0, y: 0 });
-      setImageZoom(100);
-      setImageRotation(0);
-      setFirstImageUploaded(true);
-      setSecondImageUploaded(true);
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
+  const handleFileChange = (e) => {
+    const file =
+      e.target.files && e.target.files.length > 0 ? e.target.files[0] : null;
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target.result;
+        setEditingImage(imageUrl);
+        setShowImageEditor(true);
+        setShowImageUpload(false);
+        setImagePosition({ x: 0, y: 0 });
+        setImageZoom(100);
+        setImageRotation(0);
+        setHasImageBeenUploaded(true); // Set flag to true after successful upload
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleUploadClick = () => {
     if (agreeTerms && fileInputRef.current) {
       fileInputRef.current.click();
-     fileInputRef.current.value = null;
+      fileInputRef.current.value = null; // Clear the input so same file can be uploaded again
     } else {
       toast.error(
         "Please agree to the terms and conditions to upload an image."
@@ -132,57 +126,55 @@ const DesignOptions = ({
     setShowClipartPanel(false);
   };
 
- const handleOptionSelect = (value) => {
-  // Agar wahi option dobara select ho raha hai
-  if (selectedOption === value) {
-    if (value === "image") {
-      // Agar secondImageUploaded pehle se false hai toh usko true kar do
-      if (secondImageUploaded) {
-        setSecondImageUploaded(true);
+  const handleOptionSelect = (value) => {
+    // If the same option is selected again
+    if (selectedOption === value) {
+      if (value === "image") {
+        // If an image has already been uploaded, allow uploading a new one
+        if (hasImageBeenUploaded) {
+          setShowImageUpload(true); // Show upload panel for next image
+          setShowImageEditor(false); // Hide editor if it was open
+          // Do not reset editingImage or its properties here
+        } else if (parentSelectedImage && parentSelectedImage.src) {
+          // If there's a parent selected image but not yet in editor
+          setEditingImage(parentSelectedImage.src);
+          setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
+          setImageZoom(parentSelectedImage.zoom || 100);
+          setImageRotation(parentSelectedImage.rotation || 0);
+          setShowImageEditor(true);
+          setShowImageUpload(false);
+        } else {
+          setShowImageUpload(true);
+        }
       }
-      // Aur baaki jo image editor ya upload dikhana hai wo handle karo
-      if (parentSelectedImage && parentSelectedImage.src) {
+      return; // Skip the rest if the same option is selected again
+    }
+
+    // Reset states for a new option selection
+    setSelectedOption(value);
+    setShowTextFields(false);
+    setShowImageUpload(false);
+    setShowClipartPanel(false);
+    setShowImageEditor(false);
+
+    // Show panels based on the newly selected option
+    if (value === "image") {
+      if (parentSelectedImage && parentSelectedImage.src && !hasImageBeenUploaded) {
+        // If there's a pre-selected image and no image has been uploaded yet in this session
         setEditingImage(parentSelectedImage.src);
         setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
         setImageZoom(parentSelectedImage.zoom || 100);
         setImageRotation(parentSelectedImage.rotation || 0);
         setShowImageEditor(true);
-        setShowImageUpload(false);
       } else {
         setShowImageUpload(true);
-        setShowImageEditor(false);
       }
+    } else if (value === "text") {
+      setShowTextFields(true);
+    } else if (value === "clipart") {
+      setShowClipartPanel(true);
     }
-    // Agar doosra option hai aur wahi dobara select ho toh kuch karna ho toh yahan handle kar sakte ho
-    return; // Bas yahi karo, baaki function skip karo kyunki selected option change nahi ho raha
-  }
-
-  // Naya option select karne par normal state reset karo
-  setSelectedOption(value);
-  setShowTextFields(false); 
-  setShowImageUpload(false);
-  setShowClipartPanel(false);
-  setShowImageEditor(false);
-  setSecondImageUploaded(false); // Reset second image upload flag
-
-  // Phir naya option ke hisaab se panels dikhana
-  if (value === "image") {
-    if (parentSelectedImage && parentSelectedImage.src) {
-      setEditingImage(parentSelectedImage.src);
-      setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
-      setImageZoom(parentSelectedImage.zoom || 100);
-      setImageRotation(parentSelectedImage.rotation || 0);
-      setShowImageEditor(true);
-    } else {
-      setShowImageUpload(true);
-    }
-  } else if (value === "text") {
-    setShowTextFields(true);
-  } else if (value === "clipart") {
-    setShowClipartPanel(true);
-  }
-};
-
+  };
 
   // Mouse event handlers for image dragging
   const handleMouseDown = (e) => {
@@ -267,8 +259,6 @@ const DesignOptions = ({
     setImageZoom(100);
     setImageRotation(0);
   };
-// new state for manage a multiple image
-
 
   return (
     <div className="p-0 bg-white w-64 rounded-lg shadow-md">
@@ -281,7 +271,6 @@ const DesignOptions = ({
         onValueChange={handleOptionSelect}
         className="flex flex-col space-y-6"
       >
-
         {/* yaha se Image Option suru hoga*/}
 
         <Link href={"#upload-image"}>
@@ -479,9 +468,6 @@ const DesignOptions = ({
               alt="Conversion Example"
               className="max-h-50 w-74 rounded-lg bg-cover bg-no-repeat bg-center"
             />
-            {/* <p className="text-xs text-gray-500 mt-2 text-center">
-        Your image will be printed in black.
-      </p> */}
           </div>
 
           <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
@@ -530,7 +516,6 @@ const DesignOptions = ({
                   <li>Only 1–2 close faces allowed. No arms or full body.</li>
                   <li>No copyrighted/logos unless with written permission.</li>
                   <li>Backgrounds will be removed; image prints in black. </li>
-
                 </>
               )}
             </ul>
@@ -569,7 +554,7 @@ const DesignOptions = ({
                 }
                 alt="Previously Selected"
                 className="mx-auto rounded-full"
-                style={{ borderRadius: "50%" , height:'150px' , width:'150px' }}
+                style={{ borderRadius: "50%", height: "150px", width: "150px" }}
               />
               <p className="text-xs text-gray-500 text-center mt-2">
                 Currently selected image
@@ -591,47 +576,47 @@ const DesignOptions = ({
               </span>
             </label>
           </div>
-          {/* Upload Button moved here just below the heading */}
-          
-     {/* Upload First Image Button */}
-{!firstImageUploaded && (
-  <div className="flex justify-center mt-2">
-    <input
-      type="file"
-      ref={fileInputRef}
-      onChange={handleFileChange}
-      accept="image/*"
-      className="hidden"
-      multiple
-    />
-    <button
-      onClick={handleUploadClick}
-      disabled={!agreeTerms}
-      className={`px-4 py-2 rounded-md ${
-        agreeTerms
-          ? "bg-yellow-400 text-black hover:bg-yellow-500"
-          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-      } transition-colors`}
-    >
-      Upload First Image
-    </button>
-  </div>
-)}
+          {/* Upload First Image Button */}
+          {!hasImageBeenUploaded && (
+            <div className="flex justify-center mt-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <button
+                onClick={handleUploadClick}
+                disabled={!agreeTerms}
+                className={`px-4 py-2 rounded-md ${
+                  agreeTerms
+                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                } transition-colors`}
+              >
+                Upload First Image
+              </button>
+            </div>
+          )}
 
-{/* Conditionally show Second Upload Button */}
+          {/* Conditionally show Upload Next Image Button */}
+          {hasImageBeenUploaded && (
+            <div className="flex justify-center mt-2">
+              <button
+                onClick={handleUploadClick}
+                disabled={!agreeTerms}
+                className={`px-4 py-2 rounded-md ${
+                  agreeTerms
+                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                } transition-colors`}
+              >
+                Upload Next Image
+              </button>
+            </div>
+          )}
 
-{secondImageUploaded && (
-  <div className="flex justify-center mt-2">
-    <button
-      onClick={handleUploadClick}
-      className="px-4 py-2 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 transition-colors]"
-    >
-      Upload Next Image
-    </button>
-  </div>
-)}
-
-      
           {/* Clear button and logic */}
           <div className="flex justify-center mt-2">
             <button
@@ -640,10 +625,11 @@ const DesignOptions = ({
                 setEditingImage(null);
                 setShowImageUpload(false);
                 setSelectedOption("none");
+                setHasImageBeenUploaded(false); // Reset the flag when cleared
               }}
               className="py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-yellow-500 transition-colors bg-yellow-400"
             >
-              Click To Clear.........
+              Clear Image
             </button>
           </div>
         </div>
@@ -676,7 +662,7 @@ const DesignOptions = ({
               className="w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-        {/* ye categories dynamic aaayange*/}
+          {/* ye categories dynamic aaayange*/}
           <div className="mb-4">
             <select
               value={selectedCategory}
@@ -848,7 +834,6 @@ const DesignOptions = ({
         </div>
       )}
     </div>
-    
   );
 };
 
