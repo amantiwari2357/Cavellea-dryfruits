@@ -316,7 +316,7 @@ const DesignOptions = ({
 
 
   return (
-    <div className="p-0 bg-white w-64 rounded-lg shadow-md">
+    <div className="p-0 bg-white w-64 h-full rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center">Design Your Candy</h2>
       <p className="text-gray-600 text-center mb-6">
         Choose your design option below
