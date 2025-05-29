@@ -242,7 +242,7 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
       <div className="relative w-400 h-[400px] rounded-lg overflow-hidden border border-gray-200">
         {selectedColors.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500 text-lg">Select colors to see your candy mix preview</p>
+            <p className="text-gray-500 text-lg">Choose a color to view the candy mix preview.</p>
           </div>
         ) : (
           <>
@@ -268,12 +268,12 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
                   }}
                 >
                   {/* Default 'C' if no customization is applied to this candy */}
-                  {!candy.contentData && ( // Check if contentData is null
+                  {candy.contentType === 'default' && ( // 'C' तभी दिखाएं जब कोई अन्य कस्टमाइज़ेशन न हो
                     <span className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-700'}`}>𝓒</span>
                   )}
 
                   {/* Render Text */}
-                  {candy.contentType === 'text' && candy.contentData === null && ( // Ensure no image/clipart is assigned
+                  {candy.contentType === 'text' && (firstLine || secondLine) && ( // टेक्स्ट के लिए स्पष्ट शर्त
                     <div className={`flex flex-col items-center justify-center ${fontClass} text-${isDark ? 'white' : 'gray-700'} text-[6px] leading-tight text-center transform`}>
                       {firstLine && <div>{firstLine}</div>}
                       {secondLine && <div>{secondLine}</div>}

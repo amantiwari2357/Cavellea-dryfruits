@@ -7,19 +7,19 @@ const ActiveCustomizationToolbar = ({ activeType, onEdit, onRemove, onCancel }) 
   const typeDisplay = activeType ? activeType.charAt(0).toUpperCase() + activeType.slice(1) : '';
 
   return (
-    <div className="p-6 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl flex flex-col space-y-8 items-center border border-gray-100">
+<div className="w-[300px] p-6 bg-gradient-to-br from-white to-gray-50 rounded-2xl shadow-xl flex flex-col space-y-8 items-center border border-gray-100">
       <h3 className="text-3xl font-extrabold text-gray-800 mb-4 text-center tracking-tight">
         {typeDisplay} Options
       </h3>
 
       {/* Edit Button */}
-      <button
+      {/* <button
         onClick={() => onEdit(activeType)}
         className="flex flex-col items-center justify-center w-32 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl shadow-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105"
       >
-        <Edit className="h-8 w-8 mb-2 text-white" strokeWidth={2} /> {/* Reduced icon size slightly */}
-        <span className="text-lg font-bold">Edit</span> {/* Reduced text size slightly */}
-      </button>
+        <Edit className="h-8 w-8 mb-2 text-white" strokeWidth={2} /> 
+        <span className="text-lg font-bold">Edit</span>
+      </button> */}
 
       {/* Remove Button */}
       <button
