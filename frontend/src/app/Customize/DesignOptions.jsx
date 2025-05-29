@@ -77,8 +77,17 @@ const DesignOptions = ({
       image: "/images/convert1.jpg",
     },
   ];
+
+   useEffect(() => {
+    const storedType = localStorage.getItem("printType");
+    if (storedType) {
+      setSelectedType(storedType);
+    }
+  }, []);
+
    const handleSelect = (value) => {
     setSelectedType(value);
+    localStorage.setItem("printType", value);
   };
 
 
