@@ -1010,3 +1010,164 @@ const DesignOptions = ({
 };
 
 export default DesignOptions;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+// import { useState } from "react";
+// import { ImageIcon, Palette } from "lucide-react";
+// import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+// import ImageEditorPanel from "./ImageEditorPanel";
+// import TextEditorPanel from "./TextEditorPanel";
+// import ClipartPanel from "./ClipartPanel";
+
+// const DesignOptionsMain = ({
+//   onImageSelect,
+//   onTextChange,
+//   onFontStyleChange,
+//   firstLine,
+//   secondLine,
+//   selectedFontStyle,
+//   selectedImage,
+//   onClipartSelect,
+//   firstUploadedImage,
+//   secondUploadedImage,
+// }) => {
+//   const [selectedOption, setSelectedOption] = useState("none");
+
+//   const handleOptionSelect = (value) => {
+//     if (selectedOption === value) {
+//       if (value === "image") {
+//         setShowImageUpload(true);
+//         setShowImageEditor(false);
+//       }
+//       return;
+//     }
+//     setSelectedOption(value);
+//   };
+
+//   return (
+//     <div className="p-0 bg-white w-64 rounded-lg shadow-md">
+//       <h2 className="text-2xl font-bold mb-6 text-center">Design Your Candy</h2>
+//       <p className="text-gray-600 text-center mb-6">
+//         Choose your design option below
+//       </p>
+      
+//       <RadioGroup
+//         value={selectedOption}
+//         onValueChange={handleOptionSelect}
+//         className="flex flex-col space-y-6"
+//       >
+//         {/* Image Option */}
+//         <div className={`flex items-center space-x-4 p-3 rounded-lg mb-0 ${
+//           selectedOption === "image" ? "bg-blue-50 border border-blue-200" : "hover:bg-gray-50"
+//         }`}>
+//           <RadioGroupItem value="image" id="option-image" />
+//           <div className="flex items-center space-x-3 cursor-pointer mb-0">
+//             <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+//               <ImageIcon className="h-5 w-5 text-blue-600" />
+//             </div>
+//             <div>
+//               <label htmlFor="option-image" className="text-lg font-semibold cursor-pointer">
+//                 Image
+//               </label>
+//               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
+//               {(firstUploadedImage || secondUploadedImage) && (
+//                 <p className="text-xs text-gray-500 mt-1">Images selected</p>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Text Option */}
+//         <div className={`flex items-center space-x-3 p-3 rounded-lg ${
+//           selectedOption === "text" ? "bg-orange-50 border border-orange-200" : "hover:bg-gray-50"
+//         }`}>
+//           <RadioGroupItem value="text" />
+//           <div className="flex items-center space-x-3 cursor-pointer">
+//             <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
+//               <span className="text-2xl font-bold text-orange-500">Aa</span>
+//             </div>
+//             <div>
+//               <label htmlFor="option-text" className="text-lg font-semibold cursor-pointer">
+//                 Text
+//               </label>
+//               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
+//               {(firstLine || secondLine) && (
+//                 <p className="text-xs text-gray-500 mt-1">Text added</p>
+//               )}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Clipart Option */}
+//         <div className={`flex items-center space-x-3 p-3 rounded-lg mb-0 ${
+//           selectedOption === "clipart" ? "bg-green-50 border border-green-200" : "hover:bg-gray-50"
+//         }`}>
+//           <RadioGroupItem value="clipart" />
+//           <div className="flex items-center space-x-3 cursor-pointer">
+//             <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+//               <Palette className="h-5 w-5 text-green-600" />
+//             </div>
+//             <div>
+//               <label htmlFor="option-clipart" className="text-lg font-semibold cursor-pointer">
+//                 Clipart
+//               </label>
+//               <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
+//             </div>
+//           </div>
+//         </div>
+//       </RadioGroup>
+
+//       {selectedOption === "image" && (
+//         <ImageEditorPanel
+//           onImageSelect={onImageSelect}
+//           firstUploadedImage={firstUploadedImage}
+//           secondUploadedImage={secondUploadedImage}
+//         />
+//       )}
+
+//       {selectedOption === "text" && (
+//         <TextEditorPanel
+//           onTextChange={onTextChange}
+//           onFontStyleChange={onFontStyleChange}
+//           firstLine={firstLine}
+//           secondLine={secondLine}
+//           selectedFontStyle={selectedFontStyle}
+//         />
+//       )}
+
+//       {selectedOption === "clipart" && (
+//         <ClipartPanel 
+//           onClipartSelect={onClipartSelect}
+//           selectedImage={selectedImage}
+//         />
+//       )}
+//     </div>
+//   );
+// };
+
+// export default DesignOptionsMain;
