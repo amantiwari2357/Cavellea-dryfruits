@@ -81,7 +81,7 @@ const DesignOptions = ({
     "Light",
     "Script",
     "Italic",
-    "Monospace",
+    // "Monospace",
   ];
 
   const allCliparts = clipartdata;
