@@ -62,6 +62,9 @@ const DesignOptions = ({
   const [secondUploadedImage, setSecondUploadedImage] = useState(parentSecondUploadedImage);
   const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] = useState(null);
 
+
+  const [printType, setPrintType] = useState("black-and-white"); // default option
+
   // Keep internal states in sync with parent props
   useEffect(() => {
     setFirstUploadedImage(parentFirstUploadedImage);
@@ -499,23 +502,56 @@ const DesignOptions = ({
         </div>
       )}
 
-      {showImageUpload && (
-        <div
-          ref={imageUploadRef}
-          className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
-        >
-          <h4 id="upload-image" className="text-lg font-bold">
-            Choose an Image
-          </h4>
-          <p className="text-sm text-gray-700">• First image upload is FREE.</p>
+    {showImageUpload && (
+  <div
+    ref={imageUploadRef}
+    className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
+  >
+    <h4 id="upload-image" className="text-lg font-bold">
+      Choose an Image
+    </h4>
+    <p className="text-sm text-gray-700">• First image upload is FREE.</p>
 
-          <div className="flex flex-col items-center mt-4">
-            <img
-              src="/images/convert.jpeg"
-              alt="Conversion Example"
-              className="max-h-50 w-74 rounded-lg bg-cover bg-no-repeat bg-center"
-            />
-          </div>
+    <div className="flex flex-col items-center mt-4">
+      <img
+        src="/images/convert.jpeg"
+        alt="Conversion Example"
+        className="max-h-50 w-74 rounded-lg bg-cover bg-no-repeat bg-center"
+      />
+    </div>
+
+    {/* Print Type Selection */}
+    <div className="flex justify-center space-x-8 mt-4">
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          name="printType"
+          value="black-and-white"
+          checked={printType === "black-and-white"}
+          onChange={(e) => setPrintType(e.target.value)}
+          className="form-radio text-blue-600"
+        />
+        <span className="text-sm text-gray-800 font-medium">Black & White</span>
+      </label>
+      <label className="flex items-center space-x-2">
+        <input
+          type="radio"
+          name="printType"
+          value="color"
+          checked={printType === "color"}
+          onChange={(e) => setPrintType(e.target.value)}
+          className="form-radio text-blue-600"
+        />
+        <span className="text-sm text-gray-800 font-medium">Color</span>
+      </label>
+    </div>
+
+    {/* Optional: Display selected value */}
+    {/* <p className="text-sm text-gray-600 text-center mt-2">
+      Selected: <span className="font-semibold">{printType === 'color' ? 'Color Print' : 'Black & White Print'}</span>
+    </p>
+  </div>
+)} */}
 
           <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
           <div className="flex flex-row items-center justify-center gap-4">
@@ -708,55 +744,56 @@ const DesignOptions = ({
           )}
 
           {/* Edit/Clear Buttons for Each Image */}
-          {firstUploadedImage && (
-            <div className="flex justify-center mt-2 space-x-2">
-              <button
-                onClick={() => {
-                  setEditingImageSrc(firstUploadedImage.src);
-                  setImagePosition(firstUploadedImage.position);
-                  setImageZoom(firstUploadedImage.zoom);
-                  setImageRotation(firstUploadedImage.rotation);
-                  setCurrentlyEditingImageSlot("first");
-                  setShowImageEditor(true);
-                  setShowImageUpload(false);
-                }}
-                className="py-2 px-4 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-100 transition-colors"
-              >
-                Edit First Image
-              </button>
-              <button
-                onClick={() => handleClearImage("first")}
-                className="py-2 px-4 border border-red-300 rounded-md text-red-700 hover:bg-red-100 transition-colors"
-              >
-                Clear First
-              </button>
-            </div>
-          )}
+         {firstUploadedImage && (
+  <div className="flex justify-center mt-2 space-x-4">
+    <button
+      onClick={() => {
+        setEditingImageSrc(firstUploadedImage.src);
+        setImagePosition(firstUploadedImage.position);
+        setImageZoom(firstUploadedImage.zoom);
+        setImageRotation(firstUploadedImage.rotation);
+        setCurrentlyEditingImageSlot("first");
+        setShowImageEditor(true);
+        setShowImageUpload(false);
+      }}
+      className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
+    >
+      ✏️  Edit First
+    </button>
+    <button
+      onClick={() => handleClearImage("first")}
+      className="px-5 py-2 rounded-lg bg-red-600 text-white font-semibold shadow-md hover:bg-red-700 hover:shadow-lg transition duration-200"
+    >
+      🗑️ Clear First
+    </button>
+  </div>
+)}
 
-          {secondUploadedImage && (
-            <div className="flex justify-center mt-2 space-x-2">
-              <button
-                onClick={() => {
-                  setEditingImageSrc(secondUploadedImage.src);
-                  setImagePosition(secondUploadedImage.position);
-                  setImageZoom(secondUploadedImage.zoom);
-                  setImageRotation(secondUploadedImage.rotation);
-                  setCurrentlyEditingImageSlot("second");
-                  setShowImageEditor(true);
-                  setShowImageUpload(false);
-                }}
-                className="py-2 px-4 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-100 transition-colors"
-              >
-                Edit Second Image
-              </button>
-              <button
-                onClick={() => handleClearImage("second")}
-                className="py-2 px-4 border border-red-300 rounded-md text-red-700 hover:bg-red-100 transition-colors"
-              >
-                Clear Second
-              </button>
-            </div>
-          )}
+{secondUploadedImage && (
+  <div className="flex justify-center mt-2 space-x-4">
+    <button
+      onClick={() => {
+        setEditingImageSrc(secondUploadedImage.src);
+        setImagePosition(secondUploadedImage.position);
+        setImageZoom(secondUploadedImage.zoom);
+        setImageRotation(secondUploadedImage.rotation);
+        setCurrentlyEditingImageSlot("second");
+        setShowImageEditor(true);
+        setShowImageUpload(false);
+      }}
+      className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
+    >
+      ✏️ Edit Second
+    </button>
+    <button
+      onClick={() => handleClearImage("second")}
+      className="px-5 py-2 rounded-lg bg-red-600 text-white font-semibold shadow-md hover:bg-red-700 hover:shadow-lg transition duration-200"
+    >
+      🗑️ Clear Second
+    </button>
+  </div>
+)}
+
 
           {/* Overall Clear All Images button */}
           {(firstUploadedImage || secondUploadedImage) && (
