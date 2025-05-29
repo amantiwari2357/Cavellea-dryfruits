@@ -173,6 +173,9 @@ const Customize = () => {
     <h4 className="text-2xl font-bold text-gray-700 mb-4 text-center ml-[-120px]">Preview</h4>
     <div className="flex flex-col space-y-6 items-center ml-[-120px]">
 
+{/* flex flex-col space-y-6 items-center ml-[-120px]
+esse ham right side preview circle ko ham manage krenge */}
+
       {/* Image 1 Preview */}
       <div
         className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
