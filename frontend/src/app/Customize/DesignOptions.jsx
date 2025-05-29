@@ -15,14 +15,17 @@ import clipartdata from "@/app/data/clipartData";
 import Link from "next/link";
 
 const DesignOptions = ({
-  onImageSelect,
+  onImageSelect, // This prop will now receive an object { first: image1Data, second: image2Data }
   onTextChange,
   onFontStyleChange,
   firstLine,
   secondLine,
   selectedFontStyle,
-  selectedImage: parentSelectedImage,
+  selectedImage: parentSelectedImage, // This is still the primary image from parent, used for initial setup
   onClipartSelect,
+  // New props to receive the current state of both images from the parent
+  firstUploadedImage: parentFirstUploadedImage,
+  secondUploadedImage: parentSecondUploadedImage,
 }) => {
   const [showTextFields, setShowTextFields] = useState(false);
   const [showImageUpload, setShowImageUpload] = useState(false);
@@ -40,7 +43,7 @@ const DesignOptions = ({
 
   const [showImageEditor, setShowImageEditor] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
-  const [editingImage, setEditingImage] = useState(null);
+  const [editingImageSrc, setEditingImageSrc] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageZoom, setImageZoom] = useState(100);
@@ -54,19 +57,20 @@ const DesignOptions = ({
 
   const editorRef = useRef(null);
 
-  // New state to manage if an image has been uploaded, regardless of which one
-  const [hasImageBeenUploaded, setHasImageBeenUploaded] = useState(false);
+  // Internal states for the two images, initialized from parent props
+  const [firstUploadedImage, setFirstUploadedImage] = useState(parentFirstUploadedImage);
+  const [secondUploadedImage, setSecondUploadedImage] = useState(parentSecondUploadedImage);
+  const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] = useState(null);
 
-  // New state for the second image preview (the one currently on the candy)
-  const [currentlySelectedImageForCandy, setCurrentlySelectedImageForCandy] =
-    useState(parentSelectedImage);
+  // Keep internal states in sync with parent props
+  useEffect(() => {
+    setFirstUploadedImage(parentFirstUploadedImage);
+  }, [parentFirstUploadedImage]);
 
   useEffect(() => {
-    // Update currentlySelectedImageForCandy when parentSelectedImage changes
-    if (parentSelectedImage) {
-      setCurrentlySelectedImageForCandy(parentSelectedImage);
-    }
-  }, [parentSelectedImage]);
+    setSecondUploadedImage(parentSecondUploadedImage);
+  }, [parentSecondUploadedImage]);
+
 
   const fontStyles = [
     "Bold",
@@ -87,28 +91,43 @@ const DesignOptions = ({
   );
 
   const handleFileChange = (e) => {
-    const file =
-      e.target.files && e.target.files.length > 0 ? e.target.files[0] : null;
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const imageUrl = event.target.result;
-        setEditingImage(imageUrl);
+        setEditingImageSrc(imageUrl);
+
+        // If no slot is explicitly set (e.g., first time clicking upload),
+        // determine which slot to use. If first is empty, use first. Else, use second.
+        // If both are full, default to editing the first one, or prompt user.
+        if (!currentlyEditingImageSlot) {
+            if (!firstUploadedImage) {
+                setCurrentlyEditingImageSlot("first");
+            } else if (!secondUploadedImage) {
+                setCurrentlyEditingImageSlot("second");
+            } else {
+                setCurrentlyEditingImageSlot("first"); // Default to first if both are full
+                toast.info("Both image slots are full. Editing the first image.");
+            }
+        }
+        
         setShowImageEditor(true);
         setShowImageUpload(false);
+        // Reset editor settings to default for a new image upload
         setImagePosition({ x: 0, y: 0 });
         setImageZoom(100);
         setImageRotation(0);
-        setHasImageBeenUploaded(true); // Set flag to true after successful upload
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleUploadClick = () => {
+  const handleUploadClick = (slot) => {
     if (agreeTerms && fileInputRef.current) {
+      setCurrentlyEditingImageSlot(slot); // Set which slot we are going to upload/edit
       fileInputRef.current.click();
-      // fileInputRef.current.value = null; 
+      fileInputRef.current.value = null; // Clear input to allow re-uploading the same file
     } else {
       toast.error(
         "Please agree to the terms and conditions to upload an image."
@@ -136,25 +155,11 @@ const DesignOptions = ({
   };
 
   const handleOptionSelect = (value) => {
-    // If the same option is selected again
+    // If the same option is selected again, allow re-upload if it's image
     if (selectedOption === value) {
       if (value === "image") {
-        // If an image has already been uploaded, allow uploading a new one
-        if (hasImageBeenUploaded) {
-          setShowImageUpload(true); // Show upload panel for next image
-          setShowImageEditor(false); // Hide editor if it was open
-          // Do not reset editingImage or its properties here
-        } else if (parentSelectedImage && parentSelectedImage.src) {
-          // If there's a parent selected image but not yet in editor
-          setEditingImage(parentSelectedImage.src);
-          setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
-          setImageZoom(parentSelectedImage.zoom || 100);
-          setImageRotation(parentSelectedImage.rotation || 0);
-          setShowImageEditor(true);
-          setShowImageUpload(false);
-        } else {
-          setShowImageUpload(true);
-        }
+        setShowImageUpload(true); // Show upload panel again
+        setShowImageEditor(false); // Hide editor if it was open
       }
       return; // Skip the rest if the same option is selected again
     }
@@ -165,23 +170,11 @@ const DesignOptions = ({
     setShowImageUpload(false);
     setShowClipartPanel(false);
     setShowImageEditor(false);
+    setCurrentlyEditingImageSlot(null); // Reset currently editing slot when changing option
 
     // Show panels based on the newly selected option
     if (value === "image") {
-      if (
-        parentSelectedImage &&
-        parentSelectedImage.src &&
-        !hasImageBeenUploaded
-      ) {
-        // If there's a pre-selected image and no image has been uploaded yet in this session
-        setEditingImage(parentSelectedImage.src);
-        setImagePosition(parentSelectedImage.position || { x: 0, y: 0 });
-        setImageZoom(parentSelectedImage.zoom || 100);
-        setImageRotation(parentSelectedImage.rotation || 0);
-        setShowImageEditor(true);
-      } else {
-        setShowImageUpload(true);
-      }
+      setShowImageUpload(true); // Always show upload for image selection initially
     } else if (value === "text") {
       setShowTextFields(true);
     } else if (value === "clipart") {
@@ -213,7 +206,6 @@ const DesignOptions = ({
     let newY = e.clientY - dragStart.y;
 
     // Clamp the image position within the container bounds
-    // This is a simplified clamping and might need refinement for complex rotations/zooms
     const maxX = (containerRect.width - imageRect.width) / 2;
     const maxY = (containerRect.height - imageRect.height) / 2;
 
@@ -244,34 +236,39 @@ const DesignOptions = ({
     imagePosition,
     imageZoom,
     imageRotation,
-    editingImage,
-  ]); // Added dependencies
+    editingImageSrc,
+  ]);
 
   const handleImageConfirm = () => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth", // for a smooth scroll
+      behavior: "smooth",
     });
-    onImageSelect({
-      src: editingImage,
-      position: imagePosition,
-      zoom: imageZoom,
-      rotation: imageRotation,
-      isCircular: true, // Indicate that it should be displayed as a circle
-    });
-    setCurrentlySelectedImageForCandy({
-      src: editingImage,
+
+    const imageData = {
+      src: editingImageSrc,
       position: imagePosition,
       zoom: imageZoom,
       rotation: imageRotation,
       isCircular: true,
-    }); // Update the currently selected image for the second preview
+    };
+
+    let updatedFirstImage = firstUploadedImage;
+    let updatedSecondImage = secondUploadedImage;
+
+    if (currentlyEditingImageSlot === "first") {
+      updatedFirstImage = imageData;
+      setFirstUploadedImage(imageData); // Update internal state
+    } else if (currentlyEditingImageSlot === "second") {
+      updatedSecondImage = imageData;
+      setSecondUploadedImage(imageData); // Update internal state
+    }
+
+    // Pass both images up to the parent component
+    onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
+
     setShowImageEditor(false);
     toast.success("Image has been added to your candy design!");
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth", // for a smooth scroll
-    });
   };
 
   const handleResetImageEdits = () => {
@@ -279,6 +276,41 @@ const DesignOptions = ({
     setImageZoom(100);
     setImageRotation(0);
   };
+
+  const handleClearImage = (slotToClear) => {
+    let updatedFirstImage = firstUploadedImage;
+    let updatedSecondImage = secondUploadedImage;
+
+    if (slotToClear === "first") {
+      updatedFirstImage = null;
+      setFirstUploadedImage(null);
+    } else if (slotToClear === "second") {
+      updatedSecondImage = null;
+      setSecondUploadedImage(null);
+    }
+
+    // Pass both images up to the parent component
+    onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
+
+    setEditingImageSrc(null); // Clear editor source
+    setShowImageUpload(false); // Hide upload panel
+    setShowImageEditor(false); // Hide editor
+    setCurrentlyEditingImageSlot(null); // Clear which slot is being edited
+    toast.info(`Image ${slotToClear === 'first' ? '1' : '2'} cleared.`);
+  };
+
+  const handleClearAllImages = () => {
+    setFirstUploadedImage(null);
+    setSecondUploadedImage(null);
+    onImageSelect({ first: null, second: null }); // Clear both in parent
+    setEditingImageSrc(null);
+    setShowImageUpload(false);
+    setShowImageEditor(false);
+    setSelectedOption("none");
+    setCurrentlyEditingImageSlot(null);
+    toast.info("All images cleared.");
+  };
+
 
   return (
     <div className="p-0 bg-white w-64 rounded-lg shadow-md">
@@ -292,7 +324,6 @@ const DesignOptions = ({
         className="flex flex-col space-y-6"
       >
         {/* Image Option */}
-
         <Link href={"#upload-image"}>
           <div
             ref={imageUploadRef}
@@ -318,8 +349,8 @@ const DesignOptions = ({
                   Image
                 </label>
                 <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
-                {currentlySelectedImageForCandy && (
-                  <p className="text-xs text-gray-500 mt-1">Image selected</p>
+                {(firstUploadedImage || secondUploadedImage) && (
+                  <p className="text-xs text-gray-500 mt-1">Images selected</p>
                 )}
               </div>
             </div>
@@ -385,7 +416,6 @@ const DesignOptions = ({
                   Clipart
                 </label>
                 <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
-                {/* Assuming onClipartSelect is passed and used by parent to manage selectedClipart */}
                 {onClipartSelect && (
                   <p className="text-xs text-gray-500 mt-1"></p>
                 )}
@@ -394,10 +424,7 @@ const DesignOptions = ({
           </Link>
         </div>
 
-        {/* Option for additional image - shown as an example from the reference */}
-        <div className="mt-2 text-center">
-          {/* <span className="text-gray-500 text-sm">+$4.99 for another image</span> */}
-        </div>
+        <div className="mt-2 text-center"></div>
       </RadioGroup>
 
       {/* Text Fields Panel */}
@@ -565,30 +592,57 @@ const DesignOptions = ({
           </div>
           <hr className="mt-4 border-gray-300" />
 
-          {/* Second Preview Circle for Currently Selected Image */}
-          {currentlySelectedImageForCandy &&
-            currentlySelectedImageForCandy.src && (
-              <div className="mb-4 text-center">
-                <img
-                  src={
-                    typeof currentlySelectedImageForCandy === "object"
-                      ? currentlySelectedImageForCandy.src
-                      : currentlySelectedImageForCandy
-                  }
-                  alt="Currently Selected"
-                  className="mx-auto rounded-full border-2 border-dashed border-gray-300"
-                  style={{
-                    borderRadius: "50%",
-                    height: "100px",
-                    width: "100px",
-                    objectFit: "cover",
-                  }}
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  Image currently on candy
-                </p>
+          {/* Combined Preview Circle for Both Images */}
+          {(firstUploadedImage || secondUploadedImage) && (
+            <div className="mb-4 text-center relative w-fit mx-auto">
+              <div
+                className="mx-auto rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative"
+                style={{
+                  height: "120px", // Slightly larger to accommodate two
+                  width: "120px",
+                  overflow: "hidden",
+                }}
+              >
+                {firstUploadedImage && (
+                  <img
+                    src={firstUploadedImage.src}
+                    alt="First Uploaded"
+                    className="absolute"
+                    style={{
+                      borderRadius: "50%",
+                      height: "80px", // Adjust size as needed
+                      width: "80px",
+                      objectFit: "cover",
+                      top: "10%", // Example positioning
+                      left: "10%",
+                      zIndex: 1, // Ensure it's on top
+                      transform: `translate(${firstUploadedImage.position?.x || 0}px, ${firstUploadedImage.position?.y || 0}px) rotate(${firstUploadedImage.rotation || 0}deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
+                    }}
+                  />
+                )}
+                {secondUploadedImage && (
+                  <img
+                    src={secondUploadedImage.src}
+                    alt="Second Uploaded"
+                    className="absolute"
+                    style={{
+                      borderRadius: "50%",
+                      height: "80px", // Adjust size as needed
+                      width: "80px",
+                      objectFit: "cover",
+                      bottom: "10%", // Example positioning
+                      right: "10%",
+                      zIndex: 2, // Ensure it's on top
+                      transform: `translate(${secondUploadedImage.position?.x || 0}px, ${secondUploadedImage.position?.y || 0}px) rotate(${secondUploadedImage.rotation || 0}deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
+                    }}
+                  />
+                )}
               </div>
-            )}
+              <p className="text-xs text-gray-500 mt-2">
+                Images currently on candy
+              </p>
+            </div>
+          )}
 
           {/* Checkbox moved here after all requirements */}
           <div className="mb-4">
@@ -604,8 +658,9 @@ const DesignOptions = ({
               </span>
             </label>
           </div>
+
           {/* Upload First Image Button */}
-          {!hasImageBeenUploaded && (
+          {!firstUploadedImage && ( // Only show if first image is not uploaded
             <div className="flex justify-center mt-2">
               <input
                 type="file"
@@ -615,7 +670,7 @@ const DesignOptions = ({
                 className="hidden"
               />
               <button
-                onClick={handleUploadClick}
+                onClick={() => handleUploadClick("first")}
                 disabled={!agreeTerms}
                 className={`px-4 py-2 rounded-md ${
                   agreeTerms
@@ -628,8 +683,8 @@ const DesignOptions = ({
             </div>
           )}
 
-          {/* Conditionally show Upload Next Image Button */}
-          {hasImageBeenUploaded && (
+          {/* Upload Next Image Button */}
+          {firstUploadedImage && !secondUploadedImage && ( // Only show if first image is uploaded, but second is not
             <div className="flex justify-center mt-2">
               <input
                 type="file"
@@ -639,7 +694,7 @@ const DesignOptions = ({
                 className="hidden"
               />
               <button
-                onClick={handleUploadClick}
+                onClick={() => handleUploadClick("second")}
                 disabled={!agreeTerms}
                 className={`px-4 py-2 rounded-md ${
                   agreeTerms
@@ -647,27 +702,73 @@ const DesignOptions = ({
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 } transition-colors`}
               >
-                Upload Next Image
+                Upload Second Image
               </button>
             </div>
           )}
 
-          {/* Clear button and logic */}
-          <div className="flex justify-center mt-2">
-            <button
-              onClick={() => {
-                onImageSelect(null);
-                setEditingImage(null);
-                setShowImageUpload(false);
-                setSelectedOption("none");
-                setHasImageBeenUploaded(false); // Reset the flag when cleared
-                setCurrentlySelectedImageForCandy(null); // Clear the currently selected image for candy
-              }}
-              className="py-2 px-4 border border-gray-300 rounded-md text-gray-700 hover:bg-yellow-500 transition-colors bg-yellow-400"
-            >
-              Clear Image
-            </button>
-          </div>
+          {/* Edit/Clear Buttons for Each Image */}
+          {firstUploadedImage && (
+            <div className="flex justify-center mt-2 space-x-2">
+              <button
+                onClick={() => {
+                  setEditingImageSrc(firstUploadedImage.src);
+                  setImagePosition(firstUploadedImage.position);
+                  setImageZoom(firstUploadedImage.zoom);
+                  setImageRotation(firstUploadedImage.rotation);
+                  setCurrentlyEditingImageSlot("first");
+                  setShowImageEditor(true);
+                  setShowImageUpload(false);
+                }}
+                className="py-2 px-4 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-100 transition-colors"
+              >
+                Edit First Image
+              </button>
+              <button
+                onClick={() => handleClearImage("first")}
+                className="py-2 px-4 border border-red-300 rounded-md text-red-700 hover:bg-red-100 transition-colors"
+              >
+                Clear First
+              </button>
+            </div>
+          )}
+
+          {secondUploadedImage && (
+            <div className="flex justify-center mt-2 space-x-2">
+              <button
+                onClick={() => {
+                  setEditingImageSrc(secondUploadedImage.src);
+                  setImagePosition(secondUploadedImage.position);
+                  setImageZoom(secondUploadedImage.zoom);
+                  setImageRotation(secondUploadedImage.rotation);
+                  setCurrentlyEditingImageSlot("second");
+                  setShowImageEditor(true);
+                  setShowImageUpload(false);
+                }}
+                className="py-2 px-4 border border-blue-300 rounded-md text-blue-700 hover:bg-blue-100 transition-colors"
+              >
+                Edit Second Image
+              </button>
+              <button
+                onClick={() => handleClearImage("second")}
+                className="py-2 px-4 border border-red-300 rounded-md text-red-700 hover:bg-red-100 transition-colors"
+              >
+                Clear Second
+              </button>
+            </div>
+          )}
+
+          {/* Overall Clear All Images button */}
+          {(firstUploadedImage || secondUploadedImage) && (
+            <div className="flex justify-center mt-4">
+              <button
+                onClick={handleClearAllImages}
+                className="py-2 px-4 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 transition-colors"
+              >
+                Clear All Images
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -719,7 +820,6 @@ const DesignOptions = ({
                 key={index}
                 onClick={() => handleClipartSelect(clipart.src)}
                 className={`cursor-pointer p-1 rounded-md ${
-                  // Check if this clipart is the currently selected one (assuming parentSelectedImage could be a clipart src)
                   parentSelectedImage &&
                   typeof parentSelectedImage === "string" &&
                   parentSelectedImage === clipart.src
@@ -741,23 +841,29 @@ const DesignOptions = ({
       {/* Inline Image Editor */}
       {showImageEditor && (
         <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
-          <h4 className="text-lg font-bold mb-4">Edit Your Image</h4>
+          <h4 className="text-lg font-bold mb-4">
+            Edit{" "}
+            {currentlyEditingImageSlot === "first"
+              ? "First"
+              : currentlyEditingImageSlot === "second"
+              ? "Second"
+              : ""}{" "}
+            Image
+          </h4>
 
           <div className="flex flex-col items-center space-y-6 py-4">
             <div
               ref={containerRef}
               className="bg-gray-700 w-64 h-64 rounded-full flex items-center justify-center overflow-hidden relative"
             >
-              {editingImage && (
+              {editingImageSrc && (
                 <img
                   ref={imageRef}
-                  src={editingImage}
+                  src={editingImageSrc}
                   alt="Editing"
                   className="object-cover cursor-move w-full h-full"
                   style={{
-                    transform: `translate(${imagePosition.x}px, ${
-                      imagePosition.y
-                    }px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
+                    transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
                     transition: isDragging ? "none" : "transform 0.2s ease",
                     cursor: isDragging ? "grabbing" : "grab",
                     minWidth: `${imageZoom}%`,

@@ -1,12 +1,12 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Import useEffect
 import ProgressBar from '../Customize/ProgressBar';
 import ColorPicker from '../Customize/ColorPicker';
 import CandyPreview from '../Customize/CandyPreview';
 import HoverToolbar from '../Customize/HoverToolbar';
 import DesignOptions from '../Customize/DesignOptions';
-import ActiveCustomizationToolbar from './ActiveCustomizationToolbar'; // Assuming this is in the same directory
-import PackagingOptions from './PackagingOptions'; // Make sure you have this component created
+import ActiveCustomizationToolbar from './ActiveCustomizationToolbar';
+import PackagingOptions from './PackagingOptions';
 import { toast } from "sonner";
 
 const MAX_COLOR_SELECTIONS = 5;
@@ -17,15 +17,14 @@ const Customize = () => {
   const totalSteps = 3; // Total steps including the new Packaging step
 
   // State management for design customizations
-  const [selectedImage, setSelectedImage] = useState(null); // Can be null or { src, position, zoom, rotation }
-  // NEW STATE: For the second image
-  const [secondSelectedImage, setSecondSelectedImage] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null); // Stores the first image object
+  const [secondSelectedImage, setSecondSelectedImage] = useState(null); // Stores the second image object
   const [firstLine, setFirstLine] = useState('');
   const [secondLine, setSecondLine] = useState('');
   const [selectedFontStyle, setSelectedFontStyle] = useState('Bold');
-  const [selectedClipart, setSelectedClipart] = useState(null); // This is correctly separate
+  const [selectedClipart, setSelectedClipart] = useState(null);
 
-  // NEW STATE: To track which customization is active for toolbar display
+  // To track which customization is active for toolbar display
   const [activeCustomization, setActiveCustomization] = useState(null); // Can be 'image', 'text', 'clipart', or null
 
   const handleColorSelection = (colors) => {
@@ -68,8 +67,7 @@ const Customize = () => {
 
   const handleRemoveActiveCustomization = (type) => {
     if (type === 'image') {
-      // If removing the main image, also clear the second image, or shift it up
-      // For simplicity, let's clear both if 'image' (main) is removed
+      // If removing the main image, clear both image states
       setSelectedImage(null);
       setSecondSelectedImage(null);
     } else if (type === 'text') {
@@ -103,7 +101,7 @@ const Customize = () => {
                 firstLine={firstLine}
                 secondLine={secondLine}
                 selectedFontStyle={selectedFontStyle}
-                selectedclipart={selectedClipart} // Pass clipart here
+                selectedclipart={selectedClipart}
               />
             </div>
 
@@ -127,18 +125,17 @@ const Customize = () => {
               <CandyPreview
                 selectedColors={selectedColors}
                 selectedImage={selectedImage}
-                secondSelectedImage={secondSelectedImage} 
+                secondSelectedImage={secondSelectedImage}
                 firstLine={firstLine}
                 secondLine={secondLine}
                 selectedFontStyle={selectedFontStyle}
-                selectedclipart={selectedClipart} // Pass clipart here
+                selectedclipart={selectedClipart}
               />
             </div>
 
             {/* Design Options and Preview Circles */}
-            <div className="lg:col-span-2 flex"> {/* Changed to flex to align sidebar and circles */}
-              {/* Design options or Active Customization Toolbar */}
-              <div className="flex-grow"> {/* Allows this div to take available space */}
+            <div className="lg:col-span-2 flex">
+              <div className="flex-grow">
                 {activeCustomization ? (
                   <ActiveCustomizationToolbar
                     activeType={activeCustomization}
@@ -148,13 +145,10 @@ const Customize = () => {
                   />
                 ) : (
                   <DesignOptions
-                    onImageSelect={setSelectedImage} // This handles the main image
-                    // You'll need a way for DesignOptions to set the second image.
-                    // For now, I'm assuming DesignOptions might internally manage multiple images
-                    // or you'll extend it to have an `onSecondImageSelect` prop.
-                    // For a simpler approach, you might have separate upload buttons in DesignOptions
-                    // for 'Image 1' and 'Image 2', each calling a different state setter.
-                    // If DesignOptions handles the 'next image' logic, it should update secondSelectedImage.
+                    onImageSelect={({ first, second }) => { // Destructure the object from DesignOptions
+                        setSelectedImage(first);
+                        setSecondSelectedImage(second);
+                    }}
                     onTextChange={(first, second) => {
                       setFirstLine(first);
                       setSecondLine(second);
@@ -163,16 +157,13 @@ const Customize = () => {
                     firstLine={firstLine}
                     secondLine={secondLine}
                     selectedFontStyle={selectedFontStyle}
-                    selectedImage={selectedImage}
+                    // Pass the current image states to DesignOptions so it can manage them internally
+                    firstUploadedImage={selectedImage}
+                    secondUploadedImage={secondSelectedImage}
                     onClipartSelect={setSelectedClipart}
                     selectedClipart={selectedClipart}
                     onSelectOption={setActiveCustomization}
                     currentSelectedOption={activeCustomization}
-                    // Pass the second image state setter if DesignOptions will handle it
-                    // Example: onSecondImageSelect={setSecondSelectedImage}
-                    // Or pass the current second image for internal display logic in DesignOptions
-                    secondSelectedImage={secondSelectedImage}
-                    setSecondSelectedImage={setSecondSelectedImage}
                   />
                 )}
               </div>
@@ -190,7 +181,7 @@ const Customize = () => {
                 >
                   {selectedImage ? (
                     <img
-                      src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
+                      src={selectedImage.src}
                       alt="Selected Image 1"
                       className="object-cover"
                       style={{
@@ -200,7 +191,7 @@ const Customize = () => {
                       }}
                     />
                   ) : (
-                    <span className="text-gray-400 text-xs">Image 1</span> // Placeholder if no image
+                    <span className="text-gray-400 text-xs">Image 1</span>
                   )}
                 </div>
 
@@ -210,24 +201,22 @@ const Customize = () => {
                     ${secondSelectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
                     ${activeCustomization === 'secondImage' && secondSelectedImage ? 'ring-4 ring-blue-500' : ''}
                   `}
-                  // You'll need to define what 'secondImage' means for activeCustomization
-                  // For now, let's assume a new type 'secondImage' for this.
                   onClick={() => secondSelectedImage && setActiveCustomization('secondImage')}
                 >
                   {secondSelectedImage ? (
                     <img
-                      src={typeof secondSelectedImage === 'object' ? secondSelectedImage.src : secondSelectedImage}
+                      src={secondSelectedImage.src}
                       alt="Selected Image 2"
                       className="object-cover"
                       style={{
-                        // Apply transformations if secondSelectedImage also stores position, zoom, rotation
+                        // Apply transformations using secondSelectedImage's properties
                         transform: secondSelectedImage.position ? `translate(${secondSelectedImage.position.x}px, ${secondSelectedImage.position.y}px) rotate(${secondSelectedImage.rotation}deg) scale(${secondSelectedImage.zoom / 100})` : 'none',
                         width: '100%',
                         height: '100%',
                       }}
                     />
                   ) : (
-                    <span className="text-gray-400 text-xs">Image 2</span> // Placeholder if no second image
+                    <span className="text-gray-400 text-xs">Image 2</span>
                   )}
                 </div>
 
@@ -246,7 +235,7 @@ const Customize = () => {
                       {secondLine && <div>{secondLine}</div>}
                     </div>
                   ) : (
-                    <span className="text-gray-400 text-xs">Text</span> // Placeholder for text
+                    <span className="text-gray-400 text-xs">Text</span>
                   )}
                 </div>
 
@@ -260,12 +249,12 @@ const Customize = () => {
                 >
                   {selectedClipart ? (
                     <img
-                      src={typeof selectedClipart === 'object' ? selectedClipart.src : selectedClipart}
+                      src={selectedClipart} // Clipart is just a string src
                       alt="Selected Clipart"
                       className="w-12 h-12 object-contain"
                     />
                   ) : (
-                    <span className="text-gray-400 text-xs">Clipart</span> // Placeholder for clipart
+                    <span className="text-gray-400 text-xs">Clipart</span>
                   )}
                 </div>
               </div>
@@ -283,7 +272,7 @@ const Customize = () => {
             secondLine={secondLine}
             selectedFontStyle={selectedFontStyle}
             selectedClipart={selectedClipart}
-            selectedColors={selectedColors} // Pass selected colors for random candy background
+            selectedColors={selectedColors}
           />
         );
 
@@ -316,11 +305,11 @@ const Customize = () => {
 
             <button
               className={`px-8 py-3 rounded-md font-medium ${
-                currentStep === 1 && selectedColors.length === 0 // Condition for step 1
+                currentStep === 1 && selectedColors.length === 0
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-xl'
               }`}
-              disabled={currentStep === 1 && selectedColors.length === 0} // Disable if no colors selected on step 1
+              disabled={currentStep === 1 && selectedColors.length === 0}
               onClick={handleNext}
             >
               {currentStep === totalSteps ? 'Finish' : 'Next'}
