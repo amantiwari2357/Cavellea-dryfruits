@@ -529,7 +529,7 @@ const DesignOptions = ({
     </h4>
     {/* <p className="text-sm text-gray-700">• First image upload is FREE.</p> */}
 
-    <div className="flex flex-col items-center mt-6 space-y-6">
+    <div className="flex flex-col items-center mt-6 space-x-2">
       {options.map((option) => (
         <label
           key={option.value}
