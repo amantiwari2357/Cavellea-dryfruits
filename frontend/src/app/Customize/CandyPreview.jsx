@@ -1,8 +1,9 @@
+"use client";
 import React, { useEffect, useState } from 'react';
 
 import { toast } from "sonner";
 
-const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLine, secondLine, selectedFontStyle }) => {
+const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, selectedclipart, firstLine, secondLine, selectedFontStyle }) => {
   const [candies, setCandies] = useState([]);
 
   // Color collection function
@@ -49,15 +50,15 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
 
       // Determine what customization options we have
       const hasText = firstLine || secondLine;
-      const hasImage = selectedImage !== null;
+      const hasImage1 = selectedImage !== null;
+      const hasImage2 = secondSelectedImage !== null;
       const hasClipart = selectedclipart !== null;
 
       const customizationOptions = [];
       if (hasText) customizationOptions.push('text');
-      if (hasImage) customizationOptions.push('image');
+      if (hasImage1) customizationOptions.push('image1'); // Differentiate first image
+      if (hasImage2) customizationOptions.push('image2'); // Differentiate second image
       if (hasClipart) customizationOptions.push('clipart');
-      // If you want to allow two images, push 'image' twice
-      if (hasImage) customizationOptions.push('image');
 
       const hasCustomization = customizationOptions.length > 0;
 
@@ -80,10 +81,20 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
 
         // Determine what content to show on this candy
         let contentType = 'default';
+        let contentData = null; // To store which image object to use
 
         if (hasCustomization) {
           // If there are customization options, pick one randomly
           contentType = customizationOptions[Math.floor(Math.random() * customizationOptions.length)];
+          
+          // Assign the specific image object based on contentType
+          if (contentType === 'image1') {
+            contentData = selectedImage;
+          } else if (contentType === 'image2') {
+            contentData = secondSelectedImage;
+          } else if (contentType === 'clipart') {
+            contentData = selectedclipart;
+          }
         }
 
         newCandies.push({
@@ -95,6 +106,7 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
           zIndex,
           rotation,
           contentType,
+          contentData, // Store the specific image/clipart object for rendering
         });
 
         // Move to the next position for row-wise layout
@@ -109,12 +121,11 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
     };
 
     setCandies(generateCandies());
-  }, [selectedColors, firstLine, secondLine, selectedImage, selectedclipart]);
+  }, [selectedColors, firstLine, secondLine, selectedImage, secondSelectedImage, selectedclipart]); // Added secondSelectedImage to dependencies
 
   const handleRefreshCandies = () => {
     // Re-generate candies to refresh the layout, maintaining the row-wise logic
     setCandies(prevCandies => {
-      // Re-use the existing candy data, but recalculate positions
       const updatedCandies = [];
       const candySize = 45;
       const padding = 10;
@@ -126,13 +137,15 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
 
       // Determine what customization options we have for re-generation
       const hasText = firstLine || secondLine;
-      const hasImage = selectedImage !== null;
+      const hasImage1 = selectedImage !== null;
+      const hasImage2 = secondSelectedImage !== null;
       const hasClipart = selectedclipart !== null;
-      const customizationOptions = [];
 
+      const customizationOptions = [];
       if (hasText) customizationOptions.push('text');
-      if (hasImage) customizationOptions.push('image');
-      if (hasClipart) customizationOptions.push('clipart'); // Add clipart for refresh
+      if (hasImage1) customizationOptions.push('image1');
+      if (hasImage2) customizationOptions.push('image2');
+      if (hasClipart) customizationOptions.push('clipart');
 
       const hasCustomization = customizationOptions.length > 0;
 
@@ -140,10 +153,18 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
         const x = (currentX / containerWidth) * 100;
         const y = (currentY / containerHeight) * 100;
 
-        // Optionally, re-assign content type on refresh if desired
         let newContentType = 'default';
+        let newContentData = null;
+
         if (hasCustomization) {
           newContentType = customizationOptions[Math.floor(Math.random() * customizationOptions.length)];
+          if (newContentType === 'image1') {
+            newContentData = selectedImage;
+          } else if (newContentType === 'image2') {
+            newContentData = secondSelectedImage;
+          } else if (newContentType === 'clipart') {
+            newContentData = selectedclipart;
+          }
         }
 
         updatedCandies.push({
@@ -151,7 +172,8 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
           x,
           y,
           rotation: Math.random() * 360, // Keep rotation random for variety
-          contentType: newContentType, // Update content type on refresh
+          contentType: newContentType,
+          contentData: newContentData,
         });
 
         currentX += (candySize + padding);
@@ -165,12 +187,6 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
 
     toast.success("Preview refreshed!");
   };
-
-  // Determine which custom content to show (text, image or clipart)
-  const hasText = firstLine || secondLine;
-  const hasImage = selectedImage !== null;
-  const hasClipart = selectedclipart !== null; // New: Check for clipart
-  const hasCustomization = hasText || hasImage || hasClipart; // Updated to include clipart
 
   // Set font family based on selected style
   const getFontFamily = (style) => {
@@ -188,15 +204,15 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
   const fontClass = getFontFamily(selectedFontStyle);
 
   // Get image source from image object or direct string
-  const getImageSource = () => {
-    if (!selectedImage) return null;
-    return typeof selectedImage === 'object' ? selectedImage.src : selectedImage;
+  const getImageSource = (imageObject) => {
+    if (!imageObject) return null;
+    return typeof imageObject === 'object' ? imageObject.src : imageObject;
   };
 
   // Get clipart source from clipart object or direct string
-  const getClipartSource = () => {
-    if (!selectedclipart) return null;
-    return typeof selectedclipart === 'object' ? selectedclipart.src : selectedclipart;
+  const getClipartSource = (clipartObject) => {
+    if (!clipartObject) return null;
+    return typeof clipartObject === 'object' ? clipartObject.src : clipartObject;
   };
 
 
@@ -252,43 +268,54 @@ const CandyPreview = ({ selectedColors, selectedImage, selectedclipart, firstLin
                   }}
                 >
                   {/* Default 'C' if no customization is applied to this candy */}
-                  {!hasCustomization && (
+                  {!candy.contentData && ( // Check if contentData is null
                     <span className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-700'}`}>𝓒</span>
                   )}
 
                   {/* Render Text */}
-                  {candy.contentType === 'text' && hasText && (
+                  {candy.contentType === 'text' && candy.contentData === null && ( // Ensure no image/clipart is assigned
                     <div className={`flex flex-col items-center justify-center ${fontClass} text-${isDark ? 'white' : 'gray-700'} text-[6px] leading-tight text-center transform`}>
                       {firstLine && <div>{firstLine}</div>}
                       {secondLine && <div>{secondLine}</div>}
                     </div>
                   )}
 
-                  {/* Render Image */}
-                  {candy.contentType === 'image' && hasImage && (
-                    // <div className="w-36 h-24 rounded-full overflow-hidden flex items-center justify-center cursor-pointer border-2 border-red-500">
-                      <img
-                        src={getImageSource()}
-                        alt="Customized Image"
-                        className="w-full h-full rounded-full object-cover"
-                         style={{
-                        transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
-                        width: '100%', 
-                        height: '100%', 
+                  {/* Render Image 1 */}
+                  {candy.contentType === 'image1' && candy.contentData && (
+                    <img
+                      src={getImageSource(candy.contentData)}
+                      alt="Customized Image 1"
+                      className="w-full h-full rounded-full object-cover"
+                      style={{
+                        transform: candy.contentData.position ? `translate(${candy.contentData.position.x}px, ${candy.contentData.position.y}px) rotate(${candy.contentData.rotation}deg) scale(${candy.contentData.zoom / 100})` : 'none',
+                        width: '100%',
+                        height: '100%',
                       }}
-                        // style={getMediaStyle(selectedImage)} // Use getMediaStyle
-                      />
-                    // </div>
+                    />
+                  )}
+
+                  {/* Render Image 2 */}
+                  {candy.contentType === 'image2' && candy.contentData && (
+                    <img
+                      src={getImageSource(candy.contentData)}
+                      alt="Customized Image 2"
+                      className="w-full h-full rounded-full object-cover"
+                      style={{
+                        transform: candy.contentData.position ? `translate(${candy.contentData.position.x}px, ${candy.contentData.position.y}px) rotate(${candy.contentData.rotation}deg) scale(${candy.contentData.zoom / 100})` : 'none',
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
                   )}
 
                   {/* Render Clipart */}
-                  {candy.contentType === 'clipart' && hasClipart && (
+                  {candy.contentType === 'clipart' && candy.contentData && (
                     <div className="w-full h-full flex items-center justify-center">
                       <img
-                        src={getClipartSource()}
+                        src={getClipartSource(candy.contentData)}
                         alt="Customized Clipart"
                         className="object-contain"
-                        style={getMediaStyle(selectedclipart)} // Use getMediaStyle
+                        style={getMediaStyle(candy.contentData)}
                       />
                     </div>
                   )}
