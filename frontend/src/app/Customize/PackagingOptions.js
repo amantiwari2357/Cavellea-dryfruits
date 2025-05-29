@@ -1,7 +1,15 @@
-// components/Customize/PackagingOptions.js
+"use client";
 import React from 'react';
 
-const PackagingOptions = ({ selectedImage, firstLine, secondLine, selectedFontStyle, selectedClipart, selectedColors }) => {
+const PackagingOptions = ({
+  selectedImage,
+  secondSelectedImage, // This prop is correctly passed from Customize.jsx
+  firstLine,
+  secondLine,
+  selectedFontStyle,
+  selectedClipart,
+  selectedColors,
+}) => {
   const getFontFamily = (style) => {
     switch (style) {
       case 'Bold': return 'font-bold';
@@ -54,36 +62,47 @@ const PackagingOptions = ({ selectedImage, firstLine, secondLine, selectedFontSt
     return foundColor ? foundColor.value : '#E0E0E0';
   };
 
-  const renderPreviewCircle = (type) => {
+  // Modified renderPreviewCircle to accept the specific media object and a label
+  const renderPreviewCircle = (mediaObject, type, label) => { // Added 'label' parameter
     let content = null;
     let hasContent = false;
+    let altText = '';
 
-    if (type === 'image' && selectedImage) {
+    if (type === 'image' && mediaObject && getMediaSource(mediaObject)) { // Check for actual source
       hasContent = true;
+      altText = label || 'Image'; // Use label for alt text
       content = (
         <img
-          src={getMediaSource(selectedImage)}
-          alt="Image"
+          src={getMediaSource(mediaObject)}
+          alt={altText}
           className="w-full h-full rounded-full object-cover"
-          // style={getMediaStyle(selectedImage)}
+          // Apply transformations directly from the mediaObject
+          style={{
+            transform: mediaObject.position ? `translate(${mediaObject.position.x}px, ${mediaObject.position.y}px) rotate(${mediaObject.rotation}deg) scale(${mediaObject.zoom / 100})` : 'none',
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+          }}
         />
       );
     } else if (type === 'text' && (firstLine || secondLine)) {
       hasContent = true;
+      altText = label || 'Text';
       content = (
         <div className={`text-xs text-center leading-tight truncate w-full ${fontClass}`}>
           {firstLine && <div>{firstLine}</div>}
           {secondLine && <div>{secondLine}</div>}
         </div>
       );
-    } else if (type === 'clipart' && selectedClipart) {
+    } else if (type === 'clipart' && mediaObject && getMediaSource(mediaObject)) { // Check for actual source
       hasContent = true;
+      altText = label || 'Clipart';
       content = (
         <img
-          src={getMediaSource(selectedClipart)}
-          alt="Clipart"
+          src={getMediaSource(mediaObject)}
+          alt={altText}
           className="w-full h-full object-contain rounded-full"
-          style={getMediaStyle(selectedClipart)}
+          style={getMediaStyle(mediaObject)}
         />
       );
     }
@@ -97,11 +116,14 @@ const PackagingOptions = ({ selectedImage, firstLine, secondLine, selectedFontSt
     const textColor = isDark ? 'text-white' : 'text-gray-800';
 
     return (
-      <div
-        className="w-16 h-16 rounded-full flex items-center justify-center p-1 shadow-md overflow-hidden"
-        style={{ backgroundColor: bgColor }}
-      >
-        {hasContent ? content : <span className={`text-xl font-bold ${textColor}`}>?</span>}
+      <div className="flex flex-col items-center"> {/* Added wrapper div for label */}
+        <div
+          className="w-16 h-16 rounded-full flex items-center justify-center p-1 shadow-md overflow-hidden"
+          style={{ backgroundColor: bgColor }}
+        >
+          {hasContent ? content : <span className={`text-xl font-bold ${textColor}`}>?</span>}
+        </div>
+        {label && <p className="text-xs text-gray-600 mt-1">{label}</p>} {/* Display label */}
       </div>
     );
   };
@@ -138,59 +160,43 @@ const PackagingOptions = ({ selectedImage, firstLine, secondLine, selectedFontSt
   ];
 
   return (
-<div className="p-12 bg-white rounded-lg shadow-md w-full max-w-10x2 mx-auto">
-      {/* <h2 className="text-4xl font-bold mb-6 text-center">Pick Your Packaging</h2> */}
-      {/* <p className="text-gray-600 mb-8 text-center">Select the perfect packaging for your customized candies.</p> */}
+    <div className="p-12 bg-white rounded-lg shadow-md w-full max-w-10x2 mx-auto">
+      <h2
+        className="text-4xl font-bold mb-6 text-center"
+        style={{
+          color: 'rgb(90, 31, 6)',
+          fontFamily: 'var(--font-alltogether-serif), "Times New Roman", Times, serif',
+          fontWeight: 700,
+        }}
+      >
+        Pick Your Packaging
+      </h2>
 
-      {/* Preview Circles */}
+      {/* Preview Circles - Now includes both images */}
       <div className="flex justify-center items-center mb-8 space-x-4">
-        <div className="flex space-x-2">
-          {selectedImage && renderPreviewCircle('image')}
-          {(firstLine || secondLine) && renderPreviewCircle('text')}
-          {selectedClipart && renderPreviewCircle('clipart')}
-        </div>
-<h2
-  className="text-4xl font-bold mb-6 text-center"
-  style={{
-    color: 'rgb(90, 31, 6)',
-    fontFamily: 'var(--font-alltogether-serif), "Times New Roman", Times, serif',
-    fontWeight: 700,
-  }}
->
-  Pick Your Packaging
-</h2>
+        {selectedImage && renderPreviewCircle(selectedImage, 'image', 'Image 1')}
+        {secondSelectedImage && renderPreviewCircle(secondSelectedImage, 'image', 'Image 2')}
+        {(firstLine || secondLine) && renderPreviewCircle(null, 'text', 'Text')}
+        {selectedClipart && renderPreviewCircle(selectedClipart, 'clipart', 'Clipart')}
+      </div>
 
-<div className="flex items-center justify-center space-x-2">
-  {/* Left Candy */}
-  {selectedClipart && renderPreviewCircle('clipart')}
-
-  {/* Center Text */}
-  <div className="text-xl font-semibold text-center">
-    {(firstLine || secondLine) && renderPreviewCircle('text')}
-  </div>
-
-  {/* Right Candy */}
-  {selectedImage && renderPreviewCircle('image')}
-</div>
-</div>
-
-{/* Navbar with 4 Categories */}
-<nav className="mt-8 border-t pt-6 px-6">
-  <ul className="flex justify-center space-x-10 text-lg font-medium text-gray-700">
-    <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
-      Birthday
-    </li>
-    <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
-      Wedding
-    </li>
-    <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
-      Festivals
-    </li>
-    <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
-      Custom
-    </li>
-  </ul>
-</nav>
+      {/* Navbar with 4 Categories */}
+      <nav className="mt-8 border-t pt-6 px-6">
+        <ul className="flex justify-center space-x-10 text-lg font-medium text-gray-700">
+          <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
+            Birthday
+          </li>
+          <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
+            Wedding
+          </li>
+          <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
+            Festivals
+          </li>
+          <li className="hover:text-orange-800 hover:shadow-lg hover:-translate-y-1 transform transition duration-200 cursor-pointer px-4 py-2 rounded">
+            Custom
+          </li>
+        </ul>
+      </nav>
 
       {/* Packaging Options */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">

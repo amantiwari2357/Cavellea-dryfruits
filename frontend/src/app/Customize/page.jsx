@@ -268,6 +268,7 @@ const Customize = () => {
         return (
           <PackagingOptions
             selectedImage={selectedImage}
+             secondSelectedImage={secondSelectedImage}
             firstLine={firstLine}
             secondLine={secondLine}
             selectedFontStyle={selectedFontStyle}
