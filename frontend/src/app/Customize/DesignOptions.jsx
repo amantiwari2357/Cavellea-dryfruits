@@ -67,7 +67,7 @@ const DesignOptions = ({
    const [selectedType, setSelectedType] = useState("");
     const options = [
     {
-      label: "if you used color gems it will come black and white",
+      label: "if you used color gems it will come black & white",
       value: "black-and-white",
       image: "/images/convert2.jpg",
     },
