@@ -145,7 +145,7 @@ const Customize = () => {
                   />
                 ) : (
                   <DesignOptions
-                    onImageSelect={({ first, second }) => { // Destructure the object from DesignOptions
+                    onImageSelect={({ first, second }) => {
                         setSelectedImage(first);
                         setSecondSelectedImage(second);
                     }}
@@ -168,101 +168,88 @@ const Customize = () => {
                 )}
               </div>
 
-              {/* Preview circles on the right */}
-              <div className="flex flex-col space-y-10 items-start justify-center pl-4">
+             {/* Right side: Fixed Preview Panel */}
+  <div className="w-24 flex-shrink-0">
+    <h4 className="text-2xl font-bold text-gray-700 mb-4 text-center ml-[-120px]">Preview</h4>
+    <div className="flex flex-col space-y-6 items-center ml-[-120px]">
 
-                {/* First Image preview circle */}
-                <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-                    ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-                    ${activeCustomization === 'image' && selectedImage ? 'ring-4 ring-blue-500' : ''}
-                  `}
-                  onClick={() => selectedImage && setActiveCustomization('image')}
-                >
-                  {selectedImage ? (
-                    <img
-                      src={selectedImage.src}
-                      alt="Selected Image 1"
-                      className="object-cover"
-                      style={{
-                        transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
-                        width: '100%',
-                        height: '100%',
-                      }}
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-xs">Image 1</span>
-                  )}
-                </div>
+      {/* Image 1 Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+          ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'image' && selectedImage ? 'ring-4 ring-blue-500' : ''}
+        `}
+        onClick={() => selectedImage && setActiveCustomization('image')}
+      >
+        {selectedImage ? (
+          <img
+            src={selectedImage.src}
+            alt="Image 1"
+            className="object-cover w-full h-full"
+            style={{
+              transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
+            }}
+          />
+        ) : <span className="text-gray-400 text-xs">Image 1</span>}
+      </div>
 
-                {/* Second Image preview circle */}
-                <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-                    ${secondSelectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-                    ${activeCustomization === 'secondImage' && secondSelectedImage ? 'ring-4 ring-blue-500' : ''}
-                  `}
-                  onClick={() => secondSelectedImage && setActiveCustomization('secondImage')}
-                >
-                  {secondSelectedImage ? (
-                    <img
-                      src={secondSelectedImage.src}
-                      alt="Selected Image 2"
-                      className="object-cover"
-                      style={{
-                        // Apply transformations using secondSelectedImage's properties
-                        transform: secondSelectedImage.position ? `translate(${secondSelectedImage.position.x}px, ${secondSelectedImage.position.y}px) rotate(${secondSelectedImage.rotation}deg) scale(${secondSelectedImage.zoom / 100})` : 'none',
-                        width: '100%',
-                        height: '100%',
-                      }}
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-xs">Image 2</span>
-                  )}
-                </div>
+      {/* Image 2 Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+          ${secondSelectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'secondImage' && secondSelectedImage ? 'ring-4 ring-blue-500' : ''}
+        `}
+        onClick={() => secondSelectedImage && setActiveCustomization('secondImage')}
+      >
+        {secondSelectedImage ? (
+          <img
+            src={secondSelectedImage.src}
+            alt="Image 2"
+            className="object-cover w-full h-full"
+            style={{
+              transform: secondSelectedImage.position ? `translate(${secondSelectedImage.position.x}px, ${secondSelectedImage.position.y}px) rotate(${secondSelectedImage.rotation}deg) scale(${secondSelectedImage.zoom / 100})` : 'none',
+            }}
+          />
+        ) : <span className="text-gray-400 text-xs">Image 2</span>}
+      </div>
 
-
-                {/* Text preview circle */}
-                <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer
-                    ${(firstLine || secondLine) ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-                    ${activeCustomization === 'text' ? 'ring-4 ring-orange-500' : ''}
-                  `}
-                  onClick={() => (firstLine || secondLine) && setActiveCustomization('text')}
-                >
-                  {(firstLine || secondLine) ? (
-                    <div className={`text-xs text-center leading-tight truncate w-10`} style={{ fontFamily: selectedFontStyle }}>
-                      {firstLine && <div>{firstLine}</div>}
-                      {secondLine && <div>{secondLine}</div>}
-                    </div>
-                  ) : (
-                    <span className="text-gray-400 text-xs">Text</span>
-                  )}
-                </div>
-
-                {/* Clipart preview circle */}
-                <div
-                  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-                    ${selectedClipart ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-                    ${activeCustomization === 'clipart' ? 'ring-4 ring-green-500' : ''}
-                  `}
-                  onClick={() => selectedClipart && setActiveCustomization('clipart')}
-                >
-                  {selectedClipart ? (
-                    <img
-                      src={selectedClipart} // Clipart is just a string src
-                      alt="Selected Clipart"
-                      className="w-12 h-12 object-contain"
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-xs">Clipart</span>
-                  )}
-                </div>
-              </div>
-            </div>
-
+      {/* Text Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer
+          ${(firstLine || secondLine) ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'text' ? 'ring-4 ring-orange-500' : ''}
+        `}
+        onClick={() => (firstLine || secondLine) && setActiveCustomization('text')}
+      >
+        {(firstLine || secondLine) ? (
+          <div className="text-xs text-center leading-tight truncate w-10" style={{ fontFamily: selectedFontStyle }}>
+            {firstLine && <div>{firstLine}</div>}
+            {secondLine && <div>{secondLine}</div>}
           </div>
+        ) : (
+          <span className="text-gray-400 text-xs">Text</span>
+        )}
+      </div>
 
-        );
+      {/* Clipart Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+          ${selectedClipart ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'clipart' ? 'ring-4 ring-green-500' : ''}
+        `}
+        onClick={() => selectedClipart && setActiveCustomization('clipart')}
+      >
+        {selectedClipart ? (
+          <img src={selectedClipart} alt="Clipart" className="w-12 h-12 object-contain" />
+        ) : <span className="text-gray-400 text-xs">Clipart</span>}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+            </div>
+            );
 
       case 3:
         return (
