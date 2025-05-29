@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
 import {
+  CheckCircle2, 
   ImageIcon,
   Palette,
   MoveHorizontal,
@@ -63,7 +64,23 @@ const DesignOptions = ({
   const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] = useState(null);
 
 
-  const [printType, setPrintType] = useState("black-and-white"); // default option
+   const [selectedType, setSelectedType] = useState("");
+    const options = [
+    {
+      label: "if you used color gems it will come black and white",
+      value: "black-and-white",
+      image: "/images/convert2.jpg",
+    },
+    {
+      label: "for good picture colour we will use white gems",
+      value: "color",
+      image: "/images/convert1.jpg",
+    },
+  ];
+   const handleSelect = (value) => {
+    setSelectedType(value);
+  };
+
 
   // Keep internal states in sync with parent props
   useEffect(() => {
@@ -512,40 +529,39 @@ const DesignOptions = ({
     </h4>
     {/* <p className="text-sm text-gray-700">• First image upload is FREE.</p> */}
 
-    <div className="flex flex-col items-center mt-4">
-      <img
-        src="/images/convert.jpeg"
-        alt="Conversion Example"
-        className="max-h-50 w-74 rounded-lg bg-cover bg-no-repeat bg-center"
-      />
+    <div className="flex flex-col items-center mt-6 space-y-6">
+      {options.map((option) => (
+        <label
+          key={option.value}
+          className={`relative cursor-pointer rounded-lg overflow-hidden border-2 ${
+            selectedType === option.value
+              ? "border-blue-500"
+              : "border-transparent"
+          }`}
+        >
+          <input
+            type="checkbox"
+            className="absolute opacity-0 h-0 w-0"
+            checked={selectedType === option.value}
+            onChange={() => handleSelect(option.value)}
+          />
+          <img
+            src={option.image}
+            alt={option.label}
+            className="w-72 h-auto object-cover rounded-lg"
+          />
+          {selectedType === option.value && (
+            <div className="absolute top-2 right-2 text-green-500 bg-white rounded-full p-1 shadow-md">
+              <CheckCircle2 size={24} />
+            </div>
+          )}
+          <div className="text-center mt-2 text-gray-800 font-medium">
+            {option.label}
+          </div>
+        </label>
+      ))}
     </div>
-
-    {/* Print Type Selection */}
-    <div className="flex justify-center space-x-8 mt-4">
-      <label className="flex items-center space-x-2">
-        <input
-          type="radio"
-          name="printType"
-          value="black-and-white"
-          checked={printType === "black-and-white"}
-          onChange={(e) => setPrintType(e.target.value)}
-          className="form-radio text-blue-600"
-        />
-        <span className="text-sm text-gray-800 font-medium">Black & White</span>
-      </label>
-      <label className="flex items-center space-x-2">
-        <input
-          type="radio"
-          name="printType"
-          value="color"
-          checked={printType === "color"}
-          onChange={(e) => setPrintType(e.target.value)}
-          className="form-radio text-blue-600"
-        />
-        <span className="text-sm text-gray-800 font-medium">Color</span>
-      </label>
-    </div>
-
+ 
     {/* Optional: Display selected value */}
     {/* <p className="text-sm text-gray-600 text-center mt-2">
       Selected: <span className="font-semibold">{printType === 'color' ? 'Color Print' : 'Black & White Print'}</span>
