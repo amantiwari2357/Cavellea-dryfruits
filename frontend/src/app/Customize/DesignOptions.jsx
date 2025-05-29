@@ -1,6 +1,5 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
-
 import {
   ImageIcon,
   Palette,
@@ -511,7 +510,7 @@ const DesignOptions = ({
     <h4 id="upload-image" className="text-lg font-bold">
       Choose an Image
     </h4>
-    <p className="text-sm text-gray-700">• First image upload is FREE.</p>
+    {/* <p className="text-sm text-gray-700">• First image upload is FREE.</p> */}
 
     <div className="flex flex-col items-center mt-4">
       <img
