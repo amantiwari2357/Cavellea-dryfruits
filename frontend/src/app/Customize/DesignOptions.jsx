@@ -628,57 +628,50 @@ const DesignOptions = ({
           </div>
           <hr className="mt-4 border-gray-300" />
 
-          {/* Combined Preview Circle for Both Images */}
+
+{/* Ye section me jo image preview aarha hai oo display ho rha hai*/}
+         
           {(firstUploadedImage || secondUploadedImage) && (
-            <div className="mb-4 text-center relative w-fit mx-auto">
-              <div
-                className="mx-auto rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative"
-                style={{
-                  height: "120px", // Slightly larger to accommodate two
-                  width: "120px",
-                  overflow: "hidden",
-                }}
-              >
-                {firstUploadedImage && (
-                  <img
-                    src={firstUploadedImage.src}
-                    alt="First Uploaded"
-                    className="absolute"
-                    style={{
-                      borderRadius: "50%",
-                      height: "80px", // Adjust size as needed
-                      width: "80px",
-                      objectFit: "cover",
-                      top: "10%", // Example positioning
-                      left: "10%",
-                      zIndex: 1, // Ensure it's on top
-                      transform: `translate(${firstUploadedImage.position?.x || 0}px, ${firstUploadedImage.position?.y || 0}px) rotate(${firstUploadedImage.rotation || 0}deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
-                    }}
-                  />
-                )}
-                {secondUploadedImage && (
-                  <img
-                    src={secondUploadedImage.src}
-                    alt="Second Uploaded"
-                    className="absolute"
-                    style={{
-                      borderRadius: "50%",
-                      height: "80px", // Adjust size as needed
-                      width: "80px",
-                      objectFit: "cover",
-                      bottom: "10%", // Example positioning
-                      right: "10%",
-                      zIndex: 2, // Ensure it's on top
-                      transform: `translate(${secondUploadedImage.position?.x || 0}px, ${secondUploadedImage.position?.y || 0}px) rotate(${secondUploadedImage.rotation || 0}deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
-                    }}
-                  />
-                )}
-              </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Images currently on candy
-              </p>
-            </div>
-          )}
+  <div className="mb-4 text-center w-full flex justify-center gap-4">
+    {firstUploadedImage && (
+      <div className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative" style={{ height: "80px", width: "80px", overflow: "hidden" }}>
+        <img
+          src={firstUploadedImage.src}
+          alt="First Uploaded"
+          className="absolute"
+          style={{
+            borderRadius: "50%",
+            height: "100%",
+            width: "100%",
+            objectFit: "cover",
+            zIndex: 1,
+            transform: `translate(${firstUploadedImage.position?.x || 0}px, ${firstUploadedImage.position?.y || 0}px) rotate(${firstUploadedImage.rotation || 0}deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
+          }}
+        />
+      </div>
+    )}
+
+    {secondUploadedImage && (
+      <div className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative" style={{ height: "80px", width: "80px", overflow: "hidden" }}>
+        <img
+          src={secondUploadedImage.src}
+          alt="Second Uploaded"
+          className="absolute"
+          style={{
+            borderRadius: "50%",
+            height: "100%",
+            width: "100%",
+            objectFit: "cover",
+            zIndex: 2,
+            transform: `translate(${secondUploadedImage.position?.x || 0}px, ${secondUploadedImage.position?.y || 0}px) rotate(${secondUploadedImage.rotation || 0}deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
+          }}
+        />
+      </div>
+    )}
+  </div>
+)}
+<p className="text-xs text-gray-500 text-center mt-2">Images currently on candy</p>
+
 
           {/* Checkbox moved here after all requirements */}
           <div className="mb-4">
@@ -758,7 +751,7 @@ const DesignOptions = ({
       }}
       className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
     >
-      ✏️  Edit First
+    Edit First Image
     </button>
     <button
       onClick={() => handleClearImage("first")}
@@ -783,7 +776,7 @@ const DesignOptions = ({
       }}
       className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
     >
-      ✏️ Edit Second
+    Edit Second Image
     </button>
     <button
       onClick={() => handleClearImage("second")}
