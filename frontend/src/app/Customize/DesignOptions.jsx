@@ -12,7 +12,7 @@ import {
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import clipartdata from "@/app/data/clipartData";
+import clipartdata from "../../app/data/clipartdata";
 import Link from "next/link";
 
 const DesignOptions = ({
