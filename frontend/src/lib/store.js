@@ -36,4 +36,4 @@ const store = makeStore().store;
 
 // TypeScript type aliases removed because this is a JavaScript file.
 
-export { store };
+export default store;
