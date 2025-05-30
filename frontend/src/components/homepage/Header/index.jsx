@@ -83,13 +83,13 @@ const handlePersonalize = () => {
             <div className="flex flex-col md:flex-row items-center gap-4 mb-5 md:mb-12">
               <Link
                 href="/shop"
-                className="md:w-52 inline-block text-center bg-black hover:bg-black/80 transition-all text-white px-14 py-4 rounded-full hover:animate-pulse"
+                className="w-full md:w-52 inline-block text-center bg-black hover:bg-black/80 transition-all text-white px-14 py-4 rounded-full hover:animate-pulse"
               >
                 Shop Now
               </Link>
 
               <button
-                className="bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-full flex items-center justify-center gap-2 transition-colors relative overflow-hidden group"
+                className="w-full md:w-auto bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-full flex items-center justify-center gap-2 transition-colors relative overflow-hidden group"
                 onClick={handlePersonalize}
               >
                 <span className="font-bold">personalize yours</span>
