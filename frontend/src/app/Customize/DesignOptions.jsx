@@ -534,7 +534,7 @@ const DesignOptions = ({
     className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
   >
     <h4 id="upload-image" className="text-lg font-bold">
-      Choose an Image
+      Select a Print Type
     </h4>
     {/* <p className="text-sm text-gray-700">• First image upload is FREE.</p> */}
 
