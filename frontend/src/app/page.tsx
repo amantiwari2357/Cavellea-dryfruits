@@ -1,7 +1,8 @@
 "use client";
 
 import ProductListSec from "@/components/common/ProductListSec";
-import Brands from "../components/homepage/Brands";
+// import Brands from "../components/homepage/Brands";
+import Brands from "../components/homepage/Brands"
 import DressStyle from "@/components/homepage/DressStyle";
 import Header from "@/components/homepage/Header";
 import Reviews from "@/components/homepage/Reviews";
