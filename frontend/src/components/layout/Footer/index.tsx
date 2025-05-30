@@ -13,22 +13,22 @@ const socialsData: SocialNetworks[] = [
   {
     id: 1,
     icon: <FaTwitter />,
-    url: "https://twitter.com",
+    url: "https://twitter.com/amantiwari2357",
   },
   {
     id: 2,
     icon: <FaFacebookF />,
-    url: "https://facebook.com",
+    url: "https://facebook.com/aman",
   },
   {
     id: 3,
     icon: <FaInstagram />,
-    url: "https://instagram.com",
+    url: "https://instagram.com/amantiwari2357",
   },
   {
     id: 4,
     icon: <FaGithub />,
-    url: "https://github.com/mohammadoftadeh",
+    url: "https://github.com/digiindia2025",
   },
 ];
 
