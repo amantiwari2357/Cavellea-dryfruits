@@ -240,6 +240,7 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
   return (
     <div className="flex flex-col space-y-4">
       <div className="relative w-400 h-[400px] rounded-lg overflow-hidden border border-gray-200">
+        {/* //////////////////////////////////////////////////////////AMAN///////////////////// */}
         {selectedColors.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <p className="text-gray-500 text-lg">Choose a color to view the candy mix preview.</p>
