@@ -9,7 +9,7 @@ import ActiveCustomizationToolbar from './ActiveCustomizationToolbar';
 import PackagingOptions from './PackagingOptions';
 import { toast } from "sonner";
 
-const MAX_COLOR_SELECTIONS = 5;
+const MAX_COLOR_SELECTIONS = 3;
 
 const Customize = () => {
   const [selectedColors, setSelectedColors] = useState([]);
