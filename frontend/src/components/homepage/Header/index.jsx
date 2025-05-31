@@ -114,16 +114,15 @@ const Header = () => {
         <div className="absolute inset-0 bg-black/40 z-0" />
       </header>
 
-      {/* Stats Section Below Banner */}
+ {/* Stats Section Below Banner */}
       
-      <section className="bg-[#F2F0F1] px-4 py-12">
+      <section className="bg-[#F2F0F1] px-4 py-12 ">
         <motion.div
           initial={{ y: 100, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="flex flex-wrap sm:flex-nowrap items-center justify-center sm:justify-start max-w-6xl mx-auto gap-6"
-        >
+          className="flex flex-wrap sm:flex-nowrap items-center justify-center max-w-6xl mx-auto gap-6">
           <div className="flex flex-col items-center sm:items-start">
             <span className="font-bold text-3xl lg:text-4xl">
               <AnimatedCounter from={0} to={50} />+
