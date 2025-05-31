@@ -1,9 +1,9 @@
 import React from "react";
-import { FooterLinks } from "./footer.types";
+// import { FooterLinks } from "./footer.types";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
-const footerLinksData: FooterLinks[] = [
+const footerLinksData = [
   {
     id: 1,
     title: "Our Store",

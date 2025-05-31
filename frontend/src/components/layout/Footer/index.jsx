@@ -9,7 +9,7 @@ import Image from "next/image";
 import NewsLetterSection from "./NewsLetterSection";
 import LayoutSpacing from "./LayoutSpacing";
 
-const socialsData: SocialNetworks[] = [
+const socialsData = [
   {
     id: 1,
     icon: <FaTwitter />,
@@ -32,7 +32,7 @@ const socialsData: SocialNetworks[] = [
   },
 ];
 
-const paymentBadgesData: PaymentBadge[] = [
+const paymentBadgesData = [
   {
     id: 1,
     srcUrl: "/icons/Visa.svg",
