@@ -233,7 +233,7 @@ const ImageEditorPanel = ({
             </label>
           </div>
 
-          <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
+          {/* <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
           <div className="flex flex-row items-center justify-center gap-4">
             <div className="flex flex-col items-center">
               <img
@@ -259,7 +259,7 @@ const ImageEditorPanel = ({
               />
               <p className="text-xs text-gray-500 mt-1 text-center">crop to show face only</p>
             </div>
-          </div>
+          </div> */}
 
           <div className="mt-6">
             <h4 className="text-md font-semibold mb-2">Image Requirements</h4>

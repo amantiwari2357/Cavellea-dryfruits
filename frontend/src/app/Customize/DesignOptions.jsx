@@ -534,7 +534,7 @@ const DesignOptions = ({
     className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
   >
     <h4 id="upload-image" className="text-lg font-bold">
-      Select a Print Type
+      Plase Select a Print Type
     </h4>
     {/* <p className="text-sm text-gray-700">• First image upload is FREE.</p> */}
 
@@ -578,10 +578,10 @@ const DesignOptions = ({
   </div>
 )} */}
 
-          <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4>
+          {/* <h4 className="text-md font-semibold mt-6 mb-2">For Best Results</h4> */}
           <div className="flex flex-row items-center justify-center gap-4">
             {/* Best Result Example 1 */}
-            <div className="flex flex-col items-center">
+            {/* <div className="flex flex-col items-center">
               <img
                 src="/images/print.png"
                 alt="Best Result Example 1"
@@ -590,9 +590,9 @@ const DesignOptions = ({
               <p className="text-xs text-gray-500 mt-1 text-center">
                 1-2 faces
               </p>
-            </div>
+            </div> */}
             {/* Example 2 */}
-            <div className="flex flex-col items-center">
+            {/* <div className="flex flex-col items-center">
               <img
                 src="/images/print1.png"
                 alt="Best Result Example 2"
@@ -601,9 +601,9 @@ const DesignOptions = ({
               <p className="text-xs text-gray-500 mt-1 text-center">
                 face forward
               </p>
-            </div>
+            </div> */}
             {/* Example 3 */}
-            <div className="flex flex-col items-center">
+            {/* <div className="flex flex-col items-center">
               <img
                 src="/images/print2.png"
                 alt="Best Result Example 3"
@@ -612,7 +612,7 @@ const DesignOptions = ({
               <p className="text-xs text-gray-500 mt-1 text-center">
                 crop to show face only
               </p>
-            </div>
+            </div> */}
           </div>
 
           <div className="mt-6">
