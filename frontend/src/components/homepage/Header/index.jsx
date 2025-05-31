@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const sliderImages = [
   "/images/GP_Banner_5-05.webp",
   "/images/GP_Banner-01_1.webp",
-  "/images/GP_Banner_5-05.webp",
+  "/images/Website_Banner_14_1.webp",
 ];
 
 const Header = () => {
@@ -85,7 +85,7 @@ const Header = () => {
             >
               Shop Now
             </Link> */}
-            <button
+            {/* <button
               onClick={handlePersonalize}
               className="bg-pink-600 text-white font-semibold px-6 py-3 rounded-full hover:bg-pink-700 transition flex items-center gap-2"
             >
@@ -106,12 +106,13 @@ const Header = () => {
                   />
                 </svg>
               </div>
-            </button>
+            </button> */}
           </motion.div>
         </div>
 
         {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-black/40 z-0" />
+        <div className="" />   
+        {/* use this absolute inset-0 bg-black/40 z-0 if need to display blur type banner otherwise forget it */}
       </header>
 
  {/* Stats Section Below Banner */}

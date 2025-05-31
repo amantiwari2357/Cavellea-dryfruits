@@ -26,7 +26,7 @@ const data = [
   { id: 2, type: "MenuItem", label: "Best Sellers", url: "/shop#on-sale", children: [] },
   { id: 3, type: "MenuItem", label: "Fresh Arrival", url: "/shop#fresh-arrivals", children: [] },
   { id: 4, type: "MenuItem", label: "Premium Collections", url: "/shop#brands", children: [] },
-    { id: 5, type: "MenuItem", label: "Personalized Yours", url: "/shop#fresh-arrivals", children: [] },
+    { id: 5, type: "MenuItem", label: "Personalized Yours", url: "/Customize", children: [] },
 
 ];
 
@@ -61,7 +61,7 @@ const TopNavbar = () => {
               priority
             />
           </Link>
-          <Link href="/" className={cn([integralCF.className, "text-2xl lg:text-[32px] mb-2 mr-3 lg:mr-10"])}>Home</Link>
+          {/* <Link href="/" className={cn([integralCF.className, "text-2xl lg:text-[32px] mb-2 mr-3 lg:mr-10"])}><imgage src="/images/logo.jpg" alt="Logo" width={120} height={40} className="h-auto w-auto md:w-[180px] md:h-[50px]" priority /></Link> */}
         </div>
 
         <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
