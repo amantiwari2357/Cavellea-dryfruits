@@ -18,9 +18,25 @@ export function MenuList({ data, label }) {
       <NavigationMenuContent>
         <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
           {data.map((item) => (
-            <ListItem key={item.id} title={item.label} href={item.url ?? "/"}>
-              {item.description ?? ""}
-            </ListItem>
+            <li key={item.id} className="space-y-2">
+              <ListItem title={item.label} href={item.url ?? "/"}>
+                {item.description ?? ""}
+              </ListItem>
+              {item.children && (
+                <ul className="ml-4 space-y-1">
+                  {item.children.map((child) => (
+                    <li key={child.id}>
+                      <Link
+                        href={child.url}
+                        className="text-sm text-muted-foreground hover:underline"
+                      >
+                        {child.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
           ))}
         </ul>
       </NavigationMenuContent>
@@ -28,9 +44,9 @@ export function MenuList({ data, label }) {
   );
 }
 
-const ListItem = React.forwardRef(({ className, title, children, ...props }, ref) => {
-  return (
-    <li>
+const ListItem = React.forwardRef(
+  ({ className, title, children, ...props }, ref) => {
+    return (
       <NavigationMenuLink asChild>
         <Link
           ref={ref}
@@ -46,8 +62,8 @@ const ListItem = React.forwardRef(({ className, title, children, ...props }, ref
           </p>
         </Link>
       </NavigationMenuLink>
-    </li>
-  );
-});
+    );
+  }
+);
 
 ListItem.displayName = "ListItem";
