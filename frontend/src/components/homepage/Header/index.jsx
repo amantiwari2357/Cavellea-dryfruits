@@ -4,7 +4,7 @@ import AnimatedCounter from "@/components/ui/AnimatedCounter";
 import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import Link from "next/link";
+// import Link from "next/link";
 
 const sliderImages = [
   "/images/GP_Banner_5-05.webp",
@@ -79,12 +79,12 @@ const Header = () => {
             transition={{ delay: 0.6, duration: 0.6 }}
             className="flex flex-col sm:flex-row gap-4"
           >
-            <Link
+            {/* <Link
               href="/shop"
               className="bg-white text-black font-semibold px-6 py-3 rounded-full hover:bg-gray-100 transition"
             >
               Shop Now
-            </Link>
+            </Link> */}
             <button
               onClick={handlePersonalize}
               className="bg-pink-600 text-white font-semibold px-6 py-3 rounded-full hover:bg-pink-700 transition flex items-center gap-2"

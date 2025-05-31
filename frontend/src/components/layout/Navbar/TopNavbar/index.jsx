@@ -26,6 +26,8 @@ const data = [
   { id: 2, type: "MenuItem", label: "Best Sellers", url: "/shop#on-sale", children: [] },
   { id: 3, type: "MenuItem", label: "Fresh Arrival", url: "/shop#fresh-arrivals", children: [] },
   { id: 4, type: "MenuItem", label: "Premium Collections", url: "/shop#brands", children: [] },
+    { id: 5, type: "MenuItem", label: "Personalized Yours", url: "/shop#fresh-arrivals", children: [] },
+
 ];
 
 const TopNavbar = () => {
