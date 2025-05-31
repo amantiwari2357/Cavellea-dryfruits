@@ -17,17 +17,56 @@ const data = [
     label: "Shop",
     type: "MenuList",
     children: [
-      { id: 11, label: "Nuts", url: "/shop#Nuts", description: "Premium nuts selection." },
-      { id: 12, label: "Dried Fruits", url: "/shop#DriedFruits", description: "Sweet and delicious dried fruits." },
-      { id: 13, label: "Seeds", url: "/shop#Seeds", description: "Nutritious seeds variety." },
-      { id: 14, label: "Exotic Mixes", url: "/shop#ExoticMixes", description: "Special dry fruit blends." },
+      {
+        id: 11,
+        label: "Nuts",
+        url: "/shop#Nuts",
+        description: "Premium nuts selection.",
+        children: [
+          { id: 111, label: "Almonds", url: "/shop#Almonds" },
+          { id: 112, label: "Cashews", url: "/shop#Cashews" },
+          { id: 113, label: "Walnuts", url: "/shop#Walnuts" },
+        ],
+      },
+      {
+        id: 12,
+        label: "Dried Fruits",
+        url: "/shop#DriedFruits",
+        description: "Sweet and delicious dried fruits.",
+        children: [
+          { id: 121, label: "Dates", url: "/shop#Dates" },
+          { id: 122, label: "Figs", url: "/shop#Figs" },
+          { id: 123, label: "Raisins", url: "/shop#Raisins" },
+        ],
+      },
+      {
+        id: 13,
+        label: "Seeds",
+        url: "/shop#Seeds",
+        description: "Nutritious seeds variety.",
+        children: [
+          { id: 131, label: "Pumpkin Seeds", url: "/shop#PumpkinSeeds" },
+          { id: 132, label: "Sunflower Seeds", url: "/shop#SunflowerSeeds" },
+          { id: 133, label: "Chia Seeds", url: "/shop#ChiaSeeds" },
+        ],
+      },
+      {
+        id: 14,
+        label: "Exotic Mixes",
+        url: "/shop#ExoticMixes",
+        description: "Special dry fruit blends.",
+        children: [
+          { id: 141, label: "Tropical Mix", url: "/shop#TropicalMix" },
+          { id: 142, label: "Spicy Trail Mix", url: "/shop#SpicyTrailMix" },
+          { id: 143, label: "Fusion Bites", url: "/shop#FusionBites" },
+        ],
+      },
     ],
   },
   { id: 2, type: "MenuItem", label: "Best Sellers", url: "/shop#on-sale", children: [] },
   { id: 3, type: "MenuItem", label: "Fresh Arrival", url: "/shop#fresh-arrivals", children: [] },
   { id: 4, type: "MenuItem", label: "Premium Collections", url: "/shop#brands", children: [] },
-    { id: 5, type: "MenuItem", label: "Personalized Yours", url: "/Customize", children: [] },
-
+  { id: 5, type: "MenuItem", label: "Personalized Yours", url: "/Customize", children: [] },
 ];
 
 const TopNavbar = () => {
@@ -61,7 +100,6 @@ const TopNavbar = () => {
               priority
             />
           </Link>
-          {/* <Link href="/" className={cn([integralCF.className, "text-2xl lg:text-[32px] mb-2 mr-3 lg:mr-10"])}><imgage src="/images/logo.jpg" alt="Logo" width={120} height={40} className="h-auto w-auto md:w-[180px] md:h-[50px]" priority /></Link> */}
         </div>
 
         <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
