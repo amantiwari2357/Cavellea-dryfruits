@@ -53,25 +53,25 @@ const Header = () => {
 
         {/* Overlay Text and Buttons */}
         <div className="relative z-10 h-full flex flex-col justify-center items-start px-4 md:px-10 max-w-6xl mx-auto">
-          <motion.h2
+          {/* <motion.h2
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.6 }}
             className="text-white text-4xl lg:text-6xl mb-4 max-w-3xl font-bold"
           >
             DISCOVER PREMIUM QUALITY DRY FRUITS
-          </motion.h2>
+          </motion.h2> */}
 
-          <motion.p
+          {/* <motion.p
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.6 }}
             className="text-white text-sm lg:text-lg max-w-xl mb-6"
-          >
+          > */}
             {/* Explore our handpicked selection of nutritious and delicious dry
             fruits, carefully sourced to ensure the highest quality and
             freshness. */}
-          </motion.p>
+          {/* </motion.p> */}
 
           <motion.div
             initial={{ y: 50, opacity: 0 }}
