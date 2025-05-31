@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { integralCF } from "@/styles/fonts";
 import { MenuList } from "./MenuList.jsx";
@@ -10,6 +11,13 @@ import { MenuItem } from "./MenuItem.jsx";
 import InputGroup from "@/components/ui/input-group";
 import ResTopNavbar from "./ResTopNavbar.jsx";
 import CartBtn from "./CartBtn";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 const data = [
   {
@@ -72,7 +80,12 @@ const data = [
 const TopNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
+  const [showContinueDialog, setShowContinueDialog] = useState(true);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [loading, setLoading] = useState(false);
+
   const menuRef = useRef(null);
+  const router = useRouter();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -84,11 +97,32 @@ const TopNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const handleStartOver = () => {
+    setSelectedOptions([]);
+    setShowContinueDialog(false);
+  };
+
+  const handleContinue = () => {
+    if (selectedOptions.length === 0) return;
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      router.push("/Customize");
+    }, 1000);
+  };
+
+  const handleSelect = (value) => {
+    setSelectedOptions((prev) =>
+      prev.includes(value)
+        ? prev.filter((item) => item !== value)
+        : [...prev, value]
+    );
+  };
+
   return (
     <>
       <nav className="sticky top-0 bg-white z-20">
         <div className="flex relative max-w-frame mx-auto items-center justify-between md:justify-start py-5 md:py-6 px-4 xl:px-0">
-          {/* Logo & Mobile Menu */}
           <div className="flex items-center">
             <div className="block md:hidden mr-4">
               <ResTopNavbar data={data} />
@@ -108,29 +142,30 @@ const TopNavbar = () => {
             </Link>
           </div>
 
-          {/* Main Navigation */}
           <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
             <NavigationMenuList>
               {data.map((item) => (
                 <div key={item.id}>
-                  {item.type === "MenuItem" && <MenuItem label={item.label} url={item.url} />}
+                  {item.type === "MenuItem" && item.label !== "Personalized Yours" && (
+                    <MenuItem label={item.label} url={item.url} />
+                  )}
                   {item.type === "MenuList" && <MenuList data={item.children} label={item.label} />}
+                  {item.type === "MenuItem" && item.label === "Personalized Yours" && (
+                    <button
+                      onClick={() => setShowContinueDialog(true)}
+                      className="text-gray-900 hover:text-blue-600 font-medium px-3 py-2 rounded cursor-pointer"
+                    >
+                      Personalized Yours
+                    </button>
+                  )}
                 </div>
               ))}
             </NavigationMenuList>
           </NavigationMenu>
 
-          {/* Desktop Search */}
           <InputGroup className="hidden md:flex bg-[#F0F0F0] mr-3 lg:mr-30 w-48 md:w-64 lg:w-80 px-2 py-1.5 rounded-md">
             <InputGroup.Text className="p-1">
-              <Image
-                priority
-                src="/icons/search.svg"
-                height={16}
-                width={16}
-                alt="search"
-                className="min-w-4 min-h-4"
-              />
+              <Image src="/icons/search.svg" height={16} width={16} alt="search" />
             </InputGroup.Text>
             <InputGroup.Input
               type="search"
@@ -140,9 +175,7 @@ const TopNavbar = () => {
             />
           </InputGroup>
 
-          {/* Cart & User */}
           <div className="flex items-center">
-            {/* Mobile Search Icon */}
             <Link
               href="#"
               className="block md:hidden mr-[14px] p-1"
@@ -151,12 +184,11 @@ const TopNavbar = () => {
                 setShowMobileSearch(true);
               }}
             >
-              <Image priority src="/icons/search-black.svg" height={22} width={22} alt="search" />
+              <Image src="/icons/search-black.svg" height={22} width={22} alt="search" />
             </Link>
 
             <CartBtn />
 
-            {/* User Profile Dropdown */}
             <div
               className="relative"
               ref={menuRef}
@@ -164,7 +196,7 @@ const TopNavbar = () => {
               onMouseLeave={() => setIsOpen(false)}
             >
               <button className="p-1 rounded-full hover:bg-gray-200 transition">
-                <Image priority src="/icons/user.svg" height={22} width={22} alt="user" />
+                <Image src="/icons/user.svg" height={22} width={22} alt="user" />
               </button>
 
               {isOpen && (
@@ -188,14 +220,7 @@ const TopNavbar = () => {
       {showMobileSearch && (
         <div className="absolute top-0 left-0 w-full h-full bg-white z-50 flex items-center justify-between px-4">
           <div className="flex-grow flex items-center bg-[#F0F0F0] px-3 py-2 rounded-md mr-2">
-            <Image
-              priority
-              src="/icons/search.svg"
-              height={16}
-              width={16}
-              alt="search"
-              className="min-w-4 min-h-4"
-            />
+            <Image src="/icons/search.svg" height={16} width={16} alt="search" />
             <input
               type="text"
               placeholder="Search..."
@@ -203,14 +228,65 @@ const TopNavbar = () => {
               autoFocus
             />
           </div>
-          <button
-            onClick={() => setShowMobileSearch(false)}
-            className="p-2 text-black rounded hover:bg-gray-200 transition"
-          >
-            ✕
-          </button>
+          <button className="text-sm text-blue-600" onClick={() => setShowMobileSearch(false)}>Cancel</button>
         </div>
       )}
+
+      {/* Continue Dialog */}
+      <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-xl">
+              <div className="flex justify-center items-center gap-8">
+                <label className="flex flex-col items-center cursor-pointer">
+                  <img
+                    src="/images/convert1.jpg"
+                    alt="Option 1"
+                    className="w-44 h-24 object-cover rounded-lg border"
+                  />
+                  <input
+                    type="checkbox"
+                    value="option1"
+                    checked={selectedOptions.includes("option1")}
+                    onChange={() => handleSelect("option1")}
+                    className="mt-2"
+                  />
+                </label>
+
+                <label className="flex flex-col items-center cursor-pointer">
+                  <img
+                    src="/images/convert2.jpg"
+                    alt="Option 2"
+                    className="w-44 h-24 object-cover rounded-lg border"
+                  />
+                  <input
+                    type="checkbox"
+                    value="option2"
+                    checked={selectedOptions.includes("option2")}
+                    onChange={() => handleSelect("option2")}
+                    className="mt-2"
+                  />
+                </label>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+          <DialogFooter className="flex flex-row justify-center gap-4 sm:justify-center mt-4">
+            <button
+              onClick={handleStartOver}
+              className="border-2 border-gray-300 bg-white hover:bg-gray-100 text-gray-800 px-6 py-2 rounded-full font-medium transition-colors"
+            >
+              No, start over
+            </button>
+            <button
+              onClick={handleContinue}
+              disabled={loading || selectedOptions.length === 0}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50"
+            >
+              {loading ? "Loading..." : "Yes, Continue"}
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
