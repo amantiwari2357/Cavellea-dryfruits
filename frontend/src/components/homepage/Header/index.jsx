@@ -68,9 +68,9 @@ const Header = () => {
             transition={{ delay: 0.3, duration: 0.6 }}
             className="text-white text-sm lg:text-lg max-w-xl mb-6"
           >
-            Explore our handpicked selection of nutritious and delicious dry
+            {/* Explore our handpicked selection of nutritious and delicious dry
             fruits, carefully sourced to ensure the highest quality and
-            freshness.
+            freshness. */}
           </motion.p>
 
           <motion.div
@@ -122,7 +122,8 @@ const Header = () => {
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="flex flex-wrap sm:flex-nowrap items-center justify-center max-w-6xl mx-auto gap-6">
+          className="flex flex-wrap sm:flex-nowrap items-center justify-center max-w-6xl mx-auto gap-10">  
+          {/* uper wale class se ham pura state ko kaha kya width gap and all manage kr sakte hai */}
           <div className="flex flex-col items-center sm:items-start">
             <span className="font-bold text-3xl lg:text-4xl">
               <AnimatedCounter from={0} to={50} />+
