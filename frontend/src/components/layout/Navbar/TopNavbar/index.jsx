@@ -78,11 +78,13 @@ const data = [
 ];
 
 const TopNavbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+   const [isOpen, setIsOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [showContinueDialog, setShowContinueDialog] = useState(true);
+  const [showContinueDialog, setShowContinueDialog] = useState(false); // start as false
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [hasSelected, setHasSelected] = useState(false);  // new state
+
 
   const menuRef = useRef(null);
   const router = useRouter();
@@ -100,17 +102,27 @@ const TopNavbar = () => {
   const handleStartOver = () => {
     setSelectedOptions([]);
     setShowContinueDialog(false);
+    setHasSelected(false);
   };
 
-  const handleContinue = () => {
-    if (selectedOptions.length === 0) return;
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      router.push("/Customize");
-    }, 1000);
-  };
+ const handleContinue = () => {
+  if (selectedOptions.length === 0) return;
+  setLoading(true);
+  setTimeout(() => {
+    setLoading(false);
+      setHasSelected(true); 
+    setShowContinueDialog(false); // <-- close dialog here
+    router.push("/Customize");
+  }, 1000);
+};
 
+ const handlePersonalizedClick = () => {
+    if (hasSelected) {
+      alert("You have already selected options.");  // or use any toast/notification here
+    } else {
+      setShowContinueDialog(true);
+    }
+  };
   const handleSelect = (value) => {
     setSelectedOptions((prev) =>
       prev.includes(value)
@@ -142,26 +154,26 @@ const TopNavbar = () => {
             </Link>
           </div>
 
-          <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
-            <NavigationMenuList>
-              {data.map((item) => (
-                <div key={item.id}>
-                  {item.type === "MenuItem" && item.label !== "Personalized Yours" && (
-                    <MenuItem label={item.label} url={item.url} />
-                  )}
-                  {item.type === "MenuList" && <MenuList data={item.children} label={item.label} />}
-                  {item.type === "MenuItem" && item.label === "Personalized Yours" && (
-                    <button
-                      onClick={() => setShowContinueDialog(true)}
-                      className="text-gray-900 hover:text-blue-600 font-medium px-3 py-2 rounded cursor-pointer"
-                    >
-                      Personalized Yours
-                    </button>
-                  )}
-                </div>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
+           <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
+        <NavigationMenuList>
+          {data.map((item) => (
+            <div key={item.id}>
+              {item.type === "MenuItem" && item.label !== "Personalized Yours" && (
+                <MenuItem label={item.label} url={item.url} />
+              )}
+              {item.type === "MenuList" && <MenuList data={item.children} label={item.label} />}
+              {item.type === "MenuItem" && item.label === "Personalized Yours" && (
+                <button
+                  onClick={handlePersonalizedClick}
+                  className="text-gray-900 hover:text-blue-600 font-medium px-3 py-2 rounded cursor-pointer"
+                >
+                  Personalized Yours
+                </button>
+              )}
+            </div>
+          ))}
+        </NavigationMenuList>
+      </NavigationMenu>
 
           <InputGroup className="hidden md:flex bg-[#F0F0F0] mr-3 lg:mr-30 w-48 md:w-64 lg:w-80 px-2 py-1.5 rounded-md">
             <InputGroup.Text className="p-1">
