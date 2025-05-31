@@ -74,7 +74,7 @@ const Footer = () => {
                   "text-[28px] lg:text-[32px] mb-6",
                 ])}
               >
-                Dry_Fruits
+                Cavellea
               </h1>
               <p className="text-black/60 text-sm mb-9">
   Discover premium-quality dry fruits that nourish your body and delight your taste buds. 
