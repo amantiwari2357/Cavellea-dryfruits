@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Link from "next/link";
 import {
   NavigationMenuItem,
@@ -7,12 +7,7 @@ import {
 } from "@/components/ui/navigation-menu";
 import { cn } from "@/lib/utils";
 
-type MenuItemProps = {
-  label: string;
-  url?: string;
-};
-
-export function MenuItem({ label, url }: MenuItemProps) {
+export function MenuItem({ label, url }) {
   return (
     <NavigationMenuItem>
       <Link href={url ?? "/"} legacyBehavior passHref>

@@ -19,7 +19,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-const ResTopNavbar = ({ data }: { data: NavMenu }) => {
+const ResTopNavbar = ({ data }) => {
   return (
     <Sheet>
       <SheetTrigger asChild className="cursor-pointer">

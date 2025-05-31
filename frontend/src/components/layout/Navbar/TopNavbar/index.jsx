@@ -4,15 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { integralCF } from "@/styles/fonts";
-import { NavMenu } from "../navbar.types";
-import { MenuList } from "./MenuList";
+import { MenuList } from "./MenuList.jsx";
 import { NavigationMenu, NavigationMenuList } from "@/components/ui/navigation-menu";
-import { MenuItem } from "./MenuItem";
+import { MenuItem } from "./MenuItem.jsx";
 import InputGroup from "@/components/ui/input-group";
-import ResTopNavbar from "./ResTopNavbar";
+import ResTopNavbar from "./ResTopNavbar.jsx";
 import CartBtn from "./CartBtn";
 
-const data: NavMenu = [
+const data = [
   {
     id: 1,
     label: "Shop",
@@ -31,11 +30,11 @@ const data: NavMenu = [
 
 const TopNavbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };

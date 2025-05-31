@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
@@ -8,21 +8,15 @@ import {
   NavigationMenuLink,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
-import { MenuListData } from "../navbar.types";
 
-export type MenuListProps = {
-  data: MenuListData;
-  label: string;
-};
-
-export function MenuList({ data, label }: MenuListProps) {
+export function MenuList({ data, label }) {
   return (
     <NavigationMenuItem>
       <NavigationMenuTrigger className="font-normal px-3">
         {label}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] ">
+        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
           {data.map((item) => (
             <ListItem key={item.id} title={item.label} href={item.url ?? "/"}>
               {item.description ?? ""}
@@ -34,10 +28,7 @@ export function MenuList({ data, label }: MenuListProps) {
   );
 }
 
-const ListItem = React.forwardRef<
-  React.ElementRef<typeof Link>,
-  React.ComponentPropsWithoutRef<typeof Link>
->(({ className, title, children, ...props }, ref) => {
+const ListItem = React.forwardRef(({ className, title, children, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
@@ -58,4 +49,5 @@ const ListItem = React.forwardRef<
     </li>
   );
 });
+
 ListItem.displayName = "ListItem";
