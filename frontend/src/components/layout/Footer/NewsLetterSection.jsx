@@ -38,7 +38,7 @@ const NewsLetterSection = () => {
           </InputGroup>
           <Button
             variant="secondary"
-            className="text-sm sm:text-base font-medium bg-white h-12 rounded-full px-4 py-3"
+            className="text-sm sm:text-base font-medium bg-red-600 h-12 rounded-full px-4 py-3"
             aria-label="Subscribe to Newsletter"
             type="button"
           >
