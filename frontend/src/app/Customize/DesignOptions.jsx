@@ -9,6 +9,7 @@ import {
   RotateCw,
   PictureInPicture,
   Type,
+  Brush,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
@@ -401,7 +402,7 @@ const DesignOptions = ({
               onClick={() => handleOptionSelect("text")}
             >
               <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-<Type className="h-5 w-5 text-blue-600" />
+              <Type className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <label
@@ -434,8 +435,7 @@ const DesignOptions = ({
               onClick={() => handleOptionSelect("clipart")}
             >
               <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Palette className="h-5 w-5 text-green-600" />
-              </div>
+              <Brush className="h-5 w-5 text-green-600" />              </div>
 
               <div>
                 <label
