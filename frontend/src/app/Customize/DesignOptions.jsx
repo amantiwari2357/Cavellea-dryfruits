@@ -2,7 +2,6 @@
 import { useRef, useEffect, useState } from "react";
 import {
   CheckCircle2, 
-  Palette,
   MoveHorizontal,
   ZoomIn,
   ZoomOut,
@@ -538,39 +537,48 @@ const DesignOptions = ({
     </h4>
     {/* <p className="text-sm text-gray-700">• First image upload is FREE.</p> */}
 
-    <div className="flex flex-col items-center mt-6 space-x-2">
+   <div className="flex flex-col items-center mt-6 space-y-4">
       {options.map((option) => (
         <label
           key={option.value}
-          className={`relative cursor-pointer rounded-lg overflow-hidden border-2 ${
-            selectedType === option.value
-              ? "border-blue-500"
-              : "border-transparent"
+          className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+            selectedType === option.value ? "border-yellow-500 shadow-lg" : "border-gray-200"
           }`}
         >
           <input
-            type="checkbox"
+            type="radio"
+            name="image-options"
             className="absolute opacity-0 h-0 w-0"
             checked={selectedType === option.value}
             onChange={() => handleSelect(option.value)}
           />
-          <img
-            src={option.image}
-            alt={option.label}
-            className="w-72 h-auto object-cover rounded-lg"
-          />
-          {selectedType === option.value && (
-            <div className="absolute top-2 right-2 text-green-500 bg-white rounded-full p-1 shadow-md">
-              <CheckCircle2 size={24} />
-            </div>
-          )}
-          <div className="text-center mt-2 text-gray-800 font-medium">
+          
+          {/* Container row: image + optional checkmark */}
+          
+          <div className="flex items-center space-x-3 p-2">
+            {selectedType === option.value && (
+              <div className="text-green-500 bg-white rounded-full p-1 shadow-md">
+                <CheckCircle2 size={24} />
+              </div>
+            )}
+            <img
+              src={option.image}
+              alt={option.label}
+              className="w-72 h-44 object-cover rounded-lg"
+            />
+          </div>
+
+          <div className="text-center mt-2 text-black font-semibold text-lg">
             {option.label}
           </div>
         </label>
       ))}
     </div>
- 
+  {/* );
+}; */}
+
+
+
     {/* Optional: Display selected value */}
     {/* <p className="text-sm text-gray-600 text-center mt-2">
       Selected: <span className="font-semibold">{printType === 'color' ? 'Color Print' : 'Black & White Print'}</span>
