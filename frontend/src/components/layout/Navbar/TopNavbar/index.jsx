@@ -275,8 +275,8 @@ const TopNavbar = () => {
     {/* Option 1 */}
     <label className="flex flex-col items-center cursor-pointer w-44">
       <div className="text-center mb-2">
-        <p className="text-sm font-medium">White Gems</p>
         <p className="text-xs text-gray-600">Prints in color</p>
+         <p className="text-sm font-medium">White Gems</p>
       </div>
       <div className="relative">
         <img
@@ -300,8 +300,8 @@ const TopNavbar = () => {
     {/* Option 2 */}
     <label className="flex flex-col items-center cursor-pointer w-44">
       <div className="text-center mb-2">
-        <p className="text-sm font-medium">Colored Gems</p>
         <p className="text-xs text-gray-600">Prints in black & white</p>
+        <p className="text-sm font-medium">Colored Gems</p>
       </div>
       <div className="relative">
         <img
