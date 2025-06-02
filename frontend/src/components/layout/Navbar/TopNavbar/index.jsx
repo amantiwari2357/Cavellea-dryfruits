@@ -270,7 +270,7 @@ const TopNavbar = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">
-              <h3 className="mb-4">Would you like to add color printing?</h3>
+              <h3 className="mb-4">Select a print type</h3>
               <div className="flex justify-center items-center gap-8">
                 <label className="flex flex-col items-center cursor-pointer">
                   <img
