@@ -79,6 +79,8 @@ const PackagingOptions = ({
           // Apply transformations directly from the mediaObject
           style={{
             transform: mediaObject.position ? `translate(${mediaObject.position.x}px, ${mediaObject.position.y}px) rotate(${mediaObject.rotation}deg) scale(${mediaObject.zoom / 100})` : 'none',
+            filter: "grayscale(100%)",
+
             width: '100%',
             height: '100%',
             borderRadius: '50%',
