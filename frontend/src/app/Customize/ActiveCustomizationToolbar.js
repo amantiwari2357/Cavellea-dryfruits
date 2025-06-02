@@ -1,7 +1,7 @@
 import React from 'react';
 import { Edit, Trash2, XCircle } from 'lucide-react';
 
-const ActiveCustomizationToolbar = ({ activeType, onEdit, onRemove, onCancel }) => {
+const ActiveCustomizationToolbar = ({ activeType, onRemove, onCancel }) => {
   const typeDisplay = activeType ? activeType.charAt(0).toUpperCase() + activeType.slice(1) : '';
 
   return (
