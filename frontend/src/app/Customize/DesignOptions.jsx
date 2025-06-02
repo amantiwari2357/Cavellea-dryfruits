@@ -759,7 +759,7 @@
   )}
 
 
-            {/* Overall Clear All Images button */}
+    {/* Overall Clear All Images button */}
             {(firstUploadedImage || secondUploadedImage) && (
               <div className="flex justify-center mt-4">
                 <button
