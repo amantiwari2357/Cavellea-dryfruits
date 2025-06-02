@@ -103,10 +103,16 @@ const TopNavbar = () => {
   useEffect(() => {
     if (pathname !== "/Customize") {
       setHasSelected(false);
+      setSelectedOptions([]); // Also clear selected options when leaving Customize
     }
   }, [pathname]);
 
   const handleContinue = () => {
+    if (selectedOptions.length === 0) {
+      alert("Please select an image option to continue.");
+      return;
+    }
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -123,7 +129,7 @@ const TopNavbar = () => {
   const handleStartOver = () => {
     setSelectedOptions([]);
     setShowContinueDialog(false);
-    setHasSelected(true);
+    setHasSelected(true); // Treat "SKIP" as having made a selection (an empty one) for the session
     router.push("/Customize");
   };
 
@@ -276,7 +282,7 @@ const TopNavbar = () => {
     <label className="flex flex-col items-center cursor-pointer w-44">
       <div className="text-center mb-2">
         <p className="text-xs text-gray-600">Prints in color</p>
-         <p className="text-sm font-medium">White Gems</p>
+        <p className="text-sm font-medium">White Gems</p>
       </div>
       <div className="relative">
         <img
@@ -334,8 +340,8 @@ const TopNavbar = () => {
             </button>
             <button
               onClick={handleContinue}
-              disabled={loading}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50 mr-6"
+              disabled={loading} // Disable if loading
+              className={`bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full font-medium transition-colors ${selectedOptions.length === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {loading ? "Loading..." : "CONTINUE"}
             </button>
