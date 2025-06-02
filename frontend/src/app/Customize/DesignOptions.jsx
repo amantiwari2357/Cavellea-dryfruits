@@ -670,6 +670,7 @@ const DesignOptions = ({
             objectFit: "cover",
             zIndex: 1,
             transform: `translate(${firstUploadedImage.position?.x || 0}px, ${firstUploadedImage.position?.y || 0}px) rotate(${firstUploadedImage.rotation || 0}deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
+             filter: "grayscale(100%)",
           }}
         />
       </div>
@@ -688,6 +689,7 @@ const DesignOptions = ({
             objectFit: "cover",
             zIndex: 2,
             transform: `translate(${secondUploadedImage.position?.x || 0}px, ${secondUploadedImage.position?.y || 0}px) rotate(${secondUploadedImage.rotation || 0}deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
+            filter: "grayscale(100%)",
           }}
         />
       </div>
@@ -773,7 +775,7 @@ const DesignOptions = ({
         setShowImageEditor(true);
         setShowImageUpload(false);
       }}
-      className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
+      className="w-full max-w-xs mx-auto mt-4 rounded-lg shadow-md transition duration-300 grayscale"
     >
     Edit First Image
     </button>
@@ -894,16 +896,16 @@ const DesignOptions = ({
 
       {/* Inline Image Editor */}
       {showImageEditor && (
-        <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
-          <h4 className="text-lg font-bold mb-4">
-            Edit{" "}
-            {currentlyEditingImageSlot === "first"
-              ? "First"
-              : currentlyEditingImageSlot === "second"
-              ? "Second"
-              : ""}{" "}
-            Image
-          </h4>
+  <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
+    <h4 className="text-lg font-bold mb-4">
+      Edit{" "}
+      {currentlyEditingImageSlot === "first"
+        ? "First"
+        : currentlyEditingImageSlot === "second"
+        ? "Second"
+        : ""}{" "}
+      Image
+    </h4>
 
           <div className="flex flex-col items-center space-y-6 py-4">
             <div
@@ -915,7 +917,7 @@ const DesignOptions = ({
                   ref={imageRef}
                   src={editingImageSrc}
                   alt="Editing"
-                  className="object-cover cursor-move w-full h-full"
+                  className="object-cover w-full h-full cursor-move transition duration-300 ease-in-out grayscale`}"
                   style={{
                     transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
                     transition: isDragging ? "none" : "transform 0.2s ease",
@@ -924,6 +926,7 @@ const DesignOptions = ({
                     minHeight: `${imageZoom}%`,
                     maxWidth: `${imageZoom}%`,
                     maxHeight: `${imageZoom}%`,
+                    filter: "grayscale(100%)",
                   }}
                   onMouseDown={handleMouseDown}
                 />
