@@ -269,40 +269,60 @@ const TopNavbar = () => {
       <Dialog open={showContinueDialog} onOpenChange={setShowContinueDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-center text-xl">
-              <h3 className="mb-4">Select a print type</h3>
-              <div className="flex justify-center items-center gap-8">
-                <label className="flex flex-col items-center cursor-pointer">
-                  <img
-                    src="/images/convert1.jpg"
-                    alt="Option 1"
-                    className="w-44 h-24 object-cover rounded-lg border"
-                  />
-                  <input
-                    type="checkbox"
-                    value="option1"
-                    checked={selectedOptions.includes("option1")}
-                    onChange={() => handleSelect("option1")}
-                    className="mt-2"
-                  />
-                </label>
+           <DialogTitle className="text-center">
+  <h3 className="text-xl font-semibold mb-6">Select a Print Type</h3>
+  <div className="flex justify-center items-start gap-8">
+    {/* Option 1 */}
+    <label className="flex flex-col items-center cursor-pointer w-44">
+      <div className="text-center mb-2">
+        <p className="text-sm font-medium">White Gems</p>
+        <p className="text-xs text-gray-600">Prints in color</p>
+      </div>
+      <div className="relative">
+        <img
+          src="/images/convert1.jpg"
+          alt="White Gems - Color Print"
+          className="w-full h-24 object-cover rounded-lg border-2 border-transparent hover:border-yellow-400 transition-all"
+        />
+        {selectedOptions.includes("option1") && (
+          <div className="absolute inset-0 bg-black/10 rounded-lg border-2 border-yellow-500 pointer-events-none" />
+        )}
+      </div>
+      <input
+        type="checkbox"
+        value="option1"
+        checked={selectedOptions.includes("option1")}
+        onChange={() => handleSelect("option1")}
+        className="mt-3 h-4 w-4 text-yellow-500 focus:ring-yellow-500"
+      />
+    </label>
 
-                <label className="flex flex-col items-center cursor-pointer">
-                  <img
-                    src="/images/convert2.jpg"
-                    alt="Option 2"
-                    className="w-44 h-24 object-cover rounded-lg border"
-                  />
-                  <input
-                    type="checkbox"
-                    value="option2"
-                    checked={selectedOptions.includes("option2")}
-                    onChange={() => handleSelect("option2")}
-                    className="mt-2"
-                  />
-                </label>
-              </div>
-            </DialogTitle>
+    {/* Option 2 */}
+    <label className="flex flex-col items-center cursor-pointer w-44">
+      <div className="text-center mb-2">
+        <p className="text-sm font-medium">Colored Gems</p>
+        <p className="text-xs text-gray-600">Prints in black & white</p>
+      </div>
+      <div className="relative">
+        <img
+          src="/images/convert2.jpg"
+          alt="Colored Gems - B&W Print"
+          className="w-full h-24 object-cover rounded-lg border-2 border-transparent hover:border-yellow-400 transition-all"
+        />
+        {selectedOptions.includes("option2") && (
+          <div className="absolute inset-0 bg-black/10 rounded-lg border-2 border-yellow-500 pointer-events-none" />
+        )}
+      </div>
+      <input
+        type="checkbox"
+        value="option2"
+        checked={selectedOptions.includes("option2")}
+        onChange={() => handleSelect("option2")}
+        className="mt-3 h-4 w-4 text-yellow-500 focus:ring-yellow-500"
+      />
+    </label>
+  </div>
+</DialogTitle>
           </DialogHeader>
           <DialogFooter className="flex flex-row justify-center gap-4 sm:justify-center mt-4">
             <button
