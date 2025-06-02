@@ -289,6 +289,7 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
                       className="w-full h-full rounded-full object-cover"
                       style={{
                         transform: candy.contentData.position ? `translate(${candy.contentData.position.x}px, ${candy.contentData.position.y}px) rotate(${candy.contentData.rotation}deg) scale(${candy.contentData.zoom / 100})` : 'none',
+                         filter: "grayscale(100%)",
                         width: '100%',
                         height: '100%',
                       }}
@@ -303,6 +304,7 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
                       className="w-full h-full rounded-full object-cover"
                       style={{
                         transform: candy.contentData.position ? `translate(${candy.contentData.position.x}px, ${candy.contentData.position.y}px) rotate(${candy.contentData.rotation}deg) scale(${candy.contentData.zoom / 100})` : 'none',
+                         filter: "grayscale(100%)",
                         width: '100%',
                         height: '100%',
                       }}

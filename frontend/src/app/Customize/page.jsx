@@ -191,6 +191,7 @@ esse ham right side preview circle ko ham manage krenge */}
             className="object-cover w-full h-full"
             style={{
               transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
+               filter: "grayscale(100%)",
             }}
           />
         ) : <span className="text-gray-400 text-xs">Image 1</span>}
@@ -211,6 +212,7 @@ esse ham right side preview circle ko ham manage krenge */}
             className="object-cover w-full h-full"
             style={{
               transform: secondSelectedImage.position ? `translate(${secondSelectedImage.position.x}px, ${secondSelectedImage.position.y}px) rotate(${secondSelectedImage.rotation}deg) scale(${secondSelectedImage.zoom / 100})` : 'none',
+               filter: "grayscale(100%)",
             }}
           />
         ) : <span className="text-gray-400 text-xs">Image 2</span>}
