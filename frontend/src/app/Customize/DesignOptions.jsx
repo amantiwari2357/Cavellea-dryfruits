@@ -883,9 +883,9 @@
                 <MoveHorizontal className="h-5 w-5 text-gray-500" />
                 <p className="text-center">Drag image to reposition photo</p>
               </div>
+{/* image edititing end hogya */}
 
               <div className="w-full space-y-4">
-{/* image edititing end hogaya */}
 
                 {/* Zoom control */}
                 <div className="space-y-2">
