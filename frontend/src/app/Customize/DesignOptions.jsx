@@ -46,7 +46,10 @@
     const [showImageEditor, setShowImageEditor] = useState(false);
     const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
     const [editingImageSrc, setEditingImageSrc] = useState(null);
+
+
     const [isDragging, setIsDragging] = useState(false);
+    
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
     const [imageZoom, setImageZoom] = useState(100);
     const [imageRotation, setImageRotation] = useState(0);
@@ -64,8 +67,6 @@
     const [secondUploadedImage, setSecondUploadedImage] = useState(parentSecondUploadedImage);
     const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] = useState(null);
 
-    const [dragging, setDragging] = useState(null);
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
 
     const [selectedType, setSelectedType] = useState("");
       const options = [
@@ -81,6 +82,8 @@
       },
     ];
 
+
+    
     useEffect(() => {
       const storedType = localStorage.getItem("printType");
       if (storedType) {
@@ -604,7 +607,7 @@
               zIndex: 1,
               transform: `translate(${firstUploadedImage.position?.x || 0}px, ${firstUploadedImage.position?.y || 0}px) rotate(${firstUploadedImage.rotation || 0}deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
               filter: "grayscale(100%)",
-              pointerEvents: "none" // Prevent image from interfering with drag
+              pointerEvents: "none"
             }}
             draggable="false"
           />
@@ -704,7 +707,7 @@
               </div>
             )}
 
-            {/* Edit/Clear Buttons for Each Image */}
+     {/* Edit/Clear Buttons for Each Image */}
           {firstUploadedImage && (
     <div className="flex justify-center mt-2 space-x-4">
       <button
@@ -848,6 +851,7 @@
           : ""}{" "}
         Image
       </h4>
+{/* yaha se ham image ka edit karenge */}
 
             <div className="flex flex-col items-center space-y-6 py-4">
               <div
@@ -881,6 +885,8 @@
               </div>
 
               <div className="w-full space-y-4">
+{/* image edititing end hogaya */}
+
                 {/* Zoom control */}
                 <div className="space-y-2">
                   <div className="flex justify-between">
@@ -892,7 +898,7 @@
                     <Slider
                       value={[imageZoom]}
                       min={50}
-                      max={200} // Increased max zoom for more flexibility
+                      max={200} 
                       step={1}
                       onValueChange={(value) => setImageZoom(value[0])}
                       className="flex-1"
@@ -900,6 +906,8 @@
                     <ZoomIn className="h-4 w-4 text-gray-500" />
                   </div>
                 </div>
+
+
 
                 {/* Rotation control */}
                 <div className="space-y-2">
