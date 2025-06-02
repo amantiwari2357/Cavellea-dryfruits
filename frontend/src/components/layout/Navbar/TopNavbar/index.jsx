@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { integralCF } from "@/styles/fonts";
 import { MenuList } from "./MenuList.jsx";
@@ -78,16 +78,16 @@ const data = [
 ];
 
 const TopNavbar = () => {
-   const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [showContinueDialog, setShowContinueDialog] = useState(false); // start as false
+  const [showContinueDialog, setShowContinueDialog] = useState(false);
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [hasSelected, setHasSelected] = useState(false);  // new state
-
+  const [hasSelected, setHasSelected] = useState(false);
 
   const menuRef = useRef(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -99,30 +99,51 @@ const TopNavbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Reset hasSelected when user navigates away from Customize page
+  useEffect(() => {
+    if (pathname !== "/Customize") {
+      setHasSelected(false);
+    }
+  }, [pathname]);
+
+  const handleContinue = () => {
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      setHasSelected(true);
+      setShowContinueDialog(false);
+      const params = new URLSearchParams();
+      if (selectedOptions.length > 0) {
+        params.append('selectedOptions', JSON.stringify(selectedOptions));
+      }
+      router.push(`/Customize?${params.toString()}`);
+    }, 500);
+  };
+
   const handleStartOver = () => {
     setSelectedOptions([]);
     setShowContinueDialog(false);
-    setHasSelected(false);
+    setHasSelected(true);
+    router.push("/Customize");
   };
 
- const handleContinue = () => {
-  if (selectedOptions.length === 0) return;
-  setLoading(true);
-  setTimeout(() => {
-    setLoading(false);
-      setHasSelected(true); 
-    setShowContinueDialog(false); // <-- close dialog here
-    router.push("/Customize");
-  }, 1000);
-};
-
- const handlePersonalizedClick = () => {
+  const handlePersonalizedClick = () => {
+    if (hasSelected && pathname === "/Customize") {
+      // If already on Customize page and has selected before, just stay there
+      return;
+    }
+    
     if (hasSelected) {
-      alert("You have already selected options.");  // or use any toast/notification here
+      const params = new URLSearchParams();
+      if (selectedOptions.length > 0) {
+        params.append('selectedOptions', JSON.stringify(selectedOptions));
+      }
+      router.push(`/Customize?${params.toString()}`);
     } else {
       setShowContinueDialog(true);
     }
   };
+
   const handleSelect = (value) => {
     setSelectedOptions((prev) =>
       prev.includes(value)
@@ -154,26 +175,26 @@ const TopNavbar = () => {
             </Link>
           </div>
 
-           <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
-        <NavigationMenuList>
-          {data.map((item) => (
-            <div key={item.id}>
-              {item.type === "MenuItem" && item.label !== "Personalized Yours" && (
-                <MenuItem label={item.label} url={item.url} />
-              )}
-              {item.type === "MenuList" && <MenuList data={item.children} label={item.label} />}
-              {item.type === "MenuItem" && item.label === "Personalized Yours" && (
-                <button
-                  onClick={handlePersonalizedClick}
-                  className="text-gray-900 hover:text-blue-600 font-medium px-3 py-2 rounded cursor-pointer"
-                >
-                  Personalized Yours
-                </button>
-              )}
-            </div>
-          ))}
-        </NavigationMenuList>
-      </NavigationMenu>
+          <NavigationMenu className="hidden md:flex mr-2 lg:mr-7">
+            <NavigationMenuList>
+              {data.map((item) => (
+                <div key={item.id}>
+                  {item.type === "MenuItem" && item.label !== "Personalized Yours" && (
+                    <MenuItem label={item.label} url={item.url} />
+                  )}
+                  {item.type === "MenuList" && <MenuList data={item.children} label={item.label} />}
+                  {item.type === "MenuItem" && item.label === "Personalized Yours" && (
+                    <button
+                      onClick={handlePersonalizedClick}
+                      className="text-gray-900 hover:text-blue-600 font-medium px-3 py-2 rounded cursor-pointer"
+                    >
+                      Personalized Yours
+                    </button>
+                  )}
+                </div>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
 
           <InputGroup className="hidden md:flex bg-[#F0F0F0] mr-3 lg:mr-30 w-48 md:w-64 lg:w-80 px-2 py-1.5 rounded-md">
             <InputGroup.Text className="p-1">
@@ -249,6 +270,7 @@ const TopNavbar = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center text-xl">
+              <h3 className="mb-4">Would you like to add color printing?</h3>
               <div className="flex justify-center items-center gap-8">
                 <label className="flex flex-col items-center cursor-pointer">
                   <img
@@ -285,16 +307,16 @@ const TopNavbar = () => {
           <DialogFooter className="flex flex-row justify-center gap-4 sm:justify-center mt-4">
             <button
               onClick={handleStartOver}
-              className="border-2 border-gray-300 bg-white hover:bg-gray-100 text-gray-800 px-6 py-2 rounded-full font-medium transition-colors"
+              className="border-2 border-yellow-500 bg-white hover:bg-yellow-50 text-gray-800 px-6 py-2 rounded-full font-medium transition-colors"
             >
-              No, start over
+              SKIP
             </button>
             <button
               onClick={handleContinue}
-              disabled={loading || selectedOptions.length === 0}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50"
+              disabled={loading}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50"
             >
-              {loading ? "Loading..." : "Yes, Continue"}
+              {loading ? "Loading..." : "CONTINUE"}
             </button>
           </DialogFooter>
         </DialogContent>
