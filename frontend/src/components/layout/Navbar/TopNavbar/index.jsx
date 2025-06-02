@@ -293,7 +293,7 @@ const TopNavbar = () => {
         value="option1"
         checked={selectedOptions.includes("option1")}
         onChange={() => handleSelect("option1")}
-        className="mt-3 h-4 w-4 text-yellow-500 focus:ring-yellow-500"
+        className="mt-3 h-3 w-3 text-yellow-500 focus:ring-yellow-500"
       />
     </label>
 
@@ -318,26 +318,28 @@ const TopNavbar = () => {
         value="option2"
         checked={selectedOptions.includes("option2")}
         onChange={() => handleSelect("option2")}
-        className="mt-3 h-4 w-4 text-yellow-500 focus:ring-yellow-500"
+        className="mt-3 h-3 w-3 text-yellow-500 focus:ring-yellow-500"
       />
     </label>
   </div>
 </DialogTitle>
           </DialogHeader>
           <DialogFooter className="flex flex-row justify-center gap-4 sm:justify-center mt-4">
+            <div className="flex gap-8">
             <button
               onClick={handleStartOver}
-              className="border-2 border-yellow-500 bg-white hover:bg-yellow-50 text-gray-800 px-6 py-2 rounded-full font-medium transition-colors"
+              className="border-2 border-yellow-500 bg-white hover:bg-yellow-50 text-gray-800 px-6 py-2 rounded-full font-medium transition-colors mr-12"
             >
               SKIP
             </button>
             <button
               onClick={handleContinue}
               disabled={loading}
-              className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50"
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-full font-medium transition-colors disabled:opacity-50 mr-6"
             >
               {loading ? "Loading..." : "CONTINUE"}
             </button>
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
