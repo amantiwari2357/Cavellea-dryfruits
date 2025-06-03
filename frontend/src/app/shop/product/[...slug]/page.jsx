@@ -24,7 +24,6 @@ export default function ProductPage({ params }) {
     notFound();
   }
 
-  // ✅ Move slice operations OUTSIDE JSX
   const recommendedProducts = [
     ...relatedProductData.slice(1, 4),
     ...newArrivalsData.slice(1, 4),
