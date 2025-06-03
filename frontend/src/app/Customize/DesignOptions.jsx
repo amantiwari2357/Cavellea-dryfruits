@@ -105,8 +105,20 @@ const DesignOptions = ({
 
   // Mock clipart data since import is missing
   const allCliparts = [
-    { src: "/placeholder.svg", alt: "Sample clipart 1", category: "All" },
-    { src: "/placeholder.svg", alt: "Sample clipart 2", category: "Birthday" },
+    { src: "/images/cliparts1.avif", alt: "Sample clipart 1", category: "All" },
+    { src: "/images/cliparts2.avif", alt: "Sample clipart 2", category: "Birthday" },
+    { src: "/images/cliparts3.avif", alt: "Sample clipart 3", category: "Graduation" },
+    { src: "/images/cliparts4.avif", alt: "Sample clipart 4", category: "Holiday" },
+    { src: "/images/cliparts5.avif", alt: "Sample clipart 5", category: "Wedding" },
+    { src: "/images/cliparts6.avif", alt: "Sample clipart 6", category: "All" },
+    { src: "/images/cliparts7.avif", alt: "Sample clipart 7", category: "Birthday" },
+    { src: "/images/cliparts8.avif", alt: "Sample clipart 8", category: "Graduation" },
+    { src: "/images/cliparts9.avif", alt: "Sample clipart 9", category: "Holiday" },
+    { src: "/images/cliparts10.avif", alt: "Sample clipart 10", category: "Wedding" },
+    { src: "/images/cliparts11.avif", alt: "Sample clipart 11", category: "All" },
+    { src: "/images/cliparts12.avif", alt: "Sample clipart 12", category: "Birthday" },
+    { src: "/images/cliparts13.avif", alt: "Sample clipart 13", category: "Graduation" },
+    { src: "/images/cliparts14.avif", alt: "Sample clipart 14", category: "Holiday" },
   ];
 
   const filteredCliparts = allCliparts.filter(
@@ -428,6 +440,7 @@ const DesignOptions = ({
         className="flex flex-col space-y-6"
       >
         {/* Image Option */}
+
         <a href="#upload-image">
           <div
             ref={imageUploadRef}
@@ -437,7 +450,8 @@ const DesignOptions = ({
                 : "hover:bg-gray-50"
             }`}
           >
-            <RadioGroupItem value="image" id="option-image" />
+            <RadioGroupItem value="image" />
+            {/* <a href="#select-image"></a> */}
             <div
               className="flex items-center space-x-3 cursor-pointer mb-0"
               onClick={() => handleOptionSelect("image")}
@@ -605,7 +619,7 @@ const DesignOptions = ({
           ref={imageUploadRef}
           className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
         >
-          <div className="flex flex-row items-center justify-center gap-4"></div>
+          <div id="upload-image" className="flex flex-row items-center justify-center gap-4"></div>
 
           <div className="mt-6">
             <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
@@ -621,7 +635,7 @@ const DesignOptions = ({
             </ul>
           </div>
           <div className="mt-2">
-            <button
+            <button 
               onClick={() => setShowMore(!showMore)}
               className="relative inline-flex items-center gap-1 text-sm font-medium text-blue-600 transition duration-300 ease-in-out hover:text-blue-800 group"
             >
@@ -779,7 +793,7 @@ const DesignOptions = ({
                 accept="image/*"
                 className="hidden"
               />
-              <button
+              <button id="image"
                 onClick={() => handleUploadClick("first")}
                 disabled={!agreeTerms}
                 className={`px-4 py-2 rounded-md ${
