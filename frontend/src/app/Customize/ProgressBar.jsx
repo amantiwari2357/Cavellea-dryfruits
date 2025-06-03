@@ -30,7 +30,7 @@ const ProgressBar = ({ currentStep }) => {
           return (
             <div key={step.id} className="flex flex-col items-center w-1/3">
               <div
-                className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-lg font-medium transition-all duration-300 ease-in-out
+                className={`w-10 h-10 rounded-full border-2 flex items-center justify-center text-lg font-medium transition-all duration-300 ease-in-out mt-7
                   ${
                     isCompleted
                       ? "bg-emerald-500 text-white border-emerald-600 shadow-lg"
