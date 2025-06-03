@@ -1,7 +1,6 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
 import {
-  CheckCircle2,
   MoveHorizontal,
   ZoomIn,
   ZoomOut,
@@ -47,6 +46,7 @@ const DesignOptions = ({
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [editingImageSrc, setEditingImageSrc] = useState(null);
 
+  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -63,10 +63,14 @@ const DesignOptions = ({
   const editorRef = useRef(null);
 
   // Internal states for the two images, initialized from parent props
-  const [firstUploadedImage, setFirstUploadedImage] = useState(parentFirstUploadedImage);
-  const [secondUploadedImage, setSecondUploadedImage] = useState(parentSecondUploadedImage);
-  const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] = useState(null);
-
+  const [firstUploadedImage, setFirstUploadedImage] = useState(
+    parentFirstUploadedImage
+  );
+  const [secondUploadedImage, setSecondUploadedImage] = useState(
+    parentSecondUploadedImage
+  );
+  const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] =
+    useState(null);
 
   const [selectedType, setSelectedType] = useState("");
   const options = [
@@ -82,8 +86,6 @@ const DesignOptions = ({
     },
   ];
 
-
-
   useEffect(() => {
     const storedType = localStorage.getItem("printType");
     if (storedType) {
@@ -96,7 +98,6 @@ const DesignOptions = ({
     localStorage.setItem("printType", value);
   };
 
-
   // Keep internal states in sync with parent props
   useEffect(() => {
     setFirstUploadedImage(parentFirstUploadedImage);
@@ -105,7 +106,6 @@ const DesignOptions = ({
   useEffect(() => {
     setSecondUploadedImage(parentSecondUploadedImage);
   }, [parentSecondUploadedImage]);
-
 
   const fontStyles = [
     "Bold",
@@ -219,20 +219,20 @@ const DesignOptions = ({
 
   // Mouse event handlers for image dragging
   const handleMouseDown = (e) => {
+    if (!containerRef.current) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const offsetX = e.clientX - containerRect.left - imagePosition.x;
+    const offsetY = e.clientY - containerRect.top - imagePosition.y;
+    setDragOffset({ x: offsetX, y: offsetY });
     setIsDragging(true);
-    setDragStart({
-      x: e.clientX - imagePosition.x,
-      y: e.clientY - imagePosition.y,
-    });
   };
 
   const handleMouseMove = (e) => {
-    if (isDragging) {
-      setImagePosition({
-        x: e.clientX - dragStart.x,
-        y: e.clientY - dragStart.y,
-      });
-    }
+    if (!isDragging || !containerRef.current) return;
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const newX = e.clientX - containerRect.left - dragOffset.x;
+    const newY = e.clientY - containerRect.top - dragOffset.y;
+    setImagePosition({ x: newX, y: newY });
   };
 
   const handleMouseUp = () => {
@@ -316,7 +316,7 @@ const DesignOptions = ({
     setShowImageUpload(false); // Hide upload panel
     setShowImageEditor(false); // Hide editor
     setCurrentlyEditingImageSlot(null); // Clear which slot is being edited
-    toast.info(`Image ${slotToClear === 'first' ? '1' : '2'} cleared.`);
+    toast.info(`Image ${slotToClear === "first" ? "1" : "2"} cleared.`);
   };
 
   const handleClearAllImages = () => {
@@ -331,8 +331,6 @@ const DesignOptions = ({
     toast.info("All images cleared.");
   };
   // ///////////////////
-
-
 
   return (
     <div className="p-0 bg-white w-64 h-full rounded-lg shadow-md">
@@ -349,10 +347,11 @@ const DesignOptions = ({
         <Link href={"#upload-image"}>
           <div
             ref={imageUploadRef}
-            className={`flex items-center space-x-4 p-3 rounded-lg mb-0 ${selectedOption === "image"
-              ? "bg-blue-50 border border-blue-200"
-              : "hover:bg-gray-50"
-              }`}
+            className={`flex items-center space-x-4 p-3 rounded-lg mb-0 ${
+              selectedOption === "image"
+                ? "bg-blue-50 border border-blue-200"
+                : "hover:bg-gray-50"
+            }`}
           >
             <RadioGroupItem value="image" id="option-image" />
             <div
@@ -360,7 +359,8 @@ const DesignOptions = ({
               onClick={() => handleOptionSelect("image")}
             >
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <PictureInPicture className="h-5 w-5 text-blue-600" />                             </div>
+                <PictureInPicture className="h-5 w-5 text-blue-600" />{" "}
+              </div>
               <div>
                 <label
                   htmlFor="option-image"
@@ -379,10 +379,11 @@ const DesignOptions = ({
 
         {/* Text Option */}
         <div
-          className={`flex items-center space-x-3 p-3 rounded-lg ${selectedOption === "text"
-            ? "bg-orange-50 border border-orange-200"
-            : "hover:bg-gray-50"
-            }`}
+          className={`flex items-center space-x-3 p-3 rounded-lg ${
+            selectedOption === "text"
+              ? "bg-orange-50 border border-orange-200"
+              : "hover:bg-gray-50"
+          }`}
         >
           <RadioGroupItem value="text" />
           <Link href={"#select-text"}>
@@ -411,10 +412,11 @@ const DesignOptions = ({
 
         {/* Clipart Option */}
         <div
-          className={`flex items-center space-x-3 p-3 rounded-lg mb-0 ${selectedOption === "clipart"
-            ? "bg-green-50 border border-green-200"
-            : "hover:bg-gray-50"
-            }`}
+          className={`flex items-center space-x-3 p-3 rounded-lg mb-0 ${
+            selectedOption === "clipart"
+              ? "bg-green-50 border border-green-200"
+              : "hover:bg-gray-50"
+          }`}
         >
           <RadioGroupItem value="clipart" />
           <Link href={"#select-clipart"}>
@@ -423,7 +425,8 @@ const DesignOptions = ({
               onClick={() => handleOptionSelect("clipart")}
             >
               <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Brush className="h-5 w-5 text-green-600" />              </div>
+                <Brush className="h-5 w-5 text-green-600" />{" "}
+              </div>
 
               <div>
                 <label
@@ -492,10 +495,11 @@ const DesignOptions = ({
                   <button
                     key={style}
                     onClick={() => setTempFontStyle(style)}
-                    className={`px-3 py-2 text-sm ${tempFontStyle === style
-                      ? "bg-yellow-100 border-yellow-500 border-2"
-                      : "bg-gray-100"
-                      } rounded-md transition-colors`}
+                    className={`px-3 py-2 text-sm ${
+                      tempFontStyle === style
+                        ? "bg-yellow-100 border-yellow-500 border-2"
+                        : "bg-gray-100"
+                    } rounded-md transition-colors`}
                   >
                     {style}
                   </button>
@@ -520,10 +524,7 @@ const DesignOptions = ({
           ref={imageUploadRef}
           className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
         >
-
-          <div className="flex flex-row items-center justify-center gap-4">
-
-          </div>
+          <div className="flex flex-row items-center justify-center gap-4"></div>
 
           <div className="mt-6">
             <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
@@ -545,8 +546,9 @@ const DesignOptions = ({
             >
               <span>{showMore ? "View Less" : "View More"}</span>
               <svg
-                className={`w-4 h-4 transition-transform duration-300 transform ${showMore ? "rotate-180" : ""
-                  } group-hover:translate-x-1`}
+                className={`w-4 h-4 transition-transform duration-300 transform ${
+                  showMore ? "rotate-180" : ""
+                } group-hover:translate-x-1`}
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -562,7 +564,6 @@ const DesignOptions = ({
           </div>
           <hr className="mt-4 border-gray-300" />
 
-
           {/* Image preview section with draggable images */}
           {(firstUploadedImage || secondUploadedImage) && (
             <div className="mb-4 text-center w-full flex justify-center gap-4">
@@ -572,7 +573,7 @@ const DesignOptions = ({
                   style={{ height: "80px", width: "80px", overflow: "hidden" }}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    startDrag(e, 'first');
+                    startDrag(e, "first");
                   }}
                 >
                   <img
@@ -585,9 +586,13 @@ const DesignOptions = ({
                       width: "100%",
                       objectFit: "cover",
                       zIndex: 1,
-                      transform: `translate(${firstUploadedImage.position?.x || 0}px, ${firstUploadedImage.position?.y || 0}px) rotate(${firstUploadedImage.rotation || 0}deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
+                      transform: `translate(${
+                        firstUploadedImage.position?.x || 0
+                      }px, ${firstUploadedImage.position?.y || 0}px) rotate(${
+                        firstUploadedImage.rotation || 0
+                      }deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
                       filter: "grayscale(100%)",
-                      pointerEvents: "none"
+                      pointerEvents: "none",
                     }}
                     draggable="false"
                   />
@@ -600,7 +605,7 @@ const DesignOptions = ({
                   style={{ height: "80px", width: "80px", overflow: "hidden" }}
                   onMouseDown={(e) => {
                     e.preventDefault();
-                    startDrag(e, 'second');
+                    startDrag(e, "second");
                   }}
                 >
                   <img
@@ -613,9 +618,13 @@ const DesignOptions = ({
                       width: "100%",
                       objectFit: "cover",
                       zIndex: 2,
-                      transform: `translate(${secondUploadedImage.position?.x || 0}px, ${secondUploadedImage.position?.y || 0}px) rotate(${secondUploadedImage.rotation || 0}deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
+                      transform: `translate(${
+                        secondUploadedImage.position?.x || 0
+                      }px, ${secondUploadedImage.position?.y || 0}px) rotate(${
+                        secondUploadedImage.rotation || 0
+                      }deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
                       filter: "grayscale(100%)",
-                      pointerEvents: "none" // Prevent image from interfering with drag
+                      pointerEvents: "none", // Prevent image from interfering with drag
                     }}
                     draggable="false"
                   />
@@ -652,10 +661,11 @@ const DesignOptions = ({
               <button
                 onClick={() => handleUploadClick("first")}
                 disabled={!agreeTerms}
-                className={`px-4 py-2 rounded-md ${agreeTerms
-                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  } transition-colors`}
+                className={`px-4 py-2 rounded-md ${
+                  agreeTerms
+                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                } transition-colors`}
               >
                 Upload First Image
               </button>
@@ -663,27 +673,29 @@ const DesignOptions = ({
           )}
 
           {/* Upload Next Image Button */}
-          {firstUploadedImage && !secondUploadedImage && ( // Only show if first image is uploaded, but second is not
-            <div className="flex justify-center mt-2">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-              />
-              <button
-                onClick={() => handleUploadClick("second")}
-                disabled={!agreeTerms}
-                className={`px-4 py-2 rounded-md ${agreeTerms
-                  ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          {firstUploadedImage &&
+            !secondUploadedImage && ( // Only show if first image is uploaded, but second is not
+              <div className="flex justify-center mt-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  onClick={() => handleUploadClick("second")}
+                  disabled={!agreeTerms}
+                  className={`px-4 py-2 rounded-md ${
+                    agreeTerms
+                      ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   } transition-colors`}
-              >
-                Upload Second Image
-              </button>
-            </div>
-          )}
+                >
+                  Upload Second Image
+                </button>
+              </div>
+            )}
 
           {/* Edit/Clear Buttons for Each Image */}
           {firstUploadedImage && (
@@ -698,7 +710,7 @@ const DesignOptions = ({
                   setShowImageEditor(true);
                   setShowImageUpload(false);
                 }}
-                className="w-full max-w-xs mx-auto mt-4 rounded-lg shadow-md transition duration-300 grayscale"
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
               >
                 Edit First Image
               </button>
@@ -735,7 +747,6 @@ const DesignOptions = ({
               </button>
             </div>
           )}
-
 
           {/* Overall Clear All Images button */}
           {(firstUploadedImage || secondUploadedImage) && (
@@ -798,12 +809,13 @@ const DesignOptions = ({
               <div
                 key={index}
                 onClick={() => handleClipartSelect(clipart.src)}
-                className={`cursor-pointer p-1 rounded-md ${parentSelectedImage &&
+                className={`cursor-pointer p-1 rounded-md ${
+                  parentSelectedImage &&
                   typeof parentSelectedImage === "string" &&
                   parentSelectedImage === clipart.src
-                  ? "ring-2 ring-yellow-500"
-                  : ""
-                  }`}
+                    ? "ring-2 ring-yellow-500"
+                    : ""
+                }`}
               >
                 <img
                   src={clipart.src}
@@ -824,8 +836,8 @@ const DesignOptions = ({
             {currentlyEditingImageSlot === "first"
               ? "First"
               : currentlyEditingImageSlot === "second"
-                ? "Second"
-                : ""}{" "}
+              ? "Second"
+              : ""}{" "}
             Image
           </h4>
           {/* yaha se ham image ka edit karenge */}
@@ -848,8 +860,12 @@ const DesignOptions = ({
                     alt="Editing"
                     className="absolute object-cover cursor-move select-none"
                     style={{
-                      transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
-                                            filter: "grayscale(100%)",
+                      transform: `translate(${imagePosition.x}px, ${
+                        imagePosition.y
+                      }px) rotate(${imageRotation}deg) scale(${
+                        imageZoom / 100
+                      })`,
+                      filter: "grayscale(100%)",
 
                       transition: isDragging ? "none" : "transform 0.2s ease",
                       cursor: isDragging ? "grabbing" : "grab",
@@ -861,137 +877,108 @@ const DesignOptions = ({
                   />
                 )}
               </div>
-
-              {/* Controls */}
-              <div className="mt-4 flex flex-col gap-2 w-64">
-                <label className="text-white">
-                  Zoom: {imageZoom}%
-                  <input
-                    type="range"
-                    min="50"
-                    max="200"
-                    value={imageZoom}
-                    onChange={(e) => setImageZoom(Number(e.target.value))}
-                    className="w-full"
-                    
-                  />
-                </label>
-                <label className="text-white">
-                  Rotate: {imageRotation}°
-                  <input
-                    type="range"
-                    min="0"
-                    max="360"
-                    value={imageRotation}
-                    onChange={(e) => setImageRotation(Number(e.target.value))}
-                    className="w-full"
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <MoveHorizontal className="h-5 w-5 text-gray-500" />
-              <p className="text-center">Drag image to reposition photo</p>
-            </div>
-            {/* image edititing end hogya */}
-
-            <div className="w-full space-y-4">
-
-              {/* Zoom control */}
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <label className="text-sm font-medium">Zoom</label>
-                  <span className="text-sm">{imageZoom}%</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <ZoomOut className="h-4 w-4 text-gray-500" />
-                  <Slider
-                    value={[imageZoom]}
-                    min={50}
-                    max={200}
-                    step={1}
-                    onValueChange={(value) => setImageZoom(value[0])}
-                    className="flex-1"
-                  />
-                  <ZoomIn className="h-4 w-4 text-gray-500" />
-                </div>
-              </div>
-
-
-
-              {/* Rotation control */}
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <label className="text-sm font-medium">Rotation</label>
-                  <span className="text-sm">{imageRotation}°</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RotateCw className="h-4 w-4 text-gray-500" />
-                  <Slider
-                    value={[imageRotation]}
-                    min={0}
-                    max={360}
-                    step={5}
-                    onValueChange={(value) => setImageRotation(value[0])}
-                    className="flex-1"
-                  />
-                  <RotateCw className="h-4 w-4 text-gray-500" />{" "}
-                  {/* Changed icon to match left side */}
-                </div>
-              </div>
-            </div>
-
-            <p className="text-gray-600 text-sm text-center">
-              Since Cavellea are round, it doesn't matter if your
-              <br />
-              image is upside down or sideways!
-            </p>
-
-            <button
-              onClick={handleResetImageEdits}
-              className="flex items-center space-x-2 text-gray-800 hover:text-gray-600"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1z"
-                  clipRule="evenodd"
-                />
-                <path
-                  fillRule="evenodd"
-                  d="M10.146 8.146a.5.5 0 01.708 0L12 9.293l1.146-1.147a.5.5 0 11.708.708L12.707 10l1.147 1.146a.5.5 0 01-.708.708L12 10.707l-1.146 1.147a.5.5 0 010-.708z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span>Reset position</span>
-            </button>
-
-            <div className="flex w-full justify-between space-x-4">
-              <button
-                onClick={() => {
-                  setShowImageEditor(false);
-                  setShowImageUpload(true);
-                }}
-                className="w-full border-2 border-brown-800 text-brown-800 font-bold py-3 px-6 rounded-full"
-              >
-                Back
-              </button>
-              <button
-                id="up"
-                onClick={handleImageConfirm}
-                className="w-full bg-yellow-400 text-black font-bold py-3 px-6 rounded-full hover:bg-yellow-500"
-              >
-                Confirm
-              </button>
             </div>
           </div>
+
+          <div className="flex items-center space-x-2">
+            <MoveHorizontal className="h-5 w-5 text-gray-500" />
+            <p className="text-center">Drag image to reposition photo</p>
+          </div>
+          {/* image edititing end hogya */}
+
+          <div className="w-full space-y-4">
+            {/* Zoom control */}
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <label className="text-sm font-medium">Zoom</label>
+                <span className="text-sm">{imageZoom}%</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <ZoomOut className="h-4 w-4 text-gray-500" />
+                <Slider
+                  value={[imageZoom]}
+                  min={50}
+                  max={200}
+                  step={1}
+                  onValueChange={(value) => setImageZoom(value[0])}
+                  className="flex-1"
+                />
+                <ZoomIn className="h-4 w-4 text-gray-500" />
+              </div>
+            </div>
+
+            {/* Rotation control */}
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <label className="text-sm font-medium">Rotation</label>
+                <span className="text-sm">{imageRotation}°</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RotateCw className="h-4 w-4 text-gray-500" />
+                <Slider
+                  value={[imageRotation]}
+                  min={0}
+                  max={360}
+                  step={5}
+                  onValueChange={(value) => setImageRotation(value[0])}
+                  className="flex-1"
+                />
+                <RotateCw className="h-4 w-4 text-gray-500" />{" "}
+                {/* Changed icon to match left side */}
+              </div>
+            </div>
+          </div>
+          <br />
+          <p className="text-gray-600 text-sm text-center">
+            Since Cavellea are round, it doesn't matter if your
+            <br />
+            image is upside down or sideways!
+          </p>
+          <br />
+          <button
+            onClick={handleResetImageEdits}
+            className="flex items-center space-x-2 text-gray-800 hover:text-gray-600 text-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1z"
+                clipRule="evenodd"
+              />
+              <path
+                fillRule="evenodd"
+                d="M10.146 8.146a.5.5 0 01.708 0L12 9.293l1.146-1.147a.5.5 0 11.708.708L12.707 10l1.147 1.146a.5.5 0 01-.708.708L12 10.707l-1.146 1.147a.5.5 0 010-.708z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <span>Reset position</span>
+          </button>
+          <br />
+          <div className="flex w-full justify-between space-x-4">
+            <button
+              onClick={() => {
+                setShowImageEditor(false);
+                setShowImageUpload(true);
+              }}
+              className="w-full border-2 border-brown-800 text-brown-800 font-bold py-3 px-6 rounded-full"
+            >
+              Back
+            </button>
+            <button
+              id="up"
+              onClick={handleImageConfirm}
+              className="w-full bg-yellow-400 text-black font-bold py-3 px-6 rounded-full hover:bg-yellow-500"
+            >
+              Confirm
+            </button>
+          </div>
         </div>
+        // </div>
       )}
     </div>
   );
