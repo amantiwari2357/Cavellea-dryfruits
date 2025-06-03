@@ -8,23 +8,21 @@ import {
   PictureInPicture,
   Type,
   Brush,
+  Move,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import clipartdata from "../../app/data/clipartdata";
-import Link from "next/link";
 
 const DesignOptions = ({
-  onImageSelect, // This prop will now receive an object { first: image1Data, second: image2Data }
+  onImageSelect,
   onTextChange,
   onFontStyleChange,
   firstLine,
   secondLine,
   selectedFontStyle,
-  selectedImage: parentSelectedImage, // This is still the primary image from parent, used for initial setup
+  selectedImage: parentSelectedImage,
   onClipartSelect,
-  // New props to receive the current state of both images from the parent
   firstUploadedImage: parentFirstUploadedImage,
   secondUploadedImage: parentSecondUploadedImage,
 }) => {
@@ -47,22 +45,15 @@ const DesignOptions = ({
   const [editingImageSrc, setEditingImageSrc] = useState(null);
 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
   const [isDragging, setIsDragging] = useState(false);
-
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [imageZoom, setImageZoom] = useState(100);
   const [imageRotation, setImageRotation] = useState(0);
-
   const [selectedOption, setSelectedOption] = useState("none");
-
   const imageUploadRef = useRef(null);
-
   const [showMore, setShowMore] = useState(false);
-
   const editorRef = useRef(null);
 
-  // Internal states for the two images, initialized from parent props
   const [firstUploadedImage, setFirstUploadedImage] = useState(
     parentFirstUploadedImage
   );
@@ -72,19 +63,16 @@ const DesignOptions = ({
   const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] =
     useState(null);
 
+  // Preview circle drag states
+  const [isDraggingPreview, setIsDraggingPreview] = useState(false);
+  const [draggingImageSlot, setDraggingImageSlot] = useState(null);
+  const [previewDragOffset, setPreviewDragOffset] = useState({ x: 0, y: 0 });
+  const [hoveredImageSlot, setHoveredImageSlot] = useState(null);
+
   const [selectedType, setSelectedType] = useState("");
-  const options = [
-    {
-      label: "if you used color gems it will come black & white",
-      value: "black-and-white",
-      image: "/images/convert2.jpg",
-    },
-    {
-      label: "for good picture colour we will use white gems",
-      value: "color",
-      image: "/images/convert1.jpg",
-    },
-  ];
+
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [showCursor, setShowCursor] = useState(false);
 
   useEffect(() => {
     const storedType = localStorage.getItem("printType");
@@ -113,10 +101,13 @@ const DesignOptions = ({
     "Light",
     "Script",
     "Italic",
-    // "Monospace",
   ];
 
-  const allCliparts = clipartdata;
+  // Mock clipart data since import is missing
+  const allCliparts = [
+    { src: "/placeholder.svg", alt: "Sample clipart 1", category: "All" },
+    { src: "/placeholder.svg", alt: "Sample clipart 2", category: "Birthday" },
+  ];
 
   const filteredCliparts = allCliparts.filter(
     (clipart) =>
@@ -133,23 +124,19 @@ const DesignOptions = ({
         const imageUrl = event.target.result;
         setEditingImageSrc(imageUrl);
 
-        // If no slot is explicitly set (e.g., first time clicking upload),
-        // determine which slot to use. If first is empty, use first. Else, use second.
-        // If both are full, default to editing the first one, or prompt user.
         if (!currentlyEditingImageSlot) {
           if (!firstUploadedImage) {
             setCurrentlyEditingImageSlot("first");
           } else if (!secondUploadedImage) {
             setCurrentlyEditingImageSlot("second");
           } else {
-            setCurrentlyEditingImageSlot("first"); // Default to first if both are full
+            setCurrentlyEditingImageSlot("first");
             toast.info("Both image slots are full. Editing the first image.");
           }
         }
 
         setShowImageEditor(true);
         setShowImageUpload(false);
-        // Reset editor settings to default for a new image upload
         setImagePosition({ x: 0, y: 0 });
         setImageZoom(100);
         setImageRotation(0);
@@ -160,9 +147,9 @@ const DesignOptions = ({
 
   const handleUploadClick = (slot) => {
     if (agreeTerms && fileInputRef.current) {
-      setCurrentlyEditingImageSlot(slot); // Set which slot we are going to upload/edit
+      setCurrentlyEditingImageSlot(slot);
       fileInputRef.current.click();
-      fileInputRef.current.value = null; // Clear input to allow re-uploading the same file
+      fileInputRef.current.value = null;
     } else {
       toast.error(
         "Please agree to the terms and conditions to upload an image."
@@ -190,26 +177,23 @@ const DesignOptions = ({
   };
 
   const handleOptionSelect = (value) => {
-    // If the same option is selected again, allow re-upload if it's image
     if (selectedOption === value) {
       if (value === "image") {
-        setShowImageUpload(true); // Show upload panel again
-        setShowImageEditor(false); // Hide editor if it was open
+        setShowImageUpload(true);
+        setShowImageEditor(false);
       }
-      return; // Skip the rest if the same option is selected again
+      return;
     }
 
-    // Reset states for a new option selection
     setSelectedOption(value);
     setShowTextFields(false);
     setShowImageUpload(false);
     setShowClipartPanel(false);
     setShowImageEditor(false);
-    setCurrentlyEditingImageSlot(null); // Reset currently editing slot when changing option
+    setCurrentlyEditingImageSlot(null);
 
-    // Show panels based on the newly selected option
     if (value === "image") {
-      setShowImageUpload(true); // Always show upload for image selection initially
+      setShowImageUpload(true);
     } else if (value === "text") {
       setShowTextFields(true);
     } else if (value === "clipart") {
@@ -217,26 +201,123 @@ const DesignOptions = ({
     }
   };
 
-  // Mouse event handlers for image dragging
+  // Mouse event handlers for image dragging in editor
   const handleMouseDown = (e) => {
+    e.preventDefault();
     if (!containerRef.current) return;
+    
     const containerRect = containerRef.current.getBoundingClientRect();
     const offsetX = e.clientX - containerRect.left - imagePosition.x;
     const offsetY = e.clientY - containerRect.top - imagePosition.y;
+    
     setDragOffset({ x: offsetX, y: offsetY });
     setIsDragging(true);
+    
+    console.log('Mouse down - starting drag');
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging || !containerRef.current) return;
+    
+    e.preventDefault();
     const containerRect = containerRef.current.getBoundingClientRect();
     const newX = e.clientX - containerRect.left - dragOffset.x;
     const newY = e.clientY - containerRect.top - dragOffset.y;
+    
     setImagePosition({ x: newX, y: newY });
+    console.log('Moving image to:', { x: newX, y: newY });
   };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
+  const handleMouseUp = (e) => {
+    if (isDragging) {
+      e.preventDefault();
+      setIsDragging(false);
+      console.log('Mouse up - ending drag');
+    }
+  };
+
+  // New handlers for cursor movement in editor
+  const handleEditorMouseMove = (e) => {
+    if (!containerRef.current || isDragging) return;
+    
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const x = e.clientX - containerRect.left;
+    const y = e.clientY - containerRect.top;
+    
+    setCursorPosition({ x, y });
+    setShowCursor(true);
+  };
+
+  const handleEditorMouseLeave = () => {
+    setShowCursor(false);
+  };
+
+  const handleEditorClick = (e) => {
+    if (!containerRef.current || isDragging) return;
+    
+    e.preventDefault();
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const clickX = e.clientX - containerRect.left;
+    const clickY = e.clientY - containerRect.top;
+    
+    // Move image to clicked position (center the image on click point)
+    const newX = clickX - (containerRect.width / 2);
+    const newY = clickY - (containerRect.height / 2);
+    
+    setImagePosition({ x: newX, y: newY });
+    console.log('Moving image to clicked position:', { x: newX, y: newY });
+  };
+
+  // Preview circle drag handlers
+  const handlePreviewMouseDown = (e, slot) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const imageElement = e.currentTarget.querySelector('img');
+    if (!imageElement) return;
+    
+    const rect = imageElement.getBoundingClientRect();
+    const currentImage = slot === "first" ? firstUploadedImage : secondUploadedImage;
+    const currentPos = currentImage?.position || { x: 0, y: 0 };
+    
+    const offsetX = e.clientX - rect.left - currentPos.x;
+    const offsetY = e.clientY - rect.top - currentPos.y;
+    
+    setPreviewDragOffset({ x: offsetX, y: offsetY });
+    setIsDraggingPreview(true);
+    setDraggingImageSlot(slot);
+  };
+
+  const handlePreviewMouseMove = (e) => {
+    if (!isDraggingPreview || !draggingImageSlot) return;
+    
+    e.preventDefault();
+    
+    const containerElement = document.querySelector(`[data-preview-container="${draggingImageSlot}"]`);
+    if (!containerElement) return;
+    
+    const containerRect = containerElement.getBoundingClientRect();
+    const newX = e.clientX - containerRect.left - previewDragOffset.x;
+    const newY = e.clientY - containerRect.top - previewDragOffset.y;
+    
+    const currentImage = draggingImageSlot === "first" ? firstUploadedImage : secondUploadedImage;
+    const updatedImage = {
+      ...currentImage,
+      position: { x: newX, y: newY }
+    };
+    
+    if (draggingImageSlot === "first") {
+      setFirstUploadedImage(updatedImage);
+      onImageSelect({ first: updatedImage, second: secondUploadedImage });
+    } else {
+      setSecondUploadedImage(updatedImage);
+      onImageSelect({ first: firstUploadedImage, second: updatedImage });
+    }
+  };
+
+  const handlePreviewMouseUp = () => {
+    setIsDraggingPreview(false);
+    setDraggingImageSlot(null);
   };
 
   // Add mouse event listeners when dragging is active
@@ -250,14 +331,20 @@ const DesignOptions = ({
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [
-    isDragging,
-    dragStart,
-    imagePosition,
-    imageZoom,
-    imageRotation,
-    editingImageSrc,
-  ]);
+  }, [isDragging, dragOffset, imagePosition]);
+
+  // Add preview drag event listeners
+  useEffect(() => {
+    if (isDraggingPreview) {
+      document.addEventListener("mousemove", handlePreviewMouseMove);
+      document.addEventListener("mouseup", handlePreviewMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener("mousemove", handlePreviewMouseMove);
+      document.removeEventListener("mouseup", handlePreviewMouseUp);
+    };
+  }, [isDraggingPreview, draggingImageSlot, previewDragOffset, firstUploadedImage, secondUploadedImage]);
 
   const handleImageConfirm = () => {
     window.scrollTo({
@@ -278,13 +365,12 @@ const DesignOptions = ({
 
     if (currentlyEditingImageSlot === "first") {
       updatedFirstImage = imageData;
-      setFirstUploadedImage(imageData); // Update internal state
+      setFirstUploadedImage(imageData);
     } else if (currentlyEditingImageSlot === "second") {
       updatedSecondImage = imageData;
-      setSecondUploadedImage(imageData); // Update internal state
+      setSecondUploadedImage(imageData);
     }
 
-    // Pass both images up to the parent component
     onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
 
     setShowImageEditor(false);
@@ -309,20 +395,19 @@ const DesignOptions = ({
       setSecondUploadedImage(null);
     }
 
-    // Pass both images up to the parent component
     onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
 
-    setEditingImageSrc(null); // Clear editor source
-    setShowImageUpload(false); // Hide upload panel
-    setShowImageEditor(false); // Hide editor
-    setCurrentlyEditingImageSlot(null); // Clear which slot is being edited
+    setEditingImageSrc(null);
+    setShowImageUpload(false);
+    setShowImageEditor(false);
+    setCurrentlyEditingImageSlot(null);
     toast.info(`Image ${slotToClear === "first" ? "1" : "2"} cleared.`);
   };
 
   const handleClearAllImages = () => {
     setFirstUploadedImage(null);
     setSecondUploadedImage(null);
-    onImageSelect({ first: null, second: null }); // Clear both in parent
+    onImageSelect({ first: null, second: null });
     setEditingImageSrc(null);
     setShowImageUpload(false);
     setShowImageEditor(false);
@@ -330,7 +415,6 @@ const DesignOptions = ({
     setCurrentlyEditingImageSlot(null);
     toast.info("All images cleared.");
   };
-  // ///////////////////
 
   return (
     <div className="p-0 bg-white w-64 h-full rounded-lg shadow-md">
@@ -344,7 +428,7 @@ const DesignOptions = ({
         className="flex flex-col space-y-6"
       >
         {/* Image Option */}
-        <Link href={"#upload-image"}>
+        <a href="#upload-image">
           <div
             ref={imageUploadRef}
             className={`flex items-center space-x-4 p-3 rounded-lg mb-0 ${
@@ -359,7 +443,7 @@ const DesignOptions = ({
               onClick={() => handleOptionSelect("image")}
             >
               <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <PictureInPicture className="h-5 w-5 text-blue-600" />{" "}
+                <PictureInPicture className="h-5 w-5 text-blue-600" />
               </div>
               <div>
                 <label
@@ -375,7 +459,7 @@ const DesignOptions = ({
               </div>
             </div>
           </div>
-        </Link>
+        </a>
 
         {/* Text Option */}
         <div
@@ -386,7 +470,7 @@ const DesignOptions = ({
           }`}
         >
           <RadioGroupItem value="text" />
-          <Link href={"#select-text"}>
+          <a href="#select-text">
             <div
               className="flex items-center space-x-3 cursor-pointer"
               onClick={() => handleOptionSelect("text")}
@@ -407,7 +491,7 @@ const DesignOptions = ({
                 )}
               </div>
             </div>
-          </Link>
+          </a>
         </div>
 
         {/* Clipart Option */}
@@ -419,13 +503,13 @@ const DesignOptions = ({
           }`}
         >
           <RadioGroupItem value="clipart" />
-          <Link href={"#select-clipart"}>
+          <a href="#select-clipart">
             <div
               className="flex items-center space-x-3 cursor-pointer"
               onClick={() => handleOptionSelect("clipart")}
             >
               <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <Brush className="h-5 w-5 text-green-600" />{" "}
+                <Brush className="h-5 w-5 text-green-600" />
               </div>
 
               <div>
@@ -436,12 +520,9 @@ const DesignOptions = ({
                   Clipart
                 </label>
                 <div className="w-16 h-1 bg-yellow-500 rounded mt-1"></div>
-                {onClipartSelect && (
-                  <p className="text-xs text-gray-500 mt-1"></p>
-                )}
               </div>
             </div>
-          </Link>
+          </a>
         </div>
 
         <div className="mt-2 text-center"></div>
@@ -569,12 +650,17 @@ const DesignOptions = ({
             <div className="mb-4 text-center w-full flex justify-center gap-4">
               {firstUploadedImage && (
                 <div
-                  className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative cursor-move"
-                  style={{ height: "80px", width: "80px", overflow: "hidden" }}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    startDrag(e, "first");
+                  data-preview-container="first"
+                  className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
+                  style={{ 
+                    height: "80px", 
+                    width: "80px", 
+                    overflow: "hidden",
+                    cursor: isDraggingPreview && draggingImageSlot === "first" ? "grabbing" : "grab"
                   }}
+                  onMouseDown={(e) => handlePreviewMouseDown(e, "first")}
+                  onMouseEnter={() => setHoveredImageSlot("first")}
+                  onMouseLeave={() => setHoveredImageSlot(null)}
                 >
                   <img
                     src={firstUploadedImage.src}
@@ -596,17 +682,37 @@ const DesignOptions = ({
                     }}
                     draggable="false"
                   />
+                  {/* Attractive move cursor symbol */}
+                  <div 
+                    className="absolute pointer-events-none transition-all duration-200"
+                    style={{
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 10,
+                      opacity: (hoveredImageSlot === "first" || (isDraggingPreview && draggingImageSlot === "first")) ? 1 : 0,
+                    }}
+                  >
+                    <div className="bg-blue-500 rounded-full p-2 shadow-lg">
+                      <Move className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
                 </div>
               )}
 
               {secondUploadedImage && (
                 <div
-                  className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative cursor-move"
-                  style={{ height: "80px", width: "80px", overflow: "hidden" }}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    startDrag(e, "second");
+                  data-preview-container="second"
+                  className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
+                  style={{ 
+                    height: "80px", 
+                    width: "80px", 
+                    overflow: "hidden",
+                    cursor: isDraggingPreview && draggingImageSlot === "second" ? "grabbing" : "grab"
                   }}
+                  onMouseDown={(e) => handlePreviewMouseDown(e, "second")}
+                  onMouseEnter={() => setHoveredImageSlot("second")}
+                  onMouseLeave={() => setHoveredImageSlot(null)}
                 >
                   <img
                     src={secondUploadedImage.src}
@@ -624,10 +730,25 @@ const DesignOptions = ({
                         secondUploadedImage.rotation || 0
                       }deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
                       filter: "grayscale(100%)",
-                      pointerEvents: "none", // Prevent image from interfering with drag
+                      pointerEvents: "none",
                     }}
                     draggable="false"
                   />
+                  {/* Attractive move cursor symbol */}
+                  <div 
+                    className="absolute pointer-events-none transition-all duration-200"
+                    style={{
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      zIndex: 10,
+                      opacity: (hoveredImageSlot === "second" || (isDraggingPreview && draggingImageSlot === "second")) ? 1 : 0,
+                    }}
+                  >
+                    <div className="bg-blue-500 rounded-full p-2 shadow-lg">
+                      <Move className="w-4 h-4 text-white" />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -649,7 +770,7 @@ const DesignOptions = ({
           </div>
 
           {/* Upload First Image Button */}
-          {!firstUploadedImage && ( // Only show if first image is not uploaded
+          {!firstUploadedImage && (
             <div className="flex justify-center mt-2">
               <input
                 type="file"
@@ -673,29 +794,28 @@ const DesignOptions = ({
           )}
 
           {/* Upload Next Image Button */}
-          {firstUploadedImage &&
-            !secondUploadedImage && ( // Only show if first image is uploaded, but second is not
-              <div className="flex justify-center mt-2">
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleFileChange}
-                  accept="image/*"
-                  className="hidden"
-                />
-                <button
-                  onClick={() => handleUploadClick("second")}
-                  disabled={!agreeTerms}
-                  className={`px-4 py-2 rounded-md ${
-                    agreeTerms
-                      ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  } transition-colors`}
-                >
-                  Upload Second Image
-                </button>
-              </div>
-            )}
+          {firstUploadedImage && !secondUploadedImage && (
+            <div className="flex justify-center mt-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/*"
+                className="hidden"
+              />
+              <button
+                onClick={() => handleUploadClick("second")}
+                disabled={!agreeTerms}
+                className={`px-4 py-2 rounded-md ${
+                  agreeTerms
+                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                } transition-colors`}
+              >
+                Upload Second Image
+              </button>
+            </div>
+          )}
 
           {/* Edit/Clear Buttons for Each Image */}
           {firstUploadedImage && (
@@ -789,7 +909,6 @@ const DesignOptions = ({
               className="w-full p-2 border border-gray-300 rounded-md"
             />
           </div>
-          {/* ye categories dynamic aaayange*/}
           <div className="mb-4">
             <select
               value={selectedCategory}
@@ -840,7 +959,6 @@ const DesignOptions = ({
               : ""}{" "}
             Image
           </h4>
-          {/* yaha se ham image ka edit karenge */}
 
           <div className="flex flex-col items-center space-y-6 py-4">
             <div
@@ -851,14 +969,17 @@ const DesignOptions = ({
             >
               <div
                 ref={containerRef}
-                className="bg-gray-700 w-64 h-64 rounded-full flex items-center justify-center overflow-hidden relative border-4 border-white shadow-md"
+                className="bg-gray-700 w-64 h-64 rounded-full flex items-center justify-center overflow-hidden relative border-4 border-white shadow-md cursor-crosshair"
+                onMouseMove={handleEditorMouseMove}
+                onMouseLeave={handleEditorMouseLeave}
+                onClick={handleEditorClick}
               >
                 {editingImageSrc && (
                   <img
                     ref={imageRef}
                     src={editingImageSrc}
                     alt="Editing"
-                    className="absolute object-cover cursor-move select-none"
+                    className="absolute object-cover select-none pointer-events-none"
                     style={{
                       transform: `translate(${imagePosition.x}px, ${
                         imagePosition.y
@@ -866,9 +987,7 @@ const DesignOptions = ({
                         imageZoom / 100
                       })`,
                       filter: "grayscale(100%)",
-
                       transition: isDragging ? "none" : "transform 0.2s ease",
-                      cursor: isDragging ? "grabbing" : "grab",
                       minWidth: "100%",
                       minHeight: "100%",
                     }}
@@ -876,15 +995,35 @@ const DesignOptions = ({
                     draggable={false}
                   />
                 )}
+                
+                {/* Cursor crosshair symbol */}
+                {showCursor && !isDragging && (
+                  <div 
+                    className="absolute pointer-events-none z-10"
+                    style={{
+                      left: cursorPosition.x,
+                      top: cursorPosition.y,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    <div className="w-6 h-6 relative">
+                      {/* Vertical line */}
+                      <div className="absolute top-0 left-1/2 w-0.5 h-6 bg-white shadow-lg transform -translate-x-1/2"></div>
+                      {/* Horizontal line */}
+                      <div className="absolute top-1/2 left-0 w-6 h-0.5 bg-white shadow-lg transform -translate-y-1/2"></div>
+                      {/* Center dot */}
+                      <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
             <MoveHorizontal className="h-5 w-5 text-gray-500" />
-            <p className="text-center">Drag image to reposition photo</p>
+            <p className="text-center">Click anywhere to position image or drag to move</p>
           </div>
-          {/* image edititing end hogya */}
 
           <div className="w-full space-y-4">
             {/* Zoom control */}
@@ -923,8 +1062,7 @@ const DesignOptions = ({
                   onValueChange={(value) => setImageRotation(value[0])}
                   className="flex-1"
                 />
-                <RotateCw className="h-4 w-4 text-gray-500" />{" "}
-                {/* Changed icon to match left side */}
+                <RotateCw className="h-4 w-4 text-gray-500" />
               </div>
             </div>
           </div>
@@ -976,9 +1114,8 @@ const DesignOptions = ({
             >
               Confirm
             </button>
-          </div>
+            </div>
         </div>
-        // </div>
       )}
     </div>
   );
