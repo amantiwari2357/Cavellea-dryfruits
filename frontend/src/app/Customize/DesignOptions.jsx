@@ -72,11 +72,6 @@ const DesignOptions = ({
   const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] =
     useState(null);
 
-  // Preview circle drag states
-  const [isDraggingPreview, setIsDraggingPreview] = useState(false);
-  const [draggingImageSlot, setDraggingImageSlot] = useState(null);
-  const [previewDragOffset, setPreviewDragOffset] = useState({ x: 0, y: 0 });
-
   const [selectedType, setSelectedType] = useState("");
   const options = [
     {
@@ -222,7 +217,7 @@ const DesignOptions = ({
     }
   };
 
-  // Mouse event handlers for image dragging in editor
+  // Mouse event handlers for image dragging
   const handleMouseDown = (e) => {
     if (!containerRef.current) return;
     const containerRect = containerRef.current.getBoundingClientRect();
@@ -244,59 +239,6 @@ const DesignOptions = ({
     setIsDragging(false);
   };
 
-  // Preview circle drag handlers
-  const handlePreviewMouseDown = (e, slot) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const imageElement = e.currentTarget.querySelector('img');
-    if (!imageElement) return;
-    
-    const rect = imageElement.getBoundingClientRect();
-    const currentImage = slot === "first" ? firstUploadedImage : secondUploadedImage;
-    const currentPos = currentImage?.position || { x: 0, y: 0 };
-    
-    const offsetX = e.clientX - rect.left - currentPos.x;
-    const offsetY = e.clientY - rect.top - currentPos.y;
-    
-    setPreviewDragOffset({ x: offsetX, y: offsetY });
-    setIsDraggingPreview(true);
-    setDraggingImageSlot(slot);
-  };
-
-  const handlePreviewMouseMove = (e) => {
-    if (!isDraggingPreview || !draggingImageSlot) return;
-    
-    e.preventDefault();
-    
-    const containerElement = document.querySelector(`[data-preview-container="${draggingImageSlot}"]`);
-    if (!containerElement) return;
-    
-    const containerRect = containerElement.getBoundingClientRect();
-    const newX = e.clientX - containerRect.left - previewDragOffset.x;
-    const newY = e.clientY - containerRect.top - previewDragOffset.y;
-    
-    // Update the image position in real-time
-    const currentImage = draggingImageSlot === "first" ? firstUploadedImage : secondUploadedImage;
-    const updatedImage = {
-      ...currentImage,
-      position: { x: newX, y: newY }
-    };
-    
-    if (draggingImageSlot === "first") {
-      setFirstUploadedImage(updatedImage);
-      onImageSelect({ first: updatedImage, second: secondUploadedImage });
-    } else {
-      setSecondUploadedImage(updatedImage);
-      onImageSelect({ first: firstUploadedImage, second: updatedImage });
-    }
-  };
-
-  const handlePreviewMouseUp = () => {
-    setIsDraggingPreview(false);
-    setDraggingImageSlot(null);
-  };
-
   // Add mouse event listeners when dragging is active
   useEffect(() => {
     if (isDragging) {
@@ -316,19 +258,6 @@ const DesignOptions = ({
     imageRotation,
     editingImageSrc,
   ]);
-
-  // Add preview drag event listeners
-  useEffect(() => {
-    if (isDraggingPreview) {
-      document.addEventListener("mousemove", handlePreviewMouseMove);
-      document.addEventListener("mouseup", handlePreviewMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener("mousemove", handlePreviewMouseMove);
-      document.removeEventListener("mouseup", handlePreviewMouseUp);
-    };
-  }, [isDraggingPreview, draggingImageSlot, previewDragOffset, firstUploadedImage, secondUploadedImage]);
 
   const handleImageConfirm = () => {
     window.scrollTo({
@@ -401,6 +330,7 @@ const DesignOptions = ({
     setCurrentlyEditingImageSlot(null);
     toast.info("All images cleared.");
   };
+  // ///////////////////
 
   return (
     <div className="p-0 bg-white w-64 h-full rounded-lg shadow-md">
@@ -639,10 +569,12 @@ const DesignOptions = ({
             <div className="mb-4 text-center w-full flex justify-center gap-4">
               {firstUploadedImage && (
                 <div
-                  data-preview-container="first"
                   className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative cursor-move"
                   style={{ height: "80px", width: "80px", overflow: "hidden" }}
-                  onMouseDown={(e) => handlePreviewMouseDown(e, "first")}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    startDrag(e, "first");
+                  }}
                 >
                   <img
                     src={firstUploadedImage.src}
@@ -661,7 +593,6 @@ const DesignOptions = ({
                       }deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
                       filter: "grayscale(100%)",
                       pointerEvents: "none",
-                      cursor: isDraggingPreview && draggingImageSlot === "first" ? "grabbing" : "grab",
                     }}
                     draggable="false"
                   />
@@ -670,10 +601,12 @@ const DesignOptions = ({
 
               {secondUploadedImage && (
                 <div
-                  data-preview-container="second"
                   className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative cursor-move"
                   style={{ height: "80px", width: "80px", overflow: "hidden" }}
-                  onMouseDown={(e) => handlePreviewMouseDown(e, "second")}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    startDrag(e, "second");
+                  }}
                 >
                   <img
                     src={secondUploadedImage.src}
@@ -691,27 +624,10 @@ const DesignOptions = ({
                         secondUploadedImage.rotation || 0
                       }deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
                       filter: "grayscale(100%)",
-                      pointerEvents: "none",
-                      cursor: isDraggingPreview && draggingImageSlot === "second" ? "grabbing" : "grab",
+                      pointerEvents: "none", // Prevent image from interfering with drag
                     }}
                     draggable="false"
                   />
-                  <div 
-                    className="absolute pointer-events-none"
-                    style={{
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      zIndex: 10,
-                      opacity: isDraggingPreview && draggingImageSlot === "second" ? 1 : 0,
-                      transition: "opacity 0.2s ease"
-                    }}
-                  >
-                    <div className="w-4 h-4 relative">
-                      <div className="absolute top-0 left-1/2 w-px h-4 bg-white transform -translate-x-1/2"></div>
-                      <div className="absolute top-1/2 left-0 w-4 h-px bg-white transform -translate-y-1/2"></div>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
