@@ -863,7 +863,7 @@ const DesignOptions = ({
               </div>
 
               {/* Controls */}
-              <div className="mt-4 flex flex-col gap-2 w-64">
+              {/* <div className="mt-4 flex flex-col gap-2 w-64">
                 <label className="text-white">
                   Zoom: {imageZoom}%
                   <input
@@ -875,8 +875,8 @@ const DesignOptions = ({
                     className="w-full"
                     
                   />
-                </label>
-                <label className="text-white">
+                </label> */}
+                {/* <label className="text-white">
                   Rotate: {imageRotation}°
                   <input
                     type="range"
@@ -886,7 +886,7 @@ const DesignOptions = ({
                     onChange={(e) => setImageRotation(Number(e.target.value))}
                     className="w-full"
                   />
-                </label>
+                </label> */}
               </div>
             </div>
 
@@ -991,7 +991,7 @@ const DesignOptions = ({
               </button>
             </div>
           </div>
-        </div>
+        // </div>
       )}
     </div>
   );
