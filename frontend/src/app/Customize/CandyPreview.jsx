@@ -269,12 +269,12 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
                   }}
                 >
                   {/* Default 'C' if no customization is applied to this candy */}
-                  {candy.contentType === 'default' && ( // 'C' तभी दिखाएं जब कोई अन्य कस्टमाइज़ेशन न हो
+                  {candy.contentType === 'default' && ( 
                     <span className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-700'}`}>𝓒</span>
                   )}
 
                   {/* Render Text */}
-                  {candy.contentType === 'text' && (firstLine || secondLine) && ( // टेक्स्ट के लिए स्पष्ट शर्त
+                  {candy.contentType === 'text' && (firstLine || secondLine) && (
                     <div className={`flex flex-col items-center justify-center ${fontClass} text-${isDark ? 'white' : 'gray-700'} text-[6px] leading-tight text-center transform`}>
                       {firstLine && <div>{firstLine}</div>}
                       {secondLine && <div>{secondLine}</div>}
