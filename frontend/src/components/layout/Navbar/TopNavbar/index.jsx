@@ -175,7 +175,7 @@ const TopNavbar = () => {
                 alt="Logo"
                 width={120}
                 height={40}
-                className="h-auto w-auto md:w-[180px] md:h-[50px]"
+                className="h-auto w-auto md:w-[100%] md:h-[50px]"
                 priority
               />
             </Link>
