@@ -1,31 +1,31 @@
 "use client";
-import React, { useState } from 'react';
-// import Header from '../Customize/Header';
+import React, { useState, useEffect } from 'react'; // Import useEffect
 import ProgressBar from '../Customize/ProgressBar';
 import ColorPicker from '../Customize/ColorPicker';
 import CandyPreview from '../Customize/CandyPreview';
 import HoverToolbar from '../Customize/HoverToolbar';
 import DesignOptions from '../Customize/DesignOptions';
+import ActiveCustomizationToolbar from './ActiveCustomizationToolbar';
+import PackagingOptions from './PackagingOptions';
 import { toast } from "sonner";
-// import StepNavigation from '../components/StepNavigation';
 
-const MAX_COLOR_SELECTIONS = 5;
-
-
-// Mera total three page ka hai case 1 , case 2, and case 3
+const MAX_COLOR_SELECTIONS = 3;
 
 const Customize = () => {
   const [selectedColors, setSelectedColors] = useState([]);
   const [currentStep, setCurrentStep] = useState(1);
-  const totalSteps = 3;
-  
-  // ye state managemanet for design customizations
-  const [selectedImage, setSelectedImage] = useState(null);
-   // <- new
+  const totalSteps = 3; // Total steps including the new Packaging step
+
+  // State management for design customizations
+  const [selectedImage, setSelectedImage] = useState(null); // Stores the first image object
+  const [secondSelectedImage, setSecondSelectedImage] = useState(null); // Stores the second image object
   const [firstLine, setFirstLine] = useState('');
   const [secondLine, setSecondLine] = useState('');
   const [selectedFontStyle, setSelectedFontStyle] = useState('Bold');
   const [selectedClipart, setSelectedClipart] = useState(null);
+
+  // To track which customization is active for toolbar display
+  const [activeCustomization, setActiveCustomization] = useState(null); // Can be 'image', 'text', 'clipart', or null
 
   const handleColorSelection = (colors) => {
     setSelectedColors(colors);
@@ -40,17 +40,48 @@ const Customize = () => {
       toast.success("Thank you for your order! Proceeding to checkout...");
     }
   };
-  
+
   const handlePrev = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
       window.scrollTo(0, 0);
     }
   };
-  
+
   const handleReset = () => {
     setSelectedColors([]);
-    toast.info("Color selection reset");
+    setSelectedImage(null);
+    setSecondSelectedImage(null); // Reset the second image as well
+    setSelectedClipart(null);
+    setFirstLine('');
+    setSecondLine('');
+    setSelectedFontStyle('Bold');
+    setActiveCustomization(null);
+    toast.info("Customization reset");
+  };
+
+  // NEW HANDLERS for toolbar actions
+  const handleEditActiveCustomization = (type) => {
+    setActiveCustomization(type);
+  };
+
+  const handleRemoveActiveCustomization = (type) => {
+    if (type === 'image') {
+      // If removing the main image, clear both image states
+      setSelectedImage(null);
+      setSecondSelectedImage(null);
+    } else if (type === 'text') {
+      setFirstLine('');
+      setSecondLine('');
+    } else if (type === 'clipart') {
+      setSelectedClipart(null);
+    }
+    setActiveCustomization(null);
+    toast.info(`${type.charAt(0).toUpperCase() + type.slice(1)} removed.`);
+  };
+
+  const handleCancelActiveCustomization = () => {
+    setActiveCustomization(null);
   };
 
   // Render content based on current step
@@ -58,146 +89,204 @@ const Customize = () => {
     switch (currentStep) {
       case 1:
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 ">    
-          {/* manage  kro select color wale div ko yaha se 🔝 */}
-            {/* Main content area - Takes 3/5 of the width on large screens */}
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 ">
             <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-4xl font-bold mb-4">choose up to three colors</h2>
-              <p className="text-gray-600 mb-6">Light colors print best.<br />Click color again to remove it.</p>
-              
-              <CandyPreview 
-                selectedColors={selectedColors} 
-                selectedImage={selectedImage} 
-                firstLine={firstLine} 
-                secondLine={secondLine} 
+              <p className="text-gray-600 mb-6 text-center">Light colors print best Click color again to remove it.</p>
+
+              {/* CandyPreview component here */}
+              <CandyPreview
+                selectedColors={selectedColors}
+                selectedImage={selectedImage}
+                secondSelectedImage={secondSelectedImage}
+                firstLine={firstLine}
+                secondLine={secondLine}
                 selectedFontStyle={selectedFontStyle}
                 selectedclipart={selectedClipart}
               />
             </div>
-            
-            {/* Color Selection Sidebar - Takes 2/5 of the width on large screens */}
+
             <div className="lg:col-span-2">
-              <ColorPicker 
-                selectedColors={selectedColors} 
-                onSelectColor={handleColorSelection} 
-                maxSelections={MAX_COLOR_SELECTIONS} 
+              <ColorPicker
+                selectedColors={selectedColors}
+                onSelectColor={handleColorSelection}
+                maxSelections={MAX_COLOR_SELECTIONS}
               />
             </div>
           </div>
         );
 
-         
-        //     <div className="lg:col-span-2">
-        //       <ColorPicker 
-        //         selectedColors={selectedColors} 
-        //         onSelectColor={handleColorSelection} 
-        //         maxSelections={MAX_COLOR_SELECTIONS} 
-        //       />
-        //     </div>
-        //   </div>
-        // );
       case 2:
         return (
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-            {/* Main content area - Takes 3/5 of the width on large screens */}
-            <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6  ">
-              <h2 className="text-4xl font-bold mb-6">preview your design</h2>
-              <p className="text-gray-600 mb-6">See how your customizations will look on the candies.</p>
-              
-              <CandyPreview 
-                selectedColors={selectedColors} 
-                selectedImage={selectedImage} 
-                firstLine={firstLine} 
-                secondLine={secondLine} 
+            <div className="lg:col-span-3 bg-white rounded-xl shadow-md p-6">
+              <p className="text-gray-600 mb-6 text-center">See how your customizations will look on the candies.</p>
+
+              {/* CandyPreview component here */}
+              <CandyPreview
+                selectedColors={selectedColors}
+                selectedImage={selectedImage}
+                secondSelectedImage={secondSelectedImage}
+                firstLine={firstLine}
+                secondLine={secondLine}
                 selectedFontStyle={selectedFontStyle}
-                selectedclipart={selectedClipart} 
+                selectedclipart={selectedClipart}
               />
             </div>
-           
 
-   {/* Design Options and Preview Circles */}
-            <div className="lg:col-span-2">
-              <div className="flex">
-                {/* Design options on the left */}
-                <div className="flex-grow">
-                  <DesignOptions 
-                    onImageSelect={setSelectedImage} 
+            {/* Design Options and Preview Circles */}
+            <div className="lg:col-span-2 flex">
+              <div className="flex-grow">
+                {activeCustomization ? (
+                  <ActiveCustomizationToolbar
+                    activeType={activeCustomization}
+                    onEdit={handleEditActiveCustomization}
+                    onRemove={handleRemoveActiveCustomization}
+                    onCancel={handleCancelActiveCustomization}
+                  />
+                ) : (
+                  <DesignOptions
+                    onImageSelect={({ first, second }) => {
+                        setSelectedImage(first);
+                        setSecondSelectedImage(second);
+                    }}
                     onTextChange={(first, second) => {
                       setFirstLine(first);
                       setSecondLine(second);
-                    }} 
+                    }}
                     onFontStyleChange={setSelectedFontStyle}
                     firstLine={firstLine}
                     secondLine={secondLine}
                     selectedFontStyle={selectedFontStyle}
-                    selectedImage={selectedImage}
-                   
-                    onClipartSelect={setSelectedClipart} // Pass the setter to use it
+                    // Pass the current image states to DesignOptions so it can manage them internally
+                    firstUploadedImage={selectedImage}
+                    secondUploadedImage={secondSelectedImage}
+                    onClipartSelect={setSelectedClipart}
+                    selectedClipart={selectedClipart}
+                    onSelectOption={setActiveCustomization}
+                    currentSelectedOption={activeCustomization}
                   />
-                </div>
-                
-                {/* Preview circles on the right */}
-                <div className="flex flex-col space-y-10 items-center justify-center pl-14">
-                  {/* Image preview circle */}
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${selectedImage ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}`}>
-                    {selectedImage ? (
-                      <img 
-                        src={typeof selectedImage === 'object' ? selectedImage.src : selectedImage}
-                        alt="Selected" 
-                        className="w-12 h-12 object-contain"
-                      />
-                    ) : null}
-                  </div>
-                  
-                  {/* Text preview circle */}
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${(firstLine || secondLine) ? 'border-2 border-black' : 'border border-gray-300 border-dashed'}`}>
-                    {(firstLine || secondLine) ? (
-                      <div className={`text-xs text-center leading-tight truncate w-10`}>
-                        {firstLine && <div>{firstLine}</div>}
-                        {secondLine && <div>{secondLine}</div>}
-                      </div>
-                    ) : null}
-                  </div>
-                  
-                  {/* Clipart preview circle */}
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
-                   selectedClipart 
-    ? 'border-2 border-black' 
-    : 'border border-gray-300 border-dashed'
-                  }`}>
-                    {selectedImage && typeof selectedImage !== 'object' && selectedImage.includes('placeholder.com') ? (
-                      <img 
-                        src={selectedClipart}
-                        alt="Selected Clipart" 
-                        className="w-12 h-12 object-contain"
-                      />
-                    ) : null}
-                  </div>
-                </div>
+                )}
               </div>
-            </div>
+
+             {/* Right side: Fixed Preview Panel */}
+  <div className="w-24 flex-shrink-0">
+    <h4 className="text-2xl font-bold text-gray-700 mb-4 text-center ml-[-190px]">Preview</h4>
+    <div className="flex flex-col space-y-6 items-center ml-[-190px]">
+
+{/* flex flex-col space-y-6 items-center ml-[-120px]
+esse ham right side preview circle ko ham manage krenge */}
+
+      {/* Image 1 Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+          ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'image' && selectedImage ? 'ring-4 ring-blue-500' : ''}
+        `}
+        onClick={() => selectedImage && setActiveCustomization('image')}
+      >
+        {selectedImage ? (
+          <img
+            src={selectedImage.src}
+            alt="Image 1"
+            className="object-cover w-full h-full"
+            style={{
+              transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
+               filter: "grayscale(100%)",
+            }}
+          />
+        ) : <span className="text-gray-400 text-xs">Image 1</span>}
+      </div>
+
+      {/* Image 2 Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+          ${secondSelectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'secondImage' && secondSelectedImage ? 'ring-4 ring-blue-500' : ''}
+        `}
+        onClick={() => secondSelectedImage && setActiveCustomization('secondImage')}
+      >
+        {secondSelectedImage ? (
+          <img
+            src={secondSelectedImage.src}
+            alt="Image 2"
+            className="object-cover w-full h-full"
+            style={{
+              transform: secondSelectedImage.position ? `translate(${secondSelectedImage.position.x}px, ${secondSelectedImage.position.y}px) rotate(${secondSelectedImage.rotation}deg) scale(${secondSelectedImage.zoom / 100})` : 'none',
+               filter: "grayscale(100%)",
+            }}
+          />
+        ) : <span className="text-gray-400 text-xs">Image 2</span>}
+      </div>
+
+      {/* Text Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer
+          ${(firstLine || secondLine) ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'text' ? 'ring-4 ring-orange-500' : ''}
+        `}
+        onClick={() => (firstLine || secondLine) && setActiveCustomization('text')}
+      >
+        {(firstLine || secondLine) ? (
+          <div className="text-xs text-center leading-tight truncate w-10" style={{ fontFamily: selectedFontStyle }}>
+            {firstLine && <div>{firstLine}</div>}
+            {secondLine && <div>{secondLine}</div>}
           </div>
+        ) : (
+          <span className="text-gray-400 text-xs">Text</span>
+        )}
+      </div>
+
+      {/* Clipart Preview */}
+      <div
+        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
+          ${selectedClipart ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+          ${activeCustomization === 'clipart' ? 'ring-4 ring-green-500' : ''}
+        `}
+        onClick={() => selectedClipart && setActiveCustomization('clipart')}
+      >
+        {selectedClipart ? (
+          <img src={selectedClipart} alt="Clipart" className="w-12 h-12 object-contain" />
+        ) : <span className="text-gray-400 text-xs">Clipart</span>}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+            </div>
+            );
+
+      case 3:
+        return (
+          <PackagingOptions
+            selectedImage={selectedImage}
+             secondSelectedImage={secondSelectedImage}
+            firstLine={firstLine}
+            secondLine={secondLine}
+            selectedFontStyle={selectedFontStyle}
+            selectedClipart={selectedClipart}
+            selectedColors={selectedColors}
+          />
         );
+
       default:
         return <div>Invalid step</div>;
     }
   };
 
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* <Header /> */}
       <HoverToolbar onReset={handleReset} />
-      
+
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Progress Steps */}
           <div className="mb-8 relative">
             <ProgressBar currentStep={currentStep} />
           </div>
-          
+
           {renderStepContent()}
-          
+
           {/* Single Navigation Button Area */}
           <div className="mt-8 flex justify-between">
             <button
@@ -206,11 +295,11 @@ const Customize = () => {
             >
               Back
             </button>
-            
-            <button 
+
+            <button
               className={`px-8 py-3 rounded-md font-medium ${
-                currentStep === 1 && selectedColors.length === 0 
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed' 
+                currentStep === 1 && selectedColors.length === 0
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-yellow-400 hover:bg-yellow-500 text-black font-bold text-xl'
               }`}
               disabled={currentStep === 1 && selectedColors.length === 0}
@@ -224,5 +313,4 @@ const Customize = () => {
     </div>
   );
 };
-
 export default Customize;

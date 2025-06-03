@@ -46,7 +46,7 @@ const ProductListSec = ({ title, data, viewAllLink }) => {
           opts={{
             align: "start",
           }}
-          className="w-full mb-6 md:mb-9"
+          className="flex justify-center w-full mb-6 md:mb-9"
         >
           <CarouselContent className="mx-4 xl:mx-0 space-x-4 sm:space-x-5">
             {data.map((product) => (

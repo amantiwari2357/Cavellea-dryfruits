@@ -1,13 +1,13 @@
 import { compareArrays } from "@/lib/utils";
 import { Discount } from "@/types/product.types";
 import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
+// import { PayloadAction } from "@reduxjs/toolkit";
 
 const calcAdjustedTotalPrice = (
-  totalPrice: number,
-  data: CartItem,
-  quantity?: number
-): number => {
+  totalPrice,
+  data,
+  quantity
+) => {
   return (
     (totalPrice + data.discount.percentage > 0
       ? Math.round(data.price - (data.price * data.discount.percentage) / 100)
@@ -17,36 +17,40 @@ const calcAdjustedTotalPrice = (
   );
 };
 
-export type RemoveCartItem = {
-  id: number;
-  attributes: string[];
-};
+/**
+ * @typedef {Object} RemoveCartItem
+ * @property {number} id
+ * @property {string[]} attributes
+ */
 
-export type CartItem = {
-  id: number;
-  name: string;
-  srcUrl: string;
-  price: number;
-  attributes: string[];
-  discount: Discount;
-  quantity: number;
-};
+/**
+ * @typedef {Object} CartItem
+ * @property {number} id
+ * @property {string} name
+ * @property {string} srcUrl
+ * @property {number} price
+ * @property {string[]} attributes
+ * @property {Discount} discount
+ * @property {number} quantity
+ */
 
-export type Cart = {
-  items: CartItem[];
-  totalQuantities: number;
-};
+/**
+ * @typedef {Object} Cart
+ * @property {CartItem[]} items
+ * @property {number} totalQuantities
+ */
 
 // Define a type for the slice state
-interface CartsState {
-  cart: Cart | null;
-  totalPrice: number;
-  adjustedTotalPrice: number;
-  action: "update" | "add" | "delete" | null;
-}
+/**
+ * @typedef {Object} CartsState
+ * @property {Cart|null} cart
+ * @property {number} totalPrice
+ * @property {number} adjustedTotalPrice
+ * @property {"update"|"add"|"delete"|null} action
+ */
 
 // Define the initial state using that type
-const initialState: CartsState = {
+const initialState = {
   cart: null,
   totalPrice: 0,
   adjustedTotalPrice: 0,
@@ -58,7 +62,7 @@ export const cartsSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    addToCart: (state, action: PayloadAction<CartItem>) => {
+    addToCart: (state, action) => {
       // if cart is empty then add
       if (state.cart === null) {
         state.cart = {
@@ -120,7 +124,7 @@ export const cartsSlice = createSlice({
         state.adjustedTotalPrice +
         calcAdjustedTotalPrice(state.totalPrice, action.payload);
     },
-    removeCartItem: (state, action: PayloadAction<RemoveCartItem>) => {
+    removeCartItem: (state, action) => {
       if (state.cart === null) return;
 
       // check item in cart
@@ -162,7 +166,7 @@ export const cartsSlice = createSlice({
     },
     remove: (
       state,
-      action: PayloadAction<RemoveCartItem & { quantity: number }>
+      action
     ) => {
       if (!state.cart) return;
 

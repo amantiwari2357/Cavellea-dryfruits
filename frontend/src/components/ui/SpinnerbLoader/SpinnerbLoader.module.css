@@ -1,7 +1,7 @@
 .Loader {
   aspect-ratio: 1;
   border-radius: 50%;
-  animation: 4 1s infinite linear;
+  animation: l2 1s linear infinite;
   display: inline-block;
 }
 @keyframes l2 {

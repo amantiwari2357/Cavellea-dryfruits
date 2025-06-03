@@ -2,7 +2,7 @@
 import { Product } from "@/types/product.types";
 import { Review } from "@/types/review.types";
 
-export const newArrivalsData: Product[] = [
+export const newArrivalsData = [
   {
     id: 1,
     title: "Almonds (Badam)",
@@ -41,11 +41,11 @@ export const newArrivalsData: Product[] = [
   },
 ];
 
-export const relatedProductData: Product[] = [...newArrivalsData];
+export const relatedProductData = [...newArrivalsData];
 
-export const topSellingData: Product[] = [...newArrivalsData];
+export const topSellingData = [...newArrivalsData];
 
-export const reviewsData: Review[] = [
+export const reviewsData = [
   {
     id: 1,
     user: "Rajesh K.",

@@ -70,6 +70,7 @@
     margin: 0;
     color: rgba(0, 0, 0, 0.87);
     background-color: #fff;
+    behavior: smooth;
   }
   
   h1, h2, h3, h4 {

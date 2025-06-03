@@ -64,15 +64,6 @@ const ColorPicker = ({ selectedColors, onSelectColor, maxSelections = 3 }) => {
                     style={{ backgroundColor: color.value }}
                     aria-label={`Select ${color.name}`}
                   >
-                    {/* <span
-                      className={`text-sm font-bold ${
-                        ["#FFFFFF", "#F5F5F5", "#E5E4E2", "#A3E0F5"].includes(color.value)
-                          ? "text-gray-700"
-                          : "text-white"
-                      }`}
-                    >
-                      m
-                    </span> */}
                   </button>
                   <span className="mt-1 text-xs font-medium text-gray-700">
                     {color.name}
