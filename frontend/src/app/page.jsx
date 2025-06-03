@@ -11,6 +11,7 @@ import { newArrivalsData, reviewsData } from "@/app/data/omePageData";
 export default function Home() {
   return (
     <>
+    {/* asc s H H EHD  */}
       <Header />
       <Brands />
 
