@@ -73,6 +73,7 @@ const DesignOptions = ({
 
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
+  
 
   useEffect(() => {
     const storedType = localStorage.getItem("printType");
@@ -214,10 +215,12 @@ const DesignOptions = ({
   };
 
   // Mouse event handlers for image dragging in editor
-  const handleMouseDown = (e) => {
-    e.preventDefault();
-    if (!containerRef.current) return;
-    
+const handleMouseDown = (e) => {
+  e.preventDefault();
+   const rect = containerRef.current.getBoundingClientRect();
+  setIsDragging(true);
+  
+  
     const containerRect = containerRef.current.getBoundingClientRect();
     const offsetX = e.clientX - containerRect.left - imagePosition.x;
     const offsetY = e.clientY - containerRect.top - imagePosition.y;
@@ -963,79 +966,108 @@ const DesignOptions = ({
 
       {/* Inline Image Editor */}
 
-      {showImageEditor && (
-        <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
-          <h4 className="text-lg font-bold mb-4">
-            Edit{" "}
-            {currentlyEditingImageSlot === "first"
-              ? "First"
-              : currentlyEditingImageSlot === "second"
-              ? "Second"
-              : ""}{" "}
-            Image
-          </h4>
+        {showImageEditor && (
+  <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
+    <h4 className="text-lg font-bold mb-4">
+      Edit{" "}
+      {currentlyEditingImageSlot === "first"
+        ? "First"
+        : currentlyEditingImageSlot === "second"
+        ? "Second"
+        : ""}{" "}
+      Image
+    </h4>
 
-          <div className="flex flex-col items-center space-y-6 py-4">
+    <div className="flex flex-col items-center space-y-6 py-4">
+      <div
+        className="flex flex-col items-center"
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <div
+          ref={containerRef}
+          className="bg-gray-700 w-64 h-64 rounded-full flex items-center justify-center overflow-hidden relative border-4 border-white shadow-md cursor-crosshair"
+         onMouseDown={handleMouseDown}
+  onMouseMove={handleMouseMove}
+  onMouseUp={handleMouseUp}
+  onMouseLeave={handleMouseUp}
+        >
+          {editingImageSrc && (
+            <img
+              ref={imageRef}
+              src={editingImageSrc}
+              alt="Editing"
+              className="absolute object-cover select-none pointer-events-none"
+              style={{
+                transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
+                filter: "grayscale(100%)",
+                transition: isDragging ? "none" : "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                minWidth: "100%",
+                minHeight: "100%",
+                willChange: "transform",
+              }}
+              onMouseDown={handleMouseDown}
+              draggable={false}
+            />
+          )}
+
+          {/* Enhanced Cursor Crosshair */}
+          {showCursor && !isDragging && (
             <div
-              className="flex flex-col items-center"
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
+              className="absolute pointer-events-none z-20"
+              style={{
+                left: cursorPosition.x,
+                top: cursorPosition.y,
+                transform: "translate(-50%, -50%)",
+                transition: "opacity 0.3s ease, transform 0.3s ease",
+                opacity: showCursor ? 1 : 0,
+                // make sure cursor stays within bounds visually
+                userSelect: "none",
+              }}
             >
-              <div
-                ref={containerRef}
-                className="bg-gray-700 w-64 h-64 rounded-full flex items-center justify-center overflow-hidden relative border-4 border-white shadow-md cursor-crosshair"
-                onMouseMove={handleEditorMouseMove}
-                onMouseLeave={handleEditorMouseLeave}
-                onClick={handleEditorClick}
-              >
-                {editingImageSrc && (
-                  <img
-                    ref={imageRef}
-                    src={editingImageSrc}
-                    alt="Editing"
-                    className="absolute object-cover select-none pointer-events-none"
-                    style={{
-                      transform: `translate(${imagePosition.x}px, ${
-                        imagePosition.y
-                      }px) rotate(${imageRotation}deg) scale(${
-                        imageZoom / 100
-                      })`,
-                      filter: "grayscale(100%)",
-                      transition: isDragging ? "none" : "transform 0.2s ease",
-                      minWidth: "100%",
-                      minHeight: "100%",
-                    }}
-                    onMouseDown={handleMouseDown}
-                    draggable={false}
-                    pointerEvents="none"
-                  />
-                )}
-                
-                {/* Cursor crosshair symbol */}
-                {showCursor && !isDragging && (
-  <div
-    className="absolute pointer-events-none z-20"
-    style={{
-      left: cursorPosition.x,
-      top: cursorPosition.y,
-      transform: "translate(-50%, -50%)",
-    }}
-  >
-    <div className="w-6 h-6 relative">
-      {/* Soft-glow ring */}
-      <div className="absolute w-6 h-6 rounded-full bg-blue-500/20 animate-pulse" />
+              <div className="relative w-8 h-8">
+                {/* Soft-glow rings with subtle pulsing animation */}
+                <div
+                  className="absolute inset-0 rounded-full bg-blue-400/30"
+                  style={{
+                    filter: "blur(6px)",
+                    animation: "pulseSoftGlow 3s ease-in-out infinite",
+                    animationTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                />
+                <div
+                  className="absolute inset-1 rounded-full bg-blue-500/20"
+                  style={{
+                    filter: "blur(3px)",
+                    animation: "pulseSoftGlow 3s ease-in-out infinite",
+                    animationDelay: "1.5s",
+                    animationTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
+                  }}
+                />
 
-      {/* Crosshair lines */}
-      <div className="absolute top-0 left-1/2 w-0.5 h-full bg-blue-500 shadow-md transform -translate-x-1/2" />
-      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-blue-500 shadow-md transform -translate-y-1/2" />
+                {/* Crosshair lines with subtle glow */}
+                <div
+                  className="absolute top-0 left-1/2 w-[2px] h-full bg-blue-400 rounded"
+                  style={{ boxShadow: "0 0 6px 2px rgba(96, 165, 250, 0.6)" }}
+                />
+                <div
+                  className="absolute top-1/2 left-0 w-full h-[2px] bg-blue-400 rounded"
+                  style={{ boxShadow: "0 0 6px 2px rgba(96, 165, 250, 0.6)" }}
+                />
 
-      {/* Center dot */}
-      <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-blue-600 rounded-full border border-white transform -translate-x-1/2 -translate-y-1/2 shadow" />
-    </div>
-  </div>
-)}
-{/* image cursor editor end */}
+                {/* Center dot with stronger glow */}
+                <div
+                  className="absolute top-1/2 left-1/2 w-3 h-3 bg-blue-600 rounded-full border border-white shadow-lg"
+                  style={{
+                    transform: "translate(-50%, -50%)",
+                    boxShadow: "0 0 8px 3px rgba(59, 130, 246, 0.8)",
+                  }}
+                />
+              </div>
+            </div>
+          )}
+  {/* image cursor editor end */}
 
 
               </div>
