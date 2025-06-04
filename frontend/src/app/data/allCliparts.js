@@ -1,0 +1,16 @@
+const allCliparts = [
+    { src: "/images/cliparts1.avif", alt: "Sample clipart 1", category: "All" },
+    { src: "/images/cliparts2.avif", alt: "Sample clipart 2", category: "Birthday" },
+    { src: "/images/cliparts3.avif", alt: "Sample clipart 3", category: "Graduation" },
+    { src: "/images/cliparts4.avif", alt: "Sample clipart 4", category: "Holiday" },
+    { src: "/images/cliparts5.avif", alt: "Sample clipart 5", category: "Wedding" },
+    { src: "/images/cliparts6.avif", alt: "Sample clipart 6", category: "All" },
+    { src: "/images/cliparts7.avif", alt: "Sample clipart 7", category: "Birthday" },
+    { src: "/images/cliparts8.avif", alt: "Sample clipart 8", category: "Graduation" },
+    { src: "/images/cliparts9.avif", alt: "Sample clipart 9", category: "Holiday" },
+    { src: "/images/cliparts10.avif", alt: "Sample clipart 10", category: "Wedding" },
+    { src: "/images/cliparts11.avif", alt: "Sample clipart 11", category: "All" },
+    { src: "/images/cliparts12.avif", alt: "Sample clipart 12", category: "Birthday" },
+    { src: "/images/cliparts13.avif", alt: "Sample clipart 13", category: "Graduation" },
+    { src: "/images/cliparts14.avif", alt: "Sample clipart 14", category: "Holiday" },
+  ];

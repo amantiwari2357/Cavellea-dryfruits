@@ -176,47 +176,53 @@ const Customize = () => {
 {/* flex flex-col space-y-6 items-center ml-[-120px]
 esse ham right side preview circle ko ham manage krenge */}
 
-      {/* Image 1 Preview */}
-      <div
-        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-          ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-          ${activeCustomization === 'image' && selectedImage ? 'ring-4 ring-blue-500' : ''}
-        `}
-        onClick={() => selectedImage && setActiveCustomization('image')}
-      >
-        {selectedImage ? (
-          <img
-            src={selectedImage.src}
-            alt="Image 1"
-            className="object-cover w-full h-full"
-            style={{
-              transform: selectedImage.position ? `translate(${selectedImage.position.x}px, ${selectedImage.position.y}px) rotate(${selectedImage.rotation}deg) scale(${selectedImage.zoom / 100})` : 'none',
-               filter: "grayscale(100%)",
-            }}
-          />
-        ) : <span className="text-gray-400 text-xs">Image 1</span>}
-      </div>
+    {/* Image 1 Preview */}
+<div
+  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden transition-all duration-200
+    ${selectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+    ${activeCustomization === 'image' && selectedImage ? 'ring-4 ring-blue-500' : ''}
+  `}
+  onClick={() => selectedImage && setActiveCustomization('image')}
+>
+  {selectedImage ? (
+    <img
+      src={selectedImage.src}
+      alt="Image 1"
+      className="object-cover w-full h-full select-none pointer-events-none transition-transform duration-300"
+      style={{
+        transform: `translate(${selectedImage.position?.x || 0}px, ${selectedImage.position?.y || 0}px) rotate(${selectedImage.rotation || 0}deg) scale(${selectedImage.zoom ? selectedImage.zoom / 100 : 1})`,
+        filter: "grayscale(100%)",
+      }}
+      draggable={false}
+    />
+  ) : (
+    <span className="text-gray-400 text-xs">Image 1</span>
+  )}
+</div>
 
-      {/* Image 2 Preview */}
-      <div
-        className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden
-          ${secondSelectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
-          ${activeCustomization === 'secondImage' && secondSelectedImage ? 'ring-4 ring-blue-500' : ''}
-        `}
-        onClick={() => secondSelectedImage && setActiveCustomization('secondImage')}
-      >
-        {secondSelectedImage ? (
-          <img
-            src={secondSelectedImage.src}
-            alt="Image 2"
-            className="object-cover w-full h-full"
-            style={{
-              transform: secondSelectedImage.position ? `translate(${secondSelectedImage.position.x}px, ${secondSelectedImage.position.y}px) rotate(${secondSelectedImage.rotation}deg) scale(${secondSelectedImage.zoom / 100})` : 'none',
-               filter: "grayscale(100%)",
-            }}
-          />
-        ) : <span className="text-gray-400 text-xs">Image 2</span>}
-      </div>
+{/* Image 2 Preview */}
+<div
+  className={`w-16 h-16 rounded-full flex items-center justify-center cursor-pointer overflow-hidden transition-all duration-200
+    ${secondSelectedImage ? 'border-2 border-blue-500' : 'border border-gray-300 border-dashed'}
+    ${activeCustomization === 'secondImage' && secondSelectedImage ? 'ring-4 ring-blue-500' : ''}
+  `}
+  onClick={() => secondSelectedImage && setActiveCustomization('secondImage')}
+>
+  {secondSelectedImage ? (
+    <img
+      src={secondSelectedImage.src}
+      alt="Image 2"
+      className="object-cover w-full h-full select-none pointer-events-none transition-transform duration-300"
+      style={{
+        transform: `translate(${secondSelectedImage.position?.x || 0}px, ${secondSelectedImage.position?.y || 0}px) rotate(${secondSelectedImage.rotation || 0}deg) scale(${secondSelectedImage.zoom ? secondSelectedImage.zoom / 100 : 1})`,
+        filter: "grayscale(100%)",
+      }}
+      draggable={false}
+    />
+  ) : (
+    <span className="text-gray-400 text-xs">Image 2</span>
+  )}
+</div>
 
       {/* Text Preview */}
       <div
