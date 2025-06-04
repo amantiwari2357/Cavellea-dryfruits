@@ -250,15 +250,13 @@ const DesignOptions = ({
 
   // New handlers for cursor movement in editor
   const handleEditorMouseMove = (e) => {
-    if (!containerRef.current || isDragging) return;
-    
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - containerRect.left;
-    const y = e.clientY - containerRect.top;
-    
-    setCursorPosition({ x, y });
-    setShowCursor(true);
-  };
+  const rect = containerRef.current.getBoundingClientRect();
+  setCursorPosition({
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top,
+  });
+};
+
 
   const handleEditorMouseLeave = () => {
     setShowCursor(false);
@@ -670,11 +668,11 @@ const DesignOptions = ({
                     height: "80px", 
                     width: "80px", 
                     overflow: "hidden",
-                    cursor: isDraggingPreview && draggingImageSlot === "first" ? "grabbing" : "grab"
+                    // cursor: isDraggingPreview && draggingImageSlot === "first" ? "grabbing" : "grab"
                   }}
-                  onMouseDown={(e) => handlePreviewMouseDown(e, "first")}
-                  onMouseEnter={() => setHoveredImageSlot("first")}
-                  onMouseLeave={() => setHoveredImageSlot(null)}
+                  // onMouseDown={(e) => handlePreviewMouseDown(e, "first")}
+                  // onMouseEnter={() => setHoveredImageSlot("first")}
+                  // onMouseLeave={() => setHoveredImageSlot(null)}
                 >
                   <img
                     src={firstUploadedImage.src}
@@ -695,6 +693,7 @@ const DesignOptions = ({
                       pointerEvents: "none",
                     }}
                     draggable="false"
+                    pointerEvents="none"
                   />
                   {/* Attractive move cursor symbol */}
                   <div 
@@ -722,11 +721,11 @@ const DesignOptions = ({
                     height: "80px", 
                     width: "80px", 
                     overflow: "hidden",
-                    cursor: isDraggingPreview && draggingImageSlot === "second" ? "grabbing" : "grab"
+                    // cursor: isDraggingPreview && draggingImageSlot === "second" ? "grabbing" : "grab"
                   }}
-                  onMouseDown={(e) => handlePreviewMouseDown(e, "second")}
-                  onMouseEnter={() => setHoveredImageSlot("second")}
-                  onMouseLeave={() => setHoveredImageSlot(null)}
+                  // onMouseDown={(e) => handlePreviewMouseDown(e, "second")}
+                  // onMouseEnter={() => setHoveredImageSlot("second")}
+                  // onMouseLeave={() => setHoveredImageSlot(null)}
                 >
                   <img
                     src={secondUploadedImage.src}
@@ -747,6 +746,7 @@ const DesignOptions = ({
                       pointerEvents: "none",
                     }}
                     draggable="false"
+                    pointerEvents="none"
                   />
                   {/* Attractive move cursor symbol */}
                   <div 
@@ -844,7 +844,7 @@ const DesignOptions = ({
                   setShowImageEditor(true);
                   setShowImageUpload(false);
                 }}
-                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
+                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:shadow-lg transition duration-200"
               >
                 Edit First Image
               </button>
@@ -962,6 +962,7 @@ const DesignOptions = ({
       )}
 
       {/* Inline Image Editor */}
+
       {showImageEditor && (
         <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
           <h4 className="text-lg font-bold mb-4">
@@ -1007,29 +1008,36 @@ const DesignOptions = ({
                     }}
                     onMouseDown={handleMouseDown}
                     draggable={false}
+                    pointerEvents="none"
                   />
                 )}
                 
                 {/* Cursor crosshair symbol */}
                 {showCursor && !isDragging && (
-                  <div 
-                    className="absolute pointer-events-none z-10"
-                    style={{
-                      left: cursorPosition.x,
-                      top: cursorPosition.y,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    <div className="w-6 h-6 relative">
-                      {/* Vertical line */}
-                      <div className="absolute top-0 left-1/2 w-0.5 h-6 bg-white shadow-lg transform -translate-x-1/2"></div>
-                      {/* Horizontal line */}
-                      <div className="absolute top-1/2 left-0 w-6 h-0.5 bg-white shadow-lg transform -translate-y-1/2"></div>
-                      {/* Center dot */}
-                      <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-blue-500 rounded-full transform -translate-x-1/2 -translate-y-1/2"></div>
-                    </div>
-                  </div>
-                )}
+  <div
+    className="absolute pointer-events-none z-20"
+    style={{
+      left: cursorPosition.x,
+      top: cursorPosition.y,
+      transform: "translate(-50%, -50%)",
+    }}
+  >
+    <div className="w-6 h-6 relative">
+      {/* Soft-glow ring */}
+      <div className="absolute w-6 h-6 rounded-full bg-blue-500/20 animate-pulse" />
+
+      {/* Crosshair lines */}
+      <div className="absolute top-0 left-1/2 w-0.5 h-full bg-blue-500 shadow-md transform -translate-x-1/2" />
+      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-blue-500 shadow-md transform -translate-y-1/2" />
+
+      {/* Center dot */}
+      <div className="absolute top-1/2 left-1/2 w-1.5 h-1.5 bg-blue-600 rounded-full border border-white transform -translate-x-1/2 -translate-y-1/2 shadow" />
+    </div>
+  </div>
+)}
+{/* image cursor editor end */}
+
+
               </div>
             </div>
           </div>
