@@ -65,20 +65,25 @@ const Customize = () => {
     setActiveCustomization(type);
   };
 
-  const handleRemoveActiveCustomization = (type) => {
-    if (type === 'image') {
-      // If removing the main image, clear both image states
-      setSelectedImage(null);
-      setSecondSelectedImage(null);
-    } else if (type === 'text') {
-      setFirstLine('');
-      setSecondLine('');
-    } else if (type === 'clipart') {
-      setSelectedClipart(null);
-    }
-    setActiveCustomization(null);
-    toast.info(`${type.charAt(0).toUpperCase() + type.slice(1)} removed.`);
-  };
+ const handleRemoveActiveCustomization = (type) => {
+  if (type === 'first') {
+    setSelectedImage(null);
+    toast.info(`First image removed.`);
+  } else if (type === 'second') {
+    setSecondSelectedImage(null);
+    toast.info(`Second image removed.`);
+  } else if (type === 'text') {
+    setFirstLine('');
+    setSecondLine('');
+    toast.info(`Text removed.`);
+  } else if (type === 'clipart') {
+    setSelectedClipart(null);
+    toast.info(`Clipart removed.`);
+  }
+
+  setActiveCustomization(null);
+};
+
 
   const handleCancelActiveCustomization = () => {
     setActiveCustomization(null);

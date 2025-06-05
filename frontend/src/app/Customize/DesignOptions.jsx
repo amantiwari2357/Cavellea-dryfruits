@@ -14,7 +14,6 @@ import {
 import { toast } from "sonner";
 import { Slider } from "@/components/ui/slider";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
 const DesignOptions = ({
   onImageSelect,
   onTextChange,
@@ -36,15 +35,12 @@ const DesignOptions = ({
   const fileInputRef = useRef(null);
   const imageRef = useRef(null);
   const containerRef = useRef(null);
-
   const [tempFirstLine, setTempFirstLine] = useState(firstLine);
   const [tempSecondLine, setTempSecondLine] = useState(secondLine);
   const [tempFontStyle, setTempFontStyle] = useState(selectedFontStyle);
-
   const [showImageEditor, setShowImageEditor] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [editingImageSrc, setEditingImageSrc] = useState(null);
-
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
@@ -54,7 +50,6 @@ const DesignOptions = ({
   const imageUploadRef = useRef(null);
   const [showMore, setShowMore] = useState(false);
   const editorRef = useRef(null);
-
   const [firstUploadedImage, setFirstUploadedImage] = useState(
     parentFirstUploadedImage
   );
@@ -63,42 +58,32 @@ const DesignOptions = ({
   );
   const [currentlyEditingImageSlot, setCurrentlyEditingImageSlot] =
     useState(null);
-
-  // Preview circle drag states
   const [isDraggingPreview, setIsDraggingPreview] = useState(false);
   const [draggingImageSlot, setDraggingImageSlot] = useState(null);
   const [previewDragOffset, setPreviewDragOffset] = useState({ x: 0, y: 0 });
   const [hoveredImageSlot, setHoveredImageSlot] = useState(null);
 const [originalImageSrc, setOriginalImageSrc] = useState(null);
   const [selectedType, setSelectedType] = useState("");
-
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
-
   useEffect(() => {
     const storedType = localStorage.getItem("printType");
     if (storedType) {
       setSelectedType(storedType);
     }
   }, []);
-
   const handleSelect = (value) => {
     setSelectedType(value);
     localStorage.setItem("printType", value);
   };
-
   // Keep internal states in sync with parent props
   useEffect(() => {
     setFirstUploadedImage(parentFirstUploadedImage);
   }, [parentFirstUploadedImage]);
-
   useEffect(() => {
     setSecondUploadedImage(parentSecondUploadedImage);
   }, [parentSecondUploadedImage]);
-
   const fontStyles = ["Bold", "Regular", "Light", "Script", "Italic"];
-
-  // Mock clipart data since import is missing
   const allCliparts = [
     { src: "/images/cliparts1.avif", alt: "Sample clipart 1", category: "All" },
     {
@@ -163,14 +148,12 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
       category: "Holiday",
     },
   ];
-
   const filteredCliparts = allCliparts.filter(
     (clipart) =>
       (selectedCategory === "All" || clipart.category === selectedCategory) &&
       clipart.alt &&
       clipart.alt.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const handleFileChange = (e) => {
   const file = e.target.files?.[0];
   if (file) {
@@ -203,8 +186,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
     reader.readAsDataURL(file);
   }
 };
-
-
   const handleUploadClick = (slot) => {
     if (agreeTerms && fileInputRef.current) {
       setCurrentlyEditingImageSlot(slot);
@@ -216,7 +197,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
       );
     }
   };
-
   const handleTextConfirm = () => {
     window.scrollTo({
       top: 0,
@@ -226,7 +206,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
     onFontStyleChange(tempFontStyle);
     setShowTextFields(false);
   };
-
   const handleClipartSelect = (src) => {
     window.scrollTo({
       top: 0,
@@ -235,7 +214,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
     onClipartSelect(src);
     setShowClipartPanel(false);
   };
-
   const handleOptionSelect = (value) => {
     if (selectedOption === value) {
       if (value === "image") {
@@ -279,28 +257,21 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
       console.log("Mouse up - ending drag");
     }
   };
-
   const handleEditorMouseLeave = () => {
     setShowCursor(false);
   };
 
   const handleEditorClick = (e) => {
     if (!containerRef.current || isDragging) return;
-
     e.preventDefault();
     const containerRect = containerRef.current.getBoundingClientRect();
     const clickX = e.clientX - containerRect.left;
     const clickY = e.clientY - containerRect.top;
-
-    // Move image to clicked position (center the image on click point)
     const newX = clickX - containerRect.width / 2;
     const newY = clickY - containerRect.height / 2;
-
     setImagePosition({ x: newX, y: newY });
     console.log("Moving image to clicked position:", { x: newX, y: newY });
   };
-
-  // Preview circle drag handlers
   const handlePreviewMouseDown = (e, slot) => {
     e.preventDefault();
     e.stopPropagation();
@@ -320,28 +291,22 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
     setIsDraggingPreview(true);
     setDraggingImageSlot(slot);
   };
-
   const handlePreviewMouseMove = (e) => {
     if (!isDraggingPreview || !draggingImageSlot) return;
-
     e.preventDefault();
-
-    const containerElement = document.querySelector(
+  const containerElement = document.querySelector(
       `[data-preview-container="${draggingImageSlot}"]`
     );
     if (!containerElement) return;
-
     const containerRect = containerElement.getBoundingClientRect();
     const newX = e.clientX - containerRect.left - previewDragOffset.x;
     const newY = e.clientY - containerRect.top - previewDragOffset.y;
-
     const currentImage =
       draggingImageSlot === "first" ? firstUploadedImage : secondUploadedImage;
     const updatedImage = {
       ...currentImage,
       position: { x: newX, y: newY },
     };
-
     if (draggingImageSlot === "first") {
       setFirstUploadedImage(updatedImage);
       onImageSelect({ first: updatedImage, second: secondUploadedImage });
@@ -350,32 +315,25 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
       onImageSelect({ first: firstUploadedImage, second: updatedImage });
     }
   };
-
   const handlePreviewMouseUp = () => {
     setIsDraggingPreview(false);
     setDraggingImageSlot(null);
   };
-
-  // Add mouse event listeners when dragging is active
   useEffect(() => {
     if (isDragging) {
       document.addEventListener("mousemove", handleMouseMove);
       document.addEventListener("mouseup", handleMouseUp);
     }
-
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDragging, dragOffset, imagePosition]);
-
-  // Add preview drag event listeners
   useEffect(() => {
     if (isDraggingPreview) {
       document.addEventListener("mousemove", handlePreviewMouseMove);
       document.addEventListener("mouseup", handlePreviewMouseUp);
     }
-
     return () => {
       document.removeEventListener("mousemove", handlePreviewMouseMove);
       document.removeEventListener("mouseup", handlePreviewMouseUp);
@@ -387,30 +345,24 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
     firstUploadedImage,
     secondUploadedImage,
   ]);
-
    const handleImageConfirm = async () => {
     if (!editingImageSrc || !croppedAreaPixels) return;
-
     try {
-      // helper to crop the image using canvas
       const croppedImageUrl = await getCroppedImg(
         editingImageSrc,
         croppedAreaPixels
       );
-
       window.scrollTo({
         top: 0,
         behavior: "smooth",
       });
-
       const imageData = {
-        src: croppedImageUrl, // ✅ now using cropped image
+        src: croppedImageUrl,
         position: imagePosition,
         zoom: imageZoom,
         rotation: imageRotation,
         isCircular: true,
       };
-
       let updatedFirstImage = firstUploadedImage;
       let updatedSecondImage = secondUploadedImage;
 
@@ -421,23 +373,19 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
         updatedSecondImage = imageData;
         setSecondUploadedImage(imageData);
       }
-
       onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
-
-      setShowImageEditor(false);
+     setShowImageEditor(false);
       toast.success("Image has been added to your candy design!");
     } catch (err) {
       console.error("Cropping failed", err);
       toast.error("Failed to crop the image.");
     }
   };
-
   const handleResetImageEdits = () => {
     setImagePosition({ x: 0, y: 0 });
     setImageZoom(100);
     setImageRotation(0);
   };
-
   const handleClearImage = (slotToClear) => {
     let updatedFirstImage = firstUploadedImage;
     let updatedSecondImage = secondUploadedImage;
@@ -449,16 +397,13 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
       updatedSecondImage = null;
       setSecondUploadedImage(null);
     }
-
     onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
-
     setEditingImageSrc(null);
     setShowImageUpload(false);
     setShowImageEditor(false);
     setCurrentlyEditingImageSlot(null);
     toast.info(`Image ${slotToClear === "first" ? "1" : "2"} cleared.`);
   };
-
   const handleClearAllImages = () => {
     setFirstUploadedImage(null);
     setSecondUploadedImage(null);
@@ -470,31 +415,22 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
     setCurrentlyEditingImageSlot(null);
     toast.info("All images cleared.");
   };
-
-  // ////////////////////////////////////////
-
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-
   const onCropComplete = (croppedArea, croppedPixels) => {
     setCroppedAreaPixels(croppedPixels);
   };
-
   const getCroppedImg = (imageSrc, crop) => {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.src = imageSrc;
       image.crossOrigin = "anonymous";
-
       image.onload = () => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-
         canvas.width = crop.width;
         canvas.height = crop.height;
-
         ctx.drawImage(
           image,
           crop.x,
@@ -506,7 +442,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
           crop.width,
           crop.height
         );
-
         canvas.toBlob((blob) => {
           if (!blob) {
             reject(new Error("Canvas is empty"));
@@ -516,11 +451,9 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
           resolve(fileUrl);
         }, "image/jpeg");
       };
-
       image.onerror = (err) => reject(err);
     });
   };
-
   return (
     <div className="p-2 bg-white w-64 h-full rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-center">Design Your Candy</h2>
@@ -533,7 +466,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
         className="flex flex-col space-y-6"
       >
         {/* Image Option */}
-
         <a>
           <div
             ref={imageUploadRef}
@@ -567,7 +499,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
             </div>
           </div>
         </a>
-
         {showImageUpload && (
           <div
             ref={imageUploadRef}
@@ -620,7 +551,6 @@ const [originalImageSrc, setOriginalImageSrc] = useState(null);
               </button>
             </div>
             <hr className="mt-4 border-gray-300" />
-
             {/* Image preview section with draggable images */}
             {(firstUploadedImage || secondUploadedImage) && (
               <div className="mb-4 text-center w-full flex justify-center gap-4">
