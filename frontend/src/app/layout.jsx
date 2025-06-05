@@ -1,3 +1,4 @@
+// app/layout.js or app/layout.tsx (if you're using TypeScript)
 import "@/styles/globals.css";
 import { satoshi } from "@/styles/fonts";
 import TopBanner from "@/components/layout/Banner/TopBanner";
@@ -5,6 +6,7 @@ import TopNavbar from "@/components/layout/Navbar/TopNavbar";
 import Footer from "@/components/layout/Footer";
 import HolyLoader from "holy-loader";
 import Providers from "./providers.jsx";
+import Script from "next/script";
 
 export const metadata = {
   title: "Dry_Fruits",
@@ -18,6 +20,12 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+        />
+      </head>
       <body className={satoshi.className}>
         <HolyLoader color="#868686" />
         <TopBanner />
@@ -26,6 +34,12 @@ export default function RootLayout({ children }) {
           {children}
         </Providers>
         <Footer />
+        <Script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );

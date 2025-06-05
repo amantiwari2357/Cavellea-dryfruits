@@ -1,34 +1,42 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, selectedclipart, firstLine, secondLine, selectedFontStyle }) => {
+const CandyPreview = ({
+  selectedColors,
+  selectedImage,
+  secondSelectedImage,
+  selectedclipart,
+  firstLine,
+  secondLine,
+  selectedFontStyle,
+}) => {
   const [candies, setCandies] = useState([]);
 
   // Color collection function
   const getColorValue = (colorKey) => {
     const colorOptions = [
-      { name: 'Dark Blue', value: '#000080', key: 'darkBlue' },
-      { name: 'Black', value: '#000000', key: 'black' },
-      { name: 'Purple', value: '#800080', key: 'purple' },
-      { name: 'Maroon', value: '#800000', key: 'maroon' },
-      { name: 'Brown', value: '#8B4513', key: 'brown' },
-      { name: 'White', value: '#FFFFFF', key: 'white' },
-      { name: 'Blue', value: '#0074BC', key: 'blue' },
-      { name: 'Red', value: '#BC0034', key: 'red' },
-      { name: 'Yellow', value: '#F9D71C', key: 'yellow' },
-      { name: 'Pearl', value: '#F5F5F5', key: 'pearl' },
-      { name: 'Pink', value: '#F5A3C7', key: 'pink' },
-      { name: 'Light Blue', value: '#A3E0F5', key: 'lightBlue' },
-      { name: 'Dark Green', value: '#007C36', key: 'darkGreen' },
-      { name: 'Platinum', value: '#E5E4E2', key: 'platinum' },
-      { name: 'Light Purple', value: '#C1A7E2', key: 'lightPurple' },
-      { name: 'Dark Pink', value: '#D6218F', key: 'darkPink' },
-      { name: 'Dark Yellow', value: '#EFAA22', key: 'darkYellow' },
+      { name: "Dark Blue", value: "#000080", key: "darkBlue" },
+      { name: "Black", value: "#000000", key: "black" },
+      { name: "Purple", value: "#800080", key: "purple" },
+      { name: "Maroon", value: "#800000", key: "maroon" },
+      { name: "Brown", value: "#8B4513", key: "brown" },
+      { name: "White", value: "#FFFFFF", key: "white" },
+      { name: "Blue", value: "#0074BC", key: "blue" },
+      { name: "Red", value: "#BC0034", key: "red" },
+      { name: "Yellow", value: "#F9D71C", key: "yellow" },
+      { name: "Pearl", value: "#F5F5F5", key: "pearl" },
+      { name: "Pink", value: "#F5A3C7", key: "pink" },
+      { name: "Light Blue", value: "#A3E0F5", key: "lightBlue" },
+      { name: "Dark Green", value: "#007C36", key: "darkGreen" },
+      { name: "Platinum", value: "#E5E4E2", key: "platinum" },
+      { name: "Light Purple", value: "#C1A7E2", key: "lightPurple" },
+      { name: "Dark Pink", value: "#D6218F", key: "darkPink" },
+      { name: "Dark Yellow", value: "#EFAA22", key: "darkYellow" },
     ];
 
-    const foundColor = colorOptions.find(c => c.key === colorKey);
-    return foundColor ? foundColor.value : '#00008B';
+    const foundColor = colorOptions.find((c) => c.key === colorKey);
+    return foundColor ? foundColor.value : "#00008B";
   };
 
   const generateCandies = () => {
@@ -36,59 +44,62 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
 
     const newCandies = [];
     const count = 60;
-    const candySize = 45; // Approximate size of each candy for layout calculation
-    const padding = 10; // Padding between candies
-    const containerWidth = 400; // Width of the preview container
-    const containerHeight = 400; // Height of the preview container
+    const candySize = 45; 
+    const padding = 10;
+    const containerWidth = 400; 
+    const containerHeight = 400;
 
     let currentX = padding;
     let currentY = padding;
 
-    // Determine what customization options we have
+  
     const hasText = firstLine || secondLine;
     const hasImage1 = selectedImage !== null;
     const hasImage2 = secondSelectedImage !== null;
     const hasClipart = selectedclipart !== null;
 
     const customizationOptions = [];
-    if (hasText) customizationOptions.push('text');
-    if (hasImage1) customizationOptions.push('image1'); // Differentiate first image
-    if (hasImage2) customizationOptions.push('image2'); // Differentiate second image
-    if (hasClipart) customizationOptions.push('clipart');
+    if (hasText) customizationOptions.push("text");
+    if (hasImage1) customizationOptions.push("image1");
+    if (hasImage2) customizationOptions.push("image2");
+    if (hasClipart) customizationOptions.push("clipart");
 
     const hasCustomization = customizationOptions.length > 0;
 
     for (let i = 0; i < count; i++) {
-      // Choose a random color from selected colors
-      const colorKey = selectedColors[Math.floor(Math.random() * selectedColors.length)];
+      const colorKey =
+        selectedColors[Math.floor(Math.random() * selectedColors.length)];
 
-      // Calculate position for row-wise layout
+     
       const x = (currentX / containerWidth) * 100;
       const y = (currentY / containerHeight) * 100;
 
-      // Consistent size for all candies (50-55px)
+    
       const size = 50 + Math.random() * 5;
 
-      // Random z-index for layering
+    
       const zIndex = Math.floor(Math.random() * 10);
 
-      // Random rotation
+      
       const rotation = Math.random() * 360;
 
-      // Determine what content to show on this candy
-      let contentType = 'default';
-      let contentData = null; // To store which image object to use
+     
+      let contentType = "default";
+      let contentData = null; 
 
       if (hasCustomization) {
-        // If there are customization options, pick one randomly
-        contentType = customizationOptions[Math.floor(Math.random() * customizationOptions.length)];
         
-        // Assign the specific image object based on contentType
-        if (contentType === 'image1') {
+        contentType =
+          customizationOptions[
+            Math.floor(Math.random() * customizationOptions.length)
+          ];
+
+        
+        if (contentType === "image1") {
           contentData = selectedImage;
-        } else if (contentType === 'image2') {
+        } else if (contentType === "image2") {
           contentData = secondSelectedImage;
-        } else if (contentType === 'clipart') {
+        } else if (contentType === "clipart") {
           contentData = selectedclipart;
         }
       }
@@ -102,14 +113,14 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
         zIndex,
         rotation,
         contentType,
-        contentData, // Store the specific image/clipart object for rendering
+        contentData,
       });
 
       // Move to the next position for row-wise layout
-      currentX += (candySize + padding);
+      currentX += candySize + padding;
       if (currentX + candySize + padding > containerWidth) {
         currentX = padding;
-        currentY += (candySize + padding);
+        currentY += candySize + padding;
       }
     }
 
@@ -119,9 +130,9 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
   useEffect(() => {
     setCandies(generateCandies());
   }, [
-    selectedColors, 
-    firstLine, 
-    secondLine, 
+    selectedColors,
+    firstLine,
+    secondLine,
     // Track image 1 internal props
     selectedImage?.src,
     selectedImage?.position?.x,
@@ -141,7 +152,7 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
   ]);
 
   const handleRefreshCandies = () => {
-    setCandies(prevCandies => {
+    setCandies((prevCandies) => {
       const updatedCandies = [];
       const candySize = 45;
       const padding = 10;
@@ -158,10 +169,10 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
       const hasClipart = selectedclipart !== null;
 
       const customizationOptions = [];
-      if (hasText) customizationOptions.push('text');
-      if (hasImage1) customizationOptions.push('image1');
-      if (hasImage2) customizationOptions.push('image2');
-      if (hasClipart) customizationOptions.push('clipart');
+      if (hasText) customizationOptions.push("text");
+      if (hasImage1) customizationOptions.push("image1");
+      if (hasImage2) customizationOptions.push("image2");
+      if (hasClipart) customizationOptions.push("clipart");
 
       const hasCustomization = customizationOptions.length > 0;
 
@@ -169,16 +180,19 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
         const x = (currentX / containerWidth) * 100;
         const y = (currentY / containerHeight) * 100;
 
-        let newContentType = 'default';
+        let newContentType = "default";
         let newContentData = null;
 
         if (hasCustomization) {
-          newContentType = customizationOptions[Math.floor(Math.random() * customizationOptions.length)];
-          if (newContentType === 'image1') {
+          newContentType =
+            customizationOptions[
+              Math.floor(Math.random() * customizationOptions.length)
+            ];
+          if (newContentType === "image1") {
             newContentData = selectedImage;
-          } else if (newContentType === 'image2') {
+          } else if (newContentType === "image2") {
             newContentData = secondSelectedImage;
-          } else if (newContentType === 'clipart') {
+          } else if (newContentType === "clipart") {
             newContentData = selectedclipart;
           }
         }
@@ -192,10 +206,10 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
           contentData: newContentData,
         });
 
-        currentX += (candySize + padding);
+        currentX += candySize + padding;
         if (currentX + candySize + padding > containerWidth) {
           currentX = padding;
-          currentY += (candySize + padding);
+          currentY += candySize + padding;
         }
       }
       return updatedCandies;
@@ -207,13 +221,20 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
   // Set font family based on selected style
   const getFontFamily = (style) => {
     switch (style) {
-      case 'Bold': return 'font-bold';
-      case 'Regular': return '';
-      case 'Light': return 'font-light';
-      case 'Script': return 'font-serif italic';
-      case 'Italic': return 'italic';
-      case 'Monospace': return 'font-mono';
-      default: return '';
+      case "Bold":
+        return "font-bold";
+      case "Regular":
+        return "";
+      case "Light":
+        return "font-light";
+      case "Script":
+        return "font-serif italic";
+      case "Italic":
+        return "italic";
+      case "Monospace":
+        return "font-mono";
+      default:
+        return "";
     }
   };
 
@@ -222,25 +243,27 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
   // Get image source from image object or direct string
   const getImageSource = (imageObject) => {
     if (!imageObject) return null;
-    return typeof imageObject === 'object' ? imageObject.src : imageObject;
+    return typeof imageObject === "object" ? imageObject.src : imageObject;
   };
 
   // Get clipart source from clipart object or direct string
   const getClipartSource = (clipartObject) => {
     if (!clipartObject) return null;
-    return typeof clipartObject === 'object' ? clipartObject.src : clipartObject;
+    return typeof clipartObject === "object"
+      ? clipartObject.src
+      : clipartObject;
   };
 
   const getMediaStyle = (mediaObject) => {
     if (!mediaObject) return {};
 
     const baseStyle = {
-      maxWidth: '70%',
-      maxHeight: '70%',
+      maxWidth: "70%",
+      maxHeight: "70%",
     };
 
-    if (typeof mediaObject === 'object' && mediaObject.zoom) {
-      const scale = 1 + ((mediaObject.zoom - 100) / 200); // Less dramatic zoom
+    if (typeof mediaObject === "object" && mediaObject.zoom) {
+      const scale = 1 + (mediaObject.zoom - 100) / 200; // Less dramatic zoom
       const rotation = mediaObject.rotation || 0;
       return {
         ...baseStyle,
@@ -256,13 +279,20 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
       <div className="relative w-[800px] h-[400px] rounded-lg overflow-hidden border border-gray-200">
         {selectedColors.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500 text-lg">Choose a color to view the candy mix preview.</p>
+            <p className="text-gray-500 text-lg">
+              Choose a color to view the candy mix preview.
+            </p>
           </div>
         ) : (
           <>
             {candies.map((candy) => {
               const colorValue = getColorValue(candy.colorKey);
-              const isDark = !['#FFFFFF', '#F5F5F5', '#E5E4E2', '#A3E0F5'].includes(colorValue);
+              const isDark = ![
+                "#FFFFFF",
+                "#F5F5F5",
+                "#E5E4E2",
+                "#A3E0F5",
+              ].includes(colorValue);
 
               return (
                 <div
@@ -277,55 +307,79 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
                     zIndex: candy.zIndex,
                     transform: `rotate(${candy.rotation}deg)`,
                     boxShadow: `0px 4px 8px rgba(0, 0, 0, 0.3), inset 0px -3px 6px rgba(0, 0, 0, 0.2), inset 0px 3px 6px rgba(255, 255, 255, 0.5)`,
-                    position: 'absolute',
-                    overflow: 'hidden'
+                    position: "absolute",
+                    overflow: "hidden",
                   }}
                 >
                   {/* Default 'C' if no customization is applied to this candy */}
-                  {candy.contentType === 'default' && (
-                    <span className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-700'}`}>𝓒</span>
+                  {candy.contentType === "default" && (
+                    <span
+                      className={`text-lg font-bold ${
+                        isDark ? "text-white" : "text-gray-700"
+                      }`}
+                    >
+                      𝓒
+                    </span>
                   )}
 
                   {/* Render Text */}
-                  {candy.contentType === 'text' && (firstLine || secondLine) && (
-                    <div className={`flex flex-col items-center justify-center ${fontClass} text-${isDark ? 'white' : 'gray-700'} text-[6px] leading-tight text-center`}>
-                      {firstLine && <div>{firstLine}</div>}
-                      {secondLine && <div>{secondLine}</div>}
-                    </div>
-                  )}
+                  {candy.contentType === "text" &&
+                    (firstLine || secondLine) && (
+                      <div
+                        className={`flex flex-col items-center justify-center ${fontClass} text-${
+                          isDark ? "white" : "gray-700"
+                        } text-[6px] leading-tight text-center`}
+                      >
+                        {firstLine && <div>{firstLine}</div>}
+                        {secondLine && <div>{secondLine}</div>}
+                      </div>
+                    )}
 
                   {/* Render Image 1 */}
-                  {candy.contentType === 'image1' && candy.contentData && (
+                  {candy.contentType === "image1" && candy.contentData && (
                     <img
                       src={getImageSource(candy.contentData)}
                       alt="Customized Image 1"
                       className="w-full h-full rounded-full object-cover"
                       style={{
-                        transform: candy.contentData.position ? `translate(${candy.contentData.position.x}px, ${candy.contentData.position.y}px) rotate(${candy.contentData.rotation}deg) scale(${candy.contentData.zoom / 100})` : 'none',
+                        // Correct transform: apply position, rotation, zoom exactly from candy.contentData
+                        transform: `translate(${
+                          candy.contentData.position.x
+                        }px, ${candy.contentData.position.y}px) rotate(${
+                          candy.contentData.rotation
+                        }deg) scale(${candy.contentData.zoom / 100})`,
                         filter: "grayscale(100%)",
-                        width: '100%',
-                        height: '100%',
+                        width: "100%",
+                        height: "100%",
+                        display: "block",
                       }}
                     />
                   )}
 
                   {/* Render Image 2 */}
-                  {candy.contentType === 'image2' && candy.contentData && (
+                  {candy.contentType === "image2" && candy.contentData && (
                     <img
                       src={getImageSource(candy.contentData)}
                       alt="Customized Image 2"
                       className="w-full h-full rounded-full object-cover"
                       style={{
-                        transform: candy.contentData.position ? `translate(${candy.contentData.position.x}px, ${candy.contentData.position.y}px) rotate(${candy.contentData.rotation}deg) scale(${candy.contentData.zoom / 100})` : 'none',
+                        transform: candy.contentData.position
+                          ? `translate(${candy.contentData.position.x}px, ${
+                              candy.contentData.position.y
+                            }px) rotate(${
+                              candy.contentData.rotation
+                            }deg) scale(${candy.contentData.zoom / 100})`
+                          : "none",
                         filter: "grayscale(100%)",
-                        width: '100%',
-                        height: '100%',
+                        width: "100%",
+                        height: "100%",
+                        display: "block",
                       }}
                     />
                   )}
 
                   {/* Render Clipart */}
-                  {candy.contentType === 'clipart' && candy.contentData && (
+                  {candy.contentType === "clipart" && candy.contentData && (
                     <div className="w-full h-full flex items-center justify-center">
                       <img
                         src={getClipartSource(candy.contentData)}
@@ -344,8 +398,19 @@ const CandyPreview = ({ selectedColors, selectedImage, secondSelectedImage, sele
                 className="bg-white p-2 rounded-full shadow-md hover:shadow-lg transition-all"
                 aria-label="Refresh Preview"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="w-5 h-5"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
               </button>
             </div>

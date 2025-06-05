@@ -86,3 +86,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+.reactEasyCrop_CropArea .reactEasyCrop_CropAreaGrid{
+height: 100% !important;
+  width: 100% !important;
+}

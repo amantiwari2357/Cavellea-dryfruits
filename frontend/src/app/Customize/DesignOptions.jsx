@@ -1,5 +1,6 @@
 "use client";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
+import Cropper from "react-easy-crop";
 import {
   MoveHorizontal,
   ZoomIn,
@@ -68,12 +69,11 @@ const DesignOptions = ({
   const [draggingImageSlot, setDraggingImageSlot] = useState(null);
   const [previewDragOffset, setPreviewDragOffset] = useState({ x: 0, y: 0 });
   const [hoveredImageSlot, setHoveredImageSlot] = useState(null);
-
+const [originalImageSrc, setOriginalImageSrc] = useState(null);
   const [selectedType, setSelectedType] = useState("");
 
   const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
   const [showCursor, setShowCursor] = useState(false);
-  
 
   useEffect(() => {
     const storedType = localStorage.getItem("printType");
@@ -96,30 +96,72 @@ const DesignOptions = ({
     setSecondUploadedImage(parentSecondUploadedImage);
   }, [parentSecondUploadedImage]);
 
-  const fontStyles = [
-    "Bold",
-    "Regular",
-    "Light",
-    "Script",
-    "Italic",
-  ];
+  const fontStyles = ["Bold", "Regular", "Light", "Script", "Italic"];
 
   // Mock clipart data since import is missing
   const allCliparts = [
     { src: "/images/cliparts1.avif", alt: "Sample clipart 1", category: "All" },
-    { src: "/images/cliparts2.avif", alt: "Sample clipart 2", category: "Birthday" },
-    { src: "/images/cliparts3.avif", alt: "Sample clipart 3", category: "Graduation" },
-    { src: "/images/cliparts4.avif", alt: "Sample clipart 4", category: "Holiday" },
-    { src: "/images/cliparts5.avif", alt: "Sample clipart 5", category: "Wedding" },
+    {
+      src: "/images/cliparts2.avif",
+      alt: "Sample clipart 2",
+      category: "Birthday",
+    },
+    {
+      src: "/images/cliparts3.avif",
+      alt: "Sample clipart 3",
+      category: "Graduation",
+    },
+    {
+      src: "/images/cliparts4.avif",
+      alt: "Sample clipart 4",
+      category: "Holiday",
+    },
+    {
+      src: "/images/cliparts5.avif",
+      alt: "Sample clipart 5",
+      category: "Wedding",
+    },
     { src: "/images/cliparts6.avif", alt: "Sample clipart 6", category: "All" },
-    { src: "/images/cliparts7.avif", alt: "Sample clipart 7", category: "Birthday" },
-    { src: "/images/cliparts8.avif", alt: "Sample clipart 8", category: "Graduation" },
-    { src: "/images/cliparts9.avif", alt: "Sample clipart 9", category: "Holiday" },
-    { src: "/images/cliparts10.avif", alt: "Sample clipart 10", category: "Wedding" },
-    { src: "/images/cliparts11.avif", alt: "Sample clipart 11", category: "All" },
-    { src: "/images/cliparts12.avif", alt: "Sample clipart 12", category: "Birthday" },
-    { src: "/images/cliparts13.avif", alt: "Sample clipart 13", category: "Graduation" },
-    { src: "/images/cliparts14.avif", alt: "Sample clipart 14", category: "Holiday" },
+    {
+      src: "/images/cliparts7.avif",
+      alt: "Sample clipart 7",
+      category: "Birthday",
+    },
+    {
+      src: "/images/cliparts8.avif",
+      alt: "Sample clipart 8",
+      category: "Graduation",
+    },
+    {
+      src: "/images/cliparts9.avif",
+      alt: "Sample clipart 9",
+      category: "Holiday",
+    },
+    {
+      src: "/images/cliparts10.avif",
+      alt: "Sample clipart 10",
+      category: "Wedding",
+    },
+    {
+      src: "/images/cliparts11.avif",
+      alt: "Sample clipart 11",
+      category: "All",
+    },
+    {
+      src: "/images/cliparts12.avif",
+      alt: "Sample clipart 12",
+      category: "Birthday",
+    },
+    {
+      src: "/images/cliparts13.avif",
+      alt: "Sample clipart 13",
+      category: "Graduation",
+    },
+    {
+      src: "/images/cliparts14.avif",
+      alt: "Sample clipart 14",
+      category: "Holiday",
+    },
   ];
 
   const filteredCliparts = allCliparts.filter(
@@ -130,33 +172,38 @@ const DesignOptions = ({
   );
 
   const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target.result;
-        setEditingImageSrc(imageUrl);
+  const file = e.target.files?.[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const imageUrl = event.target.result;
 
-        if (!currentlyEditingImageSlot) {
-          if (!firstUploadedImage) {
-            setCurrentlyEditingImageSlot("first");
-          } else if (!secondUploadedImage) {
-            setCurrentlyEditingImageSlot("second");
-          } else {
-            setCurrentlyEditingImageSlot("first");
-            toast.info("Both image slots are full. Editing the first image.");
-          }
+      // Save both original and editing image source
+      setEditingImageSrc(imageUrl);
+      setOriginalImageSrc(imageUrl); // Save the original image
+
+      // Determine which image slot is being edited
+      if (!currentlyEditingImageSlot) {
+        if (!firstUploadedImage) {
+          setCurrentlyEditingImageSlot("first");
+        } else if (!secondUploadedImage) {
+          setCurrentlyEditingImageSlot("second");
+        } else {
+          setCurrentlyEditingImageSlot("first");
+          toast.info("Both image slots are full. Editing the first image.");
         }
+      }
 
-        setShowImageEditor(true);
-        setShowImageUpload(false);
-        setImagePosition({ x: 0, y: 0 });
-        setImageZoom(100);
-        setImageRotation(0);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+      setShowImageEditor(true);
+      setShowImageUpload(false);
+      setImagePosition({ x: 0, y: 0 });
+      setImageZoom(100);
+      setImageRotation(0);
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 
   const handleUploadClick = (slot) => {
     if (agreeTerms && fileInputRef.current) {
@@ -213,53 +260,25 @@ const DesignOptions = ({
       setShowClipartPanel(true);
     }
   };
-
-  // Mouse event handlers for image dragging in editor
-const handleMouseDown = (e) => {
-  e.preventDefault();
-   const rect = containerRef.current.getBoundingClientRect();
-  setIsDragging(true);
-  
-  
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const offsetX = e.clientX - containerRect.left - imagePosition.x;
-    const offsetY = e.clientY - containerRect.top - imagePosition.y;
-    
-    setDragOffset({ x: offsetX, y: offsetY });
-    setIsDragging(true);
-    
-    console.log('Mouse down - starting drag');
-  };
-
   const handleMouseMove = (e) => {
     if (!isDragging || !containerRef.current) return;
-    
+
     e.preventDefault();
     const containerRect = containerRef.current.getBoundingClientRect();
     const newX = e.clientX - containerRect.left - dragOffset.x;
     const newY = e.clientY - containerRect.top - dragOffset.y;
-    
+
     setImagePosition({ x: newX, y: newY });
-    console.log('Moving image to:', { x: newX, y: newY });
+    console.log("Moving image to:", { x: newX, y: newY });
   };
 
   const handleMouseUp = (e) => {
     if (isDragging) {
       e.preventDefault();
       setIsDragging(false);
-      console.log('Mouse up - ending drag');
+      console.log("Mouse up - ending drag");
     }
   };
-
-  // New handlers for cursor movement in editor
-  const handleEditorMouseMove = (e) => {
-  const rect = containerRef.current.getBoundingClientRect();
-  setCursorPosition({
-    x: e.clientX - rect.left,
-    y: e.clientY - rect.top,
-  });
-};
-
 
   const handleEditorMouseLeave = () => {
     setShowCursor(false);
@@ -267,35 +286,36 @@ const handleMouseDown = (e) => {
 
   const handleEditorClick = (e) => {
     if (!containerRef.current || isDragging) return;
-    
+
     e.preventDefault();
     const containerRect = containerRef.current.getBoundingClientRect();
     const clickX = e.clientX - containerRect.left;
     const clickY = e.clientY - containerRect.top;
-    
+
     // Move image to clicked position (center the image on click point)
-    const newX = clickX - (containerRect.width / 2);
-    const newY = clickY - (containerRect.height / 2);
-    
+    const newX = clickX - containerRect.width / 2;
+    const newY = clickY - containerRect.height / 2;
+
     setImagePosition({ x: newX, y: newY });
-    console.log('Moving image to clicked position:', { x: newX, y: newY });
+    console.log("Moving image to clicked position:", { x: newX, y: newY });
   };
 
   // Preview circle drag handlers
   const handlePreviewMouseDown = (e, slot) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    const imageElement = e.currentTarget.querySelector('img');
+
+    const imageElement = e.currentTarget.querySelector("img");
     if (!imageElement) return;
-    
+
     const rect = imageElement.getBoundingClientRect();
-    const currentImage = slot === "first" ? firstUploadedImage : secondUploadedImage;
+    const currentImage =
+      slot === "first" ? firstUploadedImage : secondUploadedImage;
     const currentPos = currentImage?.position || { x: 0, y: 0 };
-    
+
     const offsetX = e.clientX - rect.left - currentPos.x;
     const offsetY = e.clientY - rect.top - currentPos.y;
-    
+
     setPreviewDragOffset({ x: offsetX, y: offsetY });
     setIsDraggingPreview(true);
     setDraggingImageSlot(slot);
@@ -303,22 +323,25 @@ const handleMouseDown = (e) => {
 
   const handlePreviewMouseMove = (e) => {
     if (!isDraggingPreview || !draggingImageSlot) return;
-    
+
     e.preventDefault();
-    
-    const containerElement = document.querySelector(`[data-preview-container="${draggingImageSlot}"]`);
+
+    const containerElement = document.querySelector(
+      `[data-preview-container="${draggingImageSlot}"]`
+    );
     if (!containerElement) return;
-    
+
     const containerRect = containerElement.getBoundingClientRect();
     const newX = e.clientX - containerRect.left - previewDragOffset.x;
     const newY = e.clientY - containerRect.top - previewDragOffset.y;
-    
-    const currentImage = draggingImageSlot === "first" ? firstUploadedImage : secondUploadedImage;
+
+    const currentImage =
+      draggingImageSlot === "first" ? firstUploadedImage : secondUploadedImage;
     const updatedImage = {
       ...currentImage,
-      position: { x: newX, y: newY }
+      position: { x: newX, y: newY },
     };
-    
+
     if (draggingImageSlot === "first") {
       setFirstUploadedImage(updatedImage);
       onImageSelect({ first: updatedImage, second: secondUploadedImage });
@@ -357,37 +380,56 @@ const handleMouseDown = (e) => {
       document.removeEventListener("mousemove", handlePreviewMouseMove);
       document.removeEventListener("mouseup", handlePreviewMouseUp);
     };
-  }, [isDraggingPreview, draggingImageSlot, previewDragOffset, firstUploadedImage, secondUploadedImage]);
+  }, [
+    isDraggingPreview,
+    draggingImageSlot,
+    previewDragOffset,
+    firstUploadedImage,
+    secondUploadedImage,
+  ]);
 
-  const handleImageConfirm = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+   const handleImageConfirm = async () => {
+    if (!editingImageSrc || !croppedAreaPixels) return;
 
-    const imageData = {
-      src: editingImageSrc,
-      position: imagePosition,
-      zoom: imageZoom,
-      rotation: imageRotation,
-      isCircular: true,
-    };
+    try {
+      // helper to crop the image using canvas
+      const croppedImageUrl = await getCroppedImg(
+        editingImageSrc,
+        croppedAreaPixels
+      );
 
-    let updatedFirstImage = firstUploadedImage;
-    let updatedSecondImage = secondUploadedImage;
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
 
-    if (currentlyEditingImageSlot === "first") {
-      updatedFirstImage = imageData;
-      setFirstUploadedImage(imageData);
-    } else if (currentlyEditingImageSlot === "second") {
-      updatedSecondImage = imageData;
-      setSecondUploadedImage(imageData);
+      const imageData = {
+        src: croppedImageUrl, // ✅ now using cropped image
+        position: imagePosition,
+        zoom: imageZoom,
+        rotation: imageRotation,
+        isCircular: true,
+      };
+
+      let updatedFirstImage = firstUploadedImage;
+      let updatedSecondImage = secondUploadedImage;
+
+      if (currentlyEditingImageSlot === "first") {
+        updatedFirstImage = imageData;
+        setFirstUploadedImage(imageData);
+      } else if (currentlyEditingImageSlot === "second") {
+        updatedSecondImage = imageData;
+        setSecondUploadedImage(imageData);
+      }
+
+      onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
+
+      setShowImageEditor(false);
+      toast.success("Image has been added to your candy design!");
+    } catch (err) {
+      console.error("Cropping failed", err);
+      toast.error("Failed to crop the image.");
     }
-
-    onImageSelect({ first: updatedFirstImage, second: updatedSecondImage });
-
-    setShowImageEditor(false);
-    toast.success("Image has been added to your candy design!");
   };
 
   const handleResetImageEdits = () => {
@@ -429,8 +471,58 @@ const handleMouseDown = (e) => {
     toast.info("All images cleared.");
   };
 
+  // ////////////////////////////////////////
+
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+
+  const onCropComplete = (croppedArea, croppedPixels) => {
+    setCroppedAreaPixels(croppedPixels);
+  };
+
+  const getCroppedImg = (imageSrc, crop) => {
+    return new Promise((resolve, reject) => {
+      const image = new Image();
+      image.src = imageSrc;
+      image.crossOrigin = "anonymous";
+
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = crop.width;
+        canvas.height = crop.height;
+
+        ctx.drawImage(
+          image,
+          crop.x,
+          crop.y,
+          crop.width,
+          crop.height,
+          0,
+          0,
+          crop.width,
+          crop.height
+        );
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error("Canvas is empty"));
+            return;
+          }
+          const fileUrl = URL.createObjectURL(blob);
+          resolve(fileUrl);
+        }, "image/jpeg");
+      };
+
+      image.onerror = (err) => reject(err);
+    });
+  };
+
   return (
-    <div className="p-0 bg-white w-64 h-full rounded-lg shadow-md">
+    <div className="p-2 bg-white w-64 h-full rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-center">Design Your Candy</h2>
       <p className="text-gray-600 text-center mb-4">
         Choose your design option below
@@ -442,7 +534,7 @@ const handleMouseDown = (e) => {
       >
         {/* Image Option */}
 
-        <a href="#upload-image">
+        <a>
           <div
             ref={imageUploadRef}
             className={`flex items-center space-x-4 p-3 rounded-lg mb-0 ${
@@ -476,6 +568,469 @@ const handleMouseDown = (e) => {
           </div>
         </a>
 
+        {showImageUpload && (
+          <div
+            ref={imageUploadRef}
+            style={{ marginTop: "-10px !important" }}
+            className="p-2 shadow-md bg-white"
+          >
+            <div
+              id="upload-image"
+              className="flex flex-row items-center justify-center gap-4"
+            ></div>
+
+            <div>
+              <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
+              <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
+                <li>Upload a clear .jpg, .jpeg, or .png (max 15MB).</li>
+                {showMore && (
+                  <>
+                    <li>Only 1–2 close faces allowed. No arms or full body.</li>
+                    <li>
+                      No copyrighted/logos unless with written permission.
+                    </li>
+                    <li>
+                      Backgrounds will be removed; image prints in black.{" "}
+                    </li>
+                  </>
+                )}
+              </ul>
+            </div>
+            <div className="mt-2">
+              <button
+                onClick={() => setShowMore(!showMore)}
+                className="relative inline-flex items-center gap-1 text-sm font-medium text-blue-600 transition duration-300 ease-in-out hover:text-blue-800 group"
+              >
+                <span>{showMore ? "View Less" : "View More"}</span>
+                <svg
+                  className={`w-4 h-4 transition-transform duration-300 transform ${
+                    showMore ? "rotate-180" : ""
+                  } group-hover:translate-x-1`}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+            <hr className="mt-4 border-gray-300" />
+
+            {/* Image preview section with draggable images */}
+            {(firstUploadedImage || secondUploadedImage) && (
+              <div className="mb-4 text-center w-full flex justify-center gap-4">
+                <div>
+                  {firstUploadedImage && (
+                    <div
+                      data-preview-container="first"
+                      className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
+                      style={{
+                        height: "80px",
+                        width: "80px",
+                        overflow: "hidden",
+                        // cursor: isDraggingPreview && draggingImageSlot === "first" ? "grabbing" : "grab"
+                      }}
+                      // onMouseDown={(e) => handlePreviewMouseDown(e, "first")}
+                      // onMouseEnter={() => setHoveredImageSlot("first")}
+                      // onMouseLeave={() => setHoveredImageSlot(null)}
+                    >
+                      <img
+                        src={firstUploadedImage.src}
+                        alt="First Uploaded"
+                        className="absolute select-none"
+                        style={{
+                          borderRadius: "50%",
+                          height: "100%",
+                          width: "100%",
+                          objectFit: "cover",
+                          zIndex: 1,
+                          transform: `translate(${
+                            firstUploadedImage.position?.x || 0
+                          }px, ${
+                            firstUploadedImage.position?.y || 0
+                          }px) rotate(${
+                            firstUploadedImage.rotation || 0
+                          }deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
+                          filter: "grayscale(100%)",
+                          pointerEvents: "none",
+                        }}
+                        draggable="false"
+                        pointerEvents="none"
+                      />
+                      {/* Attractive move cursor symbol */}
+                      <div
+                        className="absolute pointer-events-none transition-all duration-200"
+                        style={{
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          zIndex: 10,
+                          opacity:
+                            hoveredImageSlot === "first" ||
+                            (isDraggingPreview && draggingImageSlot === "first")
+                              ? 1
+                              : 0,
+                        }}
+                      >
+                        <div className="bg-blue-500 rounded-full p-2 shadow-lg">
+                          <Move className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {/* {firstUploadedImage && (
+                    <div className="flex justify-center mt-1 space-x-2">
+                      <button
+                        onClick={() => {
+                          setEditingImageSrc(firstUploadedImage.src);
+                          setImagePosition(firstUploadedImage.position);
+                          setImageZoom(firstUploadedImage.zoom);
+                          setImageRotation(firstUploadedImage.rotation);
+                          setCurrentlyEditingImageSlot("first");
+                          setShowImageEditor(true);
+                          setShowImageUpload(false);
+                        }}
+                        style={{ padding: "0px 6px" }}
+                        className="rounded-full bg-blue-600 text-white shadow-md hover:shadow-lg transition duration-200"
+                      >
+                        <i
+                          style={{ fontSize: "14px" }}
+                          className="bi bi-pencil-square"
+                        />
+                      </button>
+                      <button
+                        onClick={() => handleClearImage("first")}
+                        style={{ padding: "0px 6px" }}
+                        className="rounded-full bg-red-600 text-white shadow-md hover:bg-red-700 hover:shadow-lg transition duration-200"
+                      >
+                        <i
+                          style={{ fontSize: "14px" }}
+                          className="bi bi-trash3"
+                        ></i>
+                      </button>
+                    </div>
+                  )} */}
+                </div>
+
+                <div>
+                  {secondUploadedImage && (
+                    <div
+                      data-preview-container="second"
+                      className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
+                      style={{
+                        height: "80px",
+                        width: "80px",
+                        overflow: "hidden",
+                        // cursor: isDraggingPreview && draggingImageSlot === "second" ? "grabbing" : "grab"
+                      }}
+                      // onMouseDown={(e) => handlePreviewMouseDown(e, "second")}
+                      // onMouseEnter={() => setHoveredImageSlot("second")}
+                      // onMouseLeave={() => setHoveredImageSlot(null)}
+                    >
+                      <img
+                        src={secondUploadedImage.src}
+                        alt="Second Uploaded"
+                        className="absolute select-none"
+                        style={{
+                          borderRadius: "50%",
+                          height: "100%",
+                          width: "100%",
+                          objectFit: "cover",
+                          zIndex: 2,
+                          transform: `translate(${
+                            secondUploadedImage.position?.x || 0
+                          }px, ${
+                            secondUploadedImage.position?.y || 0
+                          }px) rotate(${
+                            secondUploadedImage.rotation || 0
+                          }deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
+                          filter: "grayscale(100%)",
+                          pointerEvents: "none",
+                        }}
+                        draggable="false"
+                        pointerEvents="none"
+                      />
+                      {/* Attractive move cursor symbol */}
+                      <div
+                        className="absolute pointer-events-none transition-all duration-200"
+                        style={{
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                          zIndex: 10,
+                          opacity:
+                            hoveredImageSlot === "second" ||
+                            (isDraggingPreview &&
+                              draggingImageSlot === "second")
+                              ? 1
+                              : 0,
+                        }}
+                      >
+                        <div className="bg-blue-500 rounded-full p-2 shadow-lg">
+                          <Move className="w-4 h-4 text-white" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  {/* {secondUploadedImage && (
+                    <div className="flex justify-center mt-1 space-x-2">
+                      <button
+                        onClick={() => {
+                          setEditingImageSrc(secondUploadedImage.src);
+                          setImagePosition(secondUploadedImage.position);
+                          setImageZoom(secondUploadedImage.zoom);
+                          setImageRotation(secondUploadedImage.rotation);
+                          setCurrentlyEditingImageSlot("second");
+                          setShowImageEditor(true);
+                          setShowImageUpload(false);
+                        }}
+                        style={{ padding: "0px 6px" }}
+                        className="rounded-full bg-blue-600 text-white shadow-md hover:shadow-lg transition duration-200"
+                      >
+                        <i
+                          style={{ fontSize: "14px" }}
+                          className="bi bi-pencil-square"
+                        />
+                      </button>
+                      <button
+                        onClick={() => handleClearImage("second")}
+                        style={{ padding: "0px 6px" }}
+                        className="rounded-full bg-red-600 text-white shadow-md hover:bg-red-700 hover:shadow-lg transition duration-200"
+                      >
+                        <i
+                          style={{ fontSize: "14px" }}
+                          className="bi bi-trash3"
+                        ></i>
+                      </button>
+                    </div>
+                  )} */}
+                </div>
+              </div>
+            )}
+
+            {/* Checkbox moved here after all requirements */}
+            <div className="mb-4">
+              <label className="flex items-baseline space-x-2">
+                <input
+                  type="checkbox"
+                  checked={agreeTerms}
+                  onChange={(e) => setAgreeTerms(e.target.checked)}
+                  className="rounded"
+                />
+                <span className="text-sm text-gray-700">
+                  I agree to the terms and conditions
+                </span>
+              </label>
+            </div>
+
+            {/* Upload First Image Button */}
+            {!firstUploadedImage && (
+              <div className="flex justify-center mt-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  id="image"
+                  onClick={() => handleUploadClick("first")}
+                  disabled={!agreeTerms}
+                  className={`px-4 py-2 rounded-md ${
+                    agreeTerms
+                      ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  } transition-colors`}
+                >
+                  Upload First Image
+                </button>
+              </div>
+            )}
+
+            {/* Upload Next Image Button */}
+            {firstUploadedImage && !secondUploadedImage && (
+              <div className="flex justify-center mt-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <button
+                  onClick={() => handleUploadClick("second")}
+                  disabled={!agreeTerms}
+                  className={`px-4 py-2 rounded-md ${
+                    agreeTerms
+                      ? "bg-yellow-400 text-black hover:bg-yellow-500"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  } transition-colors`}
+                >
+                  Upload Second Image
+                </button>
+              </div>
+            )}
+
+            {/* Edit/Clear Buttons for Each Image */}
+
+            {/* Overall Clear All Images button */}
+            {(firstUploadedImage || secondUploadedImage) && (
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={handleClearAllImages}
+                  className="py-2 px-4 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 transition-colors"
+                >
+                  Clear All Images
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {showImageEditor && (
+          <div ref={editorRef} className="mt-0 p-4 border rounded-md shadow-md">
+            <h4 className="text-lg font-bold mb-4">
+              Edit{" "}
+              {currentlyEditingImageSlot === "first"
+                ? "First"
+                : currentlyEditingImageSlot === "second"
+                ? "Second"
+                : ""}{" "}
+              Image
+            </h4>
+
+            <div className="flex flex-col items-center space-y-6 py-4">
+              <div
+                className="flex flex-col items-center"
+              >
+                  {/* {originalImageSrc && (
+    <img src={originalImageSrc} alt="Original" />
+  )} */}
+                <div
+                  ref={containerRef}
+                  className="bg-gray-700 w-64 h-64 rounded-full flex items-center justify-center overflow-hidden relative border-4 border-white shadow-md cursor-crosshair"
+                >
+                  <Cropper
+                    image={editingImageSrc}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={4 / 3}
+                    onCropChange={setCrop}
+                    onCropComplete={onCropComplete}
+                    onZoomChange={setZoom}
+                  />
+                </div>
+
+                {/* haaL  ;QKDW */}
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <MoveHorizontal className="h-5 w-5 text-gray-500" />
+              <p className="text-center">
+                Click anywhere to position image or drag to move
+              </p>
+            </div>
+
+            <div className="w-full space-y-4">
+              {/* Zoom control */}
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <label className="text-sm font-medium">Zoom</label>
+                  <span className="text-sm">{imageZoom}%</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <ZoomOut className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    value={[imageZoom]}
+                    min={50}
+                    max={200}
+                    step={1}
+                    onValueChange={(value) => setImageZoom(value[0])}
+                    className="flex-1"
+                  />
+                  <ZoomIn className="h-4 w-4 text-gray-500" />
+                </div>
+              </div>
+
+              {/* Rotation control */}
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <label className="text-sm font-medium">Rotation</label>
+                  <span className="text-sm">{imageRotation}°</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RotateCw className="h-4 w-4 text-gray-500" />
+                  <Slider
+                    value={[imageRotation]}
+                    min={0}
+                    max={360}
+                    step={5}
+                    onValueChange={(value) => setImageRotation(value[0])}
+                    className="flex-1"
+                  />
+                  <RotateCw className="h-4 w-4 text-gray-500" />
+                </div>
+              </div>
+            </div>
+            <br />
+            <p className="text-gray-600 text-sm text-center">
+              Since Cavellea are round, it doesn't matter if your
+              <br />
+              image is upside down or sideways!
+            </p>
+            <br />
+            <button
+              onClick={handleResetImageEdits}
+              className="flex items-center space-x-2 text-gray-800 hover:text-gray-600 text-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-5 w-5"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1z"
+                  clipRule="evenodd"
+                />
+                <path
+                  fillRule="evenodd"
+                  d="M10.146 8.146a.5.5 0 01.708 0L12 9.293l1.146-1.147a.5.5 0 11.708.708L12.707 10l1.147 1.146a.5.5 0 01-.708.708L12 10.707l-1.146 1.147a.5.5 0 010-.708z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span>Reset position</span>
+            </button>
+            <br />
+            <div className="flex w-full justify-between space-x-4">
+              <button
+                onClick={() => {
+                  setShowImageEditor(false);
+                  setShowImageUpload(true);
+                }}
+                className="w-full border-2 border-brown-800 text-brown-800 font-bold py-3 px-6 rounded-full"
+              >
+                Back
+              </button>
+              <button
+                id="up"
+                onClick={handleImageConfirm}
+                className="w-full bg-yellow-400 text-black font-bold py-3 px-6 rounded-full hover:bg-yellow-500"
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Text Option */}
         <div
           className={`flex items-center space-x-3 p-3 rounded-lg ${
@@ -508,6 +1063,80 @@ const handleMouseDown = (e) => {
             </div>
           </a>
         </div>
+        {/* Text Fields Panel */}
+        {showTextFields && (
+          <div
+            id="select-text"
+            className="mt-0 p-4 border rounded-md shadow-md"
+          >
+            <h4 className="text-lg font-bold mb-4">Add Your Text</h4>
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="firstLine"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  First Line
+                </label>
+                <input
+                  type="text"
+                  id="firstLine"
+                  value={tempFirstLine}
+                  onChange={(e) => setTempFirstLine(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Type first line"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="secondLine"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  Second Line
+                </label>
+                <input
+                  type="text"
+                  id="secondLine"
+                  value={tempSecondLine}
+                  onChange={(e) => setTempSecondLine(e.target.value)}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Type second line"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Font Style
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {fontStyles.map((style) => (
+                    <button
+                      key={style}
+                      onClick={() => setTempFontStyle(style)}
+                      className={`px-3 py-2 text-sm ${
+                        tempFontStyle === style
+                          ? "bg-yellow-100 border-yellow-500 border-2"
+                          : "bg-gray-100"
+                      } rounded-md transition-colors`}
+                    >
+                      {style}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={handleTextConfirm}
+                  className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
+                >
+                  Apply Text
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Clipart Option */}
         <div
@@ -543,367 +1172,11 @@ const handleMouseDown = (e) => {
         <div className="mt-2 text-center"></div>
       </RadioGroup>
 
-      {/* Text Fields Panel */}
-      {showTextFields && (
-        <div id="select-text" className="mt-6 p-4 border rounded-md shadow-md">
-          <h4 className="text-lg font-bold mb-4">Add Your Text</h4>
-          <div className="space-y-4">
-            <div>
-              <label
-                htmlFor="firstLine"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                First Line
-              </label>
-              <input
-                type="text"
-                id="firstLine"
-                value={tempFirstLine}
-                onChange={(e) => setTempFirstLine(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Type first line"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="secondLine"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Second Line
-              </label>
-              <input
-                type="text"
-                id="secondLine"
-                value={tempSecondLine}
-                onChange={(e) => setTempSecondLine(e.target.value)}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                placeholder="Type second line"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Font Style
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {fontStyles.map((style) => (
-                  <button
-                    key={style}
-                    onClick={() => setTempFontStyle(style)}
-                    className={`px-3 py-2 text-sm ${
-                      tempFontStyle === style
-                        ? "bg-yellow-100 border-yellow-500 border-2"
-                        : "bg-gray-100"
-                    } rounded-md transition-colors`}
-                  >
-                    {style}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={handleTextConfirm}
-                className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition-colors"
-              >
-                Apply Text
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showImageUpload && (
-        <div
-          ref={imageUploadRef}
-          className="mt-6 p-6 border rounded-md shadow-md bg-white space-y-4 mb-0"
-        >
-          <div id="upload-image" className="flex flex-row items-center justify-center gap-4"></div>
-
-          <div className="mt-6">
-            <h4 className="text-md font-semibold mb-2">Image Requirements</h4>
-            <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-              <li>Upload a clear .jpg, .jpeg, or .png (max 15MB).</li>
-              {showMore && (
-                <>
-                  <li>Only 1–2 close faces allowed. No arms or full body.</li>
-                  <li>No copyrighted/logos unless with written permission.</li>
-                  <li>Backgrounds will be removed; image prints in black. </li>
-                </>
-              )}
-            </ul>
-          </div>
-          <div className="mt-2">
-            <button 
-              onClick={() => setShowMore(!showMore)}
-              className="relative inline-flex items-center gap-1 text-sm font-medium text-blue-600 transition duration-300 ease-in-out hover:text-blue-800 group"
-            >
-              <span>{showMore ? "View Less" : "View More"}</span>
-              <svg
-                className={`w-4 h-4 transition-transform duration-300 transform ${
-                  showMore ? "rotate-180" : ""
-                } group-hover:translate-x-1`}
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-          </div>
-          <hr className="mt-4 border-gray-300" />
-
-          {/* Image preview section with draggable images */}
-          {(firstUploadedImage || secondUploadedImage) && (
-            <div className="mb-4 text-center w-full flex justify-center gap-4">
-              {firstUploadedImage && (
-                <div
-                  data-preview-container="first"
-                  className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
-                  style={{ 
-                    height: "80px", 
-                    width: "80px", 
-                    overflow: "hidden",
-                    // cursor: isDraggingPreview && draggingImageSlot === "first" ? "grabbing" : "grab"
-                  }}
-                  // onMouseDown={(e) => handlePreviewMouseDown(e, "first")}
-                  // onMouseEnter={() => setHoveredImageSlot("first")}
-                  // onMouseLeave={() => setHoveredImageSlot(null)}
-                >
-                  <img
-                    src={firstUploadedImage.src}
-                    alt="First Uploaded"
-                    className="absolute select-none"
-                    style={{
-                      borderRadius: "50%",
-                      height: "100%",
-                      width: "100%",
-                      objectFit: "cover",
-                      zIndex: 1,
-                      transform: `translate(${
-                        firstUploadedImage.position?.x || 0
-                      }px, ${firstUploadedImage.position?.y || 0}px) rotate(${
-                        firstUploadedImage.rotation || 0
-                      }deg) scale(${firstUploadedImage.zoom / 100 || 1})`,
-                      filter: "grayscale(100%)",
-                      pointerEvents: "none",
-                    }}
-                    draggable="false"
-                    pointerEvents="none"
-                  />
-                  {/* Attractive move cursor symbol */}
-                  <div 
-                    className="absolute pointer-events-none transition-all duration-200"
-                    style={{
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      zIndex: 10,
-                      opacity: (hoveredImageSlot === "first" || (isDraggingPreview && draggingImageSlot === "first")) ? 1 : 0,
-                    }}
-                  >
-                    <div className="bg-blue-500 rounded-full p-2 shadow-lg">
-                      <Move className="w-4 h-4 text-white" />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {secondUploadedImage && (
-                <div
-                  data-preview-container="second"
-                  className="rounded-full border-2 border-dashed border-gray-300 flex items-center justify-center relative transition-all duration-200 hover:border-blue-400 hover:shadow-lg"
-                  style={{ 
-                    height: "80px", 
-                    width: "80px", 
-                    overflow: "hidden",
-                    // cursor: isDraggingPreview && draggingImageSlot === "second" ? "grabbing" : "grab"
-                  }}
-                  // onMouseDown={(e) => handlePreviewMouseDown(e, "second")}
-                  // onMouseEnter={() => setHoveredImageSlot("second")}
-                  // onMouseLeave={() => setHoveredImageSlot(null)}
-                >
-                  <img
-                    src={secondUploadedImage.src}
-                    alt="Second Uploaded"
-                    className="absolute select-none"
-                    style={{
-                      borderRadius: "50%",
-                      height: "100%",
-                      width: "100%",
-                      objectFit: "cover",
-                      zIndex: 2,
-                      transform: `translate(${
-                        secondUploadedImage.position?.x || 0
-                      }px, ${secondUploadedImage.position?.y || 0}px) rotate(${
-                        secondUploadedImage.rotation || 0
-                      }deg) scale(${secondUploadedImage.zoom / 100 || 1})`,
-                      filter: "grayscale(100%)",
-                      pointerEvents: "none",
-                    }}
-                    draggable="false"
-                    pointerEvents="none"
-                  />
-                  {/* Attractive move cursor symbol */}
-                  <div 
-                    className="absolute pointer-events-none transition-all duration-200"
-                    style={{
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      zIndex: 10,
-                      opacity: (hoveredImageSlot === "second" || (isDraggingPreview && draggingImageSlot === "second")) ? 1 : 0,
-                    }}
-                  >
-                    <div className="bg-blue-500 rounded-full p-2 shadow-lg">
-                      <Move className="w-4 h-4 text-white" />
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Checkbox moved here after all requirements */}
-          <div className="mb-4">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={agreeTerms}
-                onChange={(e) => setAgreeTerms(e.target.checked)}
-                className="rounded"
-              />
-              <span className="text-sm text-gray-700">
-                I agree to the terms and conditions
-              </span>
-            </label>
-          </div>
-
-          {/* Upload First Image Button */}
-          {!firstUploadedImage && (
-            <div className="flex justify-center mt-2">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-              />
-              <button id="image"
-                onClick={() => handleUploadClick("first")}
-                disabled={!agreeTerms}
-                className={`px-4 py-2 rounded-md ${
-                  agreeTerms
-                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                } transition-colors`}
-              >
-                Upload First Image
-              </button>
-            </div>
-          )}
-
-          {/* Upload Next Image Button */}
-          {firstUploadedImage && !secondUploadedImage && (
-            <div className="flex justify-center mt-2">
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-              />
-              <button
-                onClick={() => handleUploadClick("second")}
-                disabled={!agreeTerms}
-                className={`px-4 py-2 rounded-md ${
-                  agreeTerms
-                    ? "bg-yellow-400 text-black hover:bg-yellow-500"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                } transition-colors`}
-              >
-                Upload Second Image
-              </button>
-            </div>
-          )}
-
-          {/* Edit/Clear Buttons for Each Image */}
-          {firstUploadedImage && (
-            <div className="flex justify-center mt-2 space-x-4">
-              <button
-                onClick={() => {
-                  setEditingImageSrc(firstUploadedImage.src);
-                  setImagePosition(firstUploadedImage.position);
-                  setImageZoom(firstUploadedImage.zoom);
-                  setImageRotation(firstUploadedImage.rotation);
-                  setCurrentlyEditingImageSlot("first");
-                  setShowImageEditor(true);
-                  setShowImageUpload(false);
-                }}
-                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:shadow-lg transition duration-200"
-              >
-                Edit First Image
-              </button>
-              <button
-                onClick={() => handleClearImage("first")}
-                className="px-5 py-2 rounded-lg bg-red-600 text-white font-semibold shadow-md hover:bg-red-700 hover:shadow-lg transition duration-200"
-              >
-                🗑️ Clear First
-              </button>
-            </div>
-          )}
-
-          {secondUploadedImage && (
-            <div className="flex justify-center mt-2 space-x-4">
-              <button
-                onClick={() => {
-                  setEditingImageSrc(secondUploadedImage.src);
-                  setImagePosition(secondUploadedImage.position);
-                  setImageZoom(secondUploadedImage.zoom);
-                  setImageRotation(secondUploadedImage.rotation);
-                  setCurrentlyEditingImageSlot("second");
-                  setShowImageEditor(true);
-                  setShowImageUpload(false);
-                }}
-                className="px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 hover:shadow-lg transition duration-200"
-              >
-                Edit Second Image
-              </button>
-              <button
-                onClick={() => handleClearImage("second")}
-                className="px-5 py-2 rounded-lg bg-red-600 text-white font-semibold shadow-md hover:bg-red-700 hover:shadow-lg transition duration-200"
-              >
-                🗑️ Clear Second
-              </button>
-            </div>
-          )}
-
-          {/* Overall Clear All Images button */}
-          {(firstUploadedImage || secondUploadedImage) && (
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={handleClearAllImages}
-                className="py-2 px-4 bg-yellow-400 text-black rounded-md hover:bg-yellow-500 transition-colors"
-              >
-                Clear All Images
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Clipart Panel */}
       {showClipartPanel && (
         <div
           id="select-clipart"
-          className="mt-6 p-4 border rounded-md shadow-md"
+          className="mt-0 p-4 border rounded-md shadow-md"
         >
           <div className="flex justify-between items-center mb-4">
             <h4 className="text-lg font-bold">Choose Clipart</h4>
@@ -965,212 +1238,6 @@ const handleMouseDown = (e) => {
       )}
 
       {/* Inline Image Editor */}
-
-        {showImageEditor && (
-  <div ref={editorRef} className="mt-6 p-4 border rounded-md shadow-md">
-    <h4 className="text-lg font-bold mb-4">
-      Edit{" "}
-      {currentlyEditingImageSlot === "first"
-        ? "First"
-        : currentlyEditingImageSlot === "second"
-        ? "Second"
-        : ""}{" "}
-      Image
-    </h4>
-
-    <div className="flex flex-col items-center space-y-6 py-4">
-      <div
-        className="flex flex-col items-center"
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-      >
-        <div
-          ref={containerRef}
-          className="bg-gray-700 w-64 h-64 rounded-full flex items-center justify-center overflow-hidden relative border-4 border-white shadow-md cursor-crosshair"
-         onMouseDown={handleMouseDown}
-  onMouseMove={handleMouseMove}
-  onMouseUp={handleMouseUp}
-  onMouseLeave={handleMouseUp}
-        >
-          {editingImageSrc && (
-            <img
-              ref={imageRef}
-              src={editingImageSrc}
-              alt="Editing"
-              className="absolute object-cover select-none pointer-events-none"
-              style={{
-                transform: `translate(${imagePosition.x}px, ${imagePosition.y}px) rotate(${imageRotation}deg) scale(${imageZoom / 100})`,
-                filter: "grayscale(100%)",
-                transition: isDragging ? "none" : "transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                minWidth: "100%",
-                minHeight: "100%",
-                willChange: "transform",
-              }}
-              onMouseDown={handleMouseDown}
-              draggable={false}
-            />
-          )}
-
-          {/* Enhanced Cursor Crosshair */}
-          {showCursor && !isDragging && (
-            <div
-              className="absolute pointer-events-none z-20"
-              style={{
-                left: cursorPosition.x,
-                top: cursorPosition.y,
-                transform: "translate(-50%, -50%)",
-                transition: "opacity 0.3s ease, transform 0.3s ease",
-                opacity: showCursor ? 1 : 0,
-                // make sure cursor stays within bounds visually
-                userSelect: "none",
-              }}
-            >
-              <div className="relative w-8 h-8">
-                {/* Soft-glow rings with subtle pulsing animation */}
-                <div
-                  className="absolute inset-0 rounded-full bg-blue-400/30"
-                  style={{
-                    filter: "blur(6px)",
-                    animation: "pulseSoftGlow 3s ease-in-out infinite",
-                    animationTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-                  }}
-                />
-                <div
-                  className="absolute inset-1 rounded-full bg-blue-500/20"
-                  style={{
-                    filter: "blur(3px)",
-                    animation: "pulseSoftGlow 3s ease-in-out infinite",
-                    animationDelay: "1.5s",
-                    animationTimingFunction: "cubic-bezier(0.4, 0, 0.2, 1)",
-                  }}
-                />
-
-                {/* Crosshair lines with subtle glow */}
-                <div
-                  className="absolute top-0 left-1/2 w-[2px] h-full bg-blue-400 rounded"
-                  style={{ boxShadow: "0 0 6px 2px rgba(96, 165, 250, 0.6)" }}
-                />
-                <div
-                  className="absolute top-1/2 left-0 w-full h-[2px] bg-blue-400 rounded"
-                  style={{ boxShadow: "0 0 6px 2px rgba(96, 165, 250, 0.6)" }}
-                />
-
-                {/* Center dot with stronger glow */}
-                <div
-                  className="absolute top-1/2 left-1/2 w-3 h-3 bg-blue-600 rounded-full border border-white shadow-lg"
-                  style={{
-                    transform: "translate(-50%, -50%)",
-                    boxShadow: "0 0 8px 3px rgba(59, 130, 246, 0.8)",
-                  }}
-                />
-              </div>
-            </div>
-          )}
-  {/* image cursor editor end */}
-
-
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <MoveHorizontal className="h-5 w-5 text-gray-500" />
-            <p className="text-center">Click anywhere to position image or drag to move</p>
-          </div>
-
-          <div className="w-full space-y-4">
-            {/* Zoom control */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="text-sm font-medium">Zoom</label>
-                <span className="text-sm">{imageZoom}%</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <ZoomOut className="h-4 w-4 text-gray-500" />
-                <Slider
-                  value={[imageZoom]}
-                  min={50}
-                  max={200}
-                  step={1}
-                  onValueChange={(value) => setImageZoom(value[0])}
-                  className="flex-1"
-                />
-                <ZoomIn className="h-4 w-4 text-gray-500" />
-              </div>
-            </div>
-
-            {/* Rotation control */}
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <label className="text-sm font-medium">Rotation</label>
-                <span className="text-sm">{imageRotation}°</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RotateCw className="h-4 w-4 text-gray-500" />
-                <Slider
-                  value={[imageRotation]}
-                  min={0}
-                  max={360}
-                  step={5}
-                  onValueChange={(value) => setImageRotation(value[0])}
-                  className="flex-1"
-                />
-                <RotateCw className="h-4 w-4 text-gray-500" />
-              </div>
-            </div>
-          </div>
-          <br />
-          <p className="text-gray-600 text-sm text-center">
-            Since Cavellea are round, it doesn't matter if your
-            <br />
-            image is upside down or sideways!
-          </p>
-          <br />
-          <button
-            onClick={handleResetImageEdits}
-            className="flex items-center space-x-2 text-gray-800 hover:text-gray-600 text-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-5 w-5"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1z"
-                clipRule="evenodd"
-              />
-              <path
-                fillRule="evenodd"
-                d="M10.146 8.146a.5.5 0 01.708 0L12 9.293l1.146-1.147a.5.5 0 11.708.708L12.707 10l1.147 1.146a.5.5 0 01-.708.708L12 10.707l-1.146 1.147a.5.5 0 010-.708z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <span>Reset position</span>
-          </button>
-          <br />
-          <div className="flex w-full justify-between space-x-4">
-            <button
-              onClick={() => {
-                setShowImageEditor(false);
-                setShowImageUpload(true);
-              }}
-              className="w-full border-2 border-brown-800 text-brown-800 font-bold py-3 px-6 rounded-full"
-            >
-              Back
-            </button>
-            <button
-              id="up"
-              onClick={handleImageConfirm}
-              className="w-full bg-yellow-400 text-black font-bold py-3 px-6 rounded-full hover:bg-yellow-500"
-            >
-              Confirm
-            </button>
-            </div>
-        </div>
-      )}
     </div>
   );
 };
