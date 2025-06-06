@@ -35,8 +35,8 @@ const HoverToolbar = ({ onReset }) => {
 
   return (
     <TooltipProvider>
-      <div className="fixed right-6 top-32 z-60">
-        <div className="flex flex-col gap-3">
+      <div className="fixed right-6 top-32 ">
+        <div className="flex flex-col gap-3 z-999">
           {/* FAQ */}
           <HoverCard>
             <HoverCardTrigger asChild>

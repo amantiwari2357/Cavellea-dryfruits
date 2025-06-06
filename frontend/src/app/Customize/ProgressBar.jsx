@@ -60,14 +60,13 @@ const ProgressBar = ({ currentStep }) => {
       {/* Stripe animation style */}
       <style jsx>{`
         .progress-fill {
-          background-image: repeating-linear-gradient(
+          background-image: linear-gradient(
             45deg,
             #10b981,
             #10b981 10px,
             #059669 10px,
             #059669 20px
           );
-          animation: progressMove 1s linear infinite;
         }
 
         @keyframes progressMove {
